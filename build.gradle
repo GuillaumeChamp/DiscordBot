@@ -1,0 +1,38 @@
+plugins {
+    id'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'application'
+}
+apply plugin: 'java'
+apply plugin: 'idea'
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+mainClassName = 'Main'
+sourceCompatibility = targetCompatibility = 1.8
+group 'com.bot'
+version '1.0-SNAPSHOT'
+def jdaVersion = '5.0.0-alpha.21'
+repositories {
+    mavenCentral()
+    maven { // on Kotlin DSL use `maven("https://m2.dv8tion.net/releases")` instead
+        url "https://m2.dv8tion.net/releases"
+    }
+}
+
+dependencies {
+    implementation("net.dv8tion:JDA:$jdaVersion")
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    // https://mvnrepository.com/artifact/org.awaitility/awaitility
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '3.0.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+compileJava.options.encoding = 'UTF-8'
