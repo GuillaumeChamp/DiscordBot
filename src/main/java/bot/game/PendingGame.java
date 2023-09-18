@@ -15,28 +15,29 @@ public class PendingGame implements GameType {
     private final ArrayList<Member> players;
     private final TextChannel channel;
 
-    public PendingGame(Guild server,int id, int limit) {
+    public PendingGame(Guild server, int id, int limit) {
         this.players = new ArrayList<>();
         this.id = id;
-        this.limit=limit;
-        channel = ChannelManager.createChannel(server,"game"+id);
-        channel.sendMessage("A new game will start !\n/join "+id+" to join it ("+limit+" players max )").queue();
+        this.limit = limit;
+        channel = ChannelManager.createChannel(server, "game" + id);
+        channel.sendMessage("A new game will start !\n/join " + id + " to join it (" + limit + " players max )").queue();
     }
+
     public void addPlayer(Member member) throws ProcessingException {
         if (isStarted) throw new ProcessingException("the game is already start");
-        if (players.size()>=limit) throw new ProcessingException("The game is full");
+        if (players.size() >= limit) throw new ProcessingException("The game is full");
         players.add(member);
-        channel.sendMessage(member.getEffectiveName()+ " join the game").queue();
-        if (players.size()==limit) this.startGame();
+        channel.sendMessage(member.getEffectiveName() + " join the game").queue();
+        if (players.size() == limit) this.startGame();
     }
 
     public Game startGame() throws ProcessingException {
         if (isStarted) throw new ProcessingException("the game is already in progress");
-        isStarted=true;
+        isStarted = true;
         return new Game(id, players, channel);
     }
 
-    public int getGameId() {
+    public Integer getGameId() {
         return id;
     }
 

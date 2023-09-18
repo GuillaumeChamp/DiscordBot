@@ -14,41 +14,49 @@ public class Composition {
 
     /**
      * Create a new composition performing operations depending on the game size
+     * To add new role you need to precise added card to the stack and removed one
+     * If stack overlap the number of player, may remove before draw
+     *
      * @param gameSize number of role to assign (in fact can be more than that to add randomness on number of present roles)
      */
-    public Composition(int gameSize){
-        numberWerewolf = (int) Math.floor(0.27*(gameSize-2));
-        numberVillager = (gameSize-2)-numberWerewolf;
+    public Composition(int gameSize) {
+        numberWerewolf = (int) Math.floor(0.3 * (gameSize));
+        numberVillager = (gameSize) - numberWerewolf;
         for (int i = 0; i < numberWerewolf; i++) {
             stack.add(EnhanceRoleType.simpleWolf);
         }
         for (int i = 0; i < numberVillager; i++) {
             stack.add(EnhanceRoleType.simpleVillager);
         }
-        if (gameSize>4) {
+        if (gameSize > 4) {
+            stack.remove(EnhanceRoleType.simpleVillager);
             stack.add(EnhanceRoleType.seer);
+            stack.remove(EnhanceRoleType.simpleVillager);
             stack.add(EnhanceRoleType.witch);
-        }
-        else {
-            stack.add(EnhanceRoleType.simpleWolf);
-            stack.add(EnhanceRoleType.simpleVillager);
         }
     }
 
     /**
      * Return a random role which is in the remaining pool of role
+     *
      * @param m member to assign
      * @return a new random type role instance
      */
-    public Role getARole(Member m){
-        double rng = Math.random();
-        EnhanceRoleType realRole = stack.get((int) Math.floor(rng*stack.size()));
+    public Role getARole(Member m) {
+        EnhanceRoleType realRole = drawARole();
         if (realRole.equals(EnhanceRoleType.witch)) return new WitchRole(m);
-        return new Role(m,realRole);
+        return new Role(m, realRole);
+    }
+
+    public EnhanceRoleType drawARole() {
+        double rng = Math.random();
+        int position = (int) Math.floor(rng * stack.size());
+        return stack.remove(position);
     }
 
     /**
      * Use for balance test
+     *
      * @return the roles in the stack
      */
     @Override

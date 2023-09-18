@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
+import java.util.logging.Level;
 
 public class PropertyReader {
     private static final String BOT_DATA_PATH = "src/main/resources/botConfiguration.properties";
@@ -17,13 +18,12 @@ public class PropertyReader {
      * Allow to retrieve value of a key in botConfiguration.properties
      * @param key key int the file
      */
-    public static String getBotProperty(String key) throws IOException {
+    public static String getBotProperty(String key){
         Properties properties = new Properties();
         try (InputStream stream = Files.newInputStream(Paths.get(BOT_DATA_PATH))) {
             properties.load(stream);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
+            BotLogger.log(Level.SEVERE,"Unable to read property " + key);
         }
         return properties.getProperty(key);
     }
@@ -37,7 +37,7 @@ public class PropertyReader {
         try (InputStream stream = Files.newInputStream(Paths.get(path))) {
             properties.load(stream);
         } catch (IOException e) {
-            e.printStackTrace();
+            BotLogger.log(Level.SEVERE,"Unable to recover text " + (isFR ? "FR" : "EN") + " " + key);
             throw e;
         }
         return properties.getProperty(key);
