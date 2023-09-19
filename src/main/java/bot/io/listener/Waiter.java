@@ -8,15 +8,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Waiter implements Runnable {
     private static Waiter waiter;
     private final HashMap<ParallelAction, Game> pendingList;
-    private final HashMap<ParallelAction, LocalDateTime> watchList;
+    private final ConcurrentHashMap<ParallelAction, LocalDateTime> watchList;
 
     private Waiter() {
         pendingList = new HashMap<>(3);
-        watchList = new HashMap<>(3);
+        watchList = new ConcurrentHashMap<>(3);
     }
 
     @Override
