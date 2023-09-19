@@ -48,7 +48,7 @@ public class DiscordTestUtil {
 
     private static void initialize() {
         if (api == null) {
-            String botToken = System.getenv("BOT-TOKEN");
+            String botToken = System.getenv("BOT_TOKEN");
             assertThat(botToken).isNotNull();
             api = JDABuilder.createLight(botToken, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
                     .addEventListeners(new CommandListener())

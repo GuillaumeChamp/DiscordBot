@@ -14,7 +14,7 @@ public class Main {
     static JDA api;
 
     public static void main(String[] args) throws InterruptedException {
-        String botToken = System.getenv("BOT-TOKEN");
+        String botToken = System.getenv("BOT_TOKEN");
         api = JDABuilder.createLight(botToken, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
                 .addEventListeners(new CommandListener())
                 .build();

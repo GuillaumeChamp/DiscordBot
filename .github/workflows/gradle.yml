@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: test variable
+        run: echo "The API key is:${{secrets.TOKEN}}"
       - uses: actions/checkout@v3
       - name: Set up JDK 11
         uses: actions/setup-java@v3
