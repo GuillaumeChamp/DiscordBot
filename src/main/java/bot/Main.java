@@ -2,7 +2,6 @@ package bot;
 
 import bot.io.BotLogger;
 import bot.io.ChannelManager;
-import bot.io.PropertyReader;
 import bot.io.listener.CommandListener;
 import bot.io.listener.CommandStore;
 import net.dv8tion.jda.api.JDA;
@@ -15,7 +14,8 @@ public class Main {
     static JDA api;
 
     public static void main(String[] args) throws InterruptedException {
-        String botToken = PropertyReader.getBotProperty("bot-token");
+        //String botToken = PropertyReader.getBotProperty("bot-token");
+        String botToken = System.getenv("BOT-TOKEN");
         api = JDABuilder.createLight(botToken, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
                 .addEventListeners(new CommandListener())
                 .build();
