@@ -2,10 +2,12 @@ package bot.game;
 
 import bot.game.game.mechanism.*;
 import bot.game.roles.*;
+import bot.io.BotConfig;
 import bot.io.ChannelManager;
 import bot.io.ProcessingException;
 import bot.io.listener.GuildManager;
 import bot.io.listener.Waiter;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
@@ -18,6 +20,7 @@ public class Game extends Thread implements GameType {
     private final TextChannel channel;
     private final Integer id;
     private final List<Role> roles;
+    private final Guild currentServer;
 
     /**
      * Start a game
@@ -36,11 +39,16 @@ public class Game extends Thread implements GameType {
         }
         this.roles = temporaryRoleList;
         this.channel = channel;
-        this.tellRoles();
-        if (channel != null) {
-            ChannelManager.createRestrictedChannel(channel.getGuild(), RoleManagement.getAll(temporaryRoleList, RoleType.werewolf), "game" + id + "wolf");
-            channel.sendMessage("The game has started !").queue();
+        if (channel == null) {
+            this.currentServer = null;
+        } else {
+            this.currentServer = channel.getGuild();
+            if (!BotConfig.isSilence) {
+                ChannelManager.createRestrictedChannel(currentServer, RoleManagement.getAll(temporaryRoleList, RoleType.werewolf), "game" + id + "wolf");
+                channel.sendMessage("The game has started !").queue();
+            }
         }
+        this.tellRoles();
         this.start();
     }
 
@@ -52,28 +60,30 @@ public class Game extends Thread implements GameType {
      */
     private void playTurn() throws GameException, InterruptedException {
         nbTurn++;
-        channel.sendMessage("You have 30 seconds to vote for someone (/vote)").queue();
+        sendPublicMessage("You have 30 seconds to vote for someone (/vote)");
         playDayTime();
-        channel.sendMessage("This is now the night be careful to not die").queue();
+        sendPublicMessage("This is now the night be careful to not die");
         playNightTime();
     }
 
     private void playNightTime() throws InterruptedException, GameException {
         if (RoleManagement.isRoleIn(roles, EnhanceRoleType.seer)) {
-            channel.sendMessage("Seer turn for 10 sec").queue();
+            sendPublicMessage("Seer turn for 10 sec");
             try {
-                ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You can spec someone (/see name) you have 10 s");
+                if (!BotConfig.isSilence)
+                    ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You can spec someone (/see name) you have 10 s");
                 SeerAction action = new SeerAction(roles);
-                GuildManager.getInterface(channel.getGuild()).registerAction(id, action);
+                GuildManager.getInterface(currentServer).registerAction(id, action);
                 Thread.sleep(10000);
-                ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You have spec " + action.getResult().get(0));
+                if (!BotConfig.isSilence)
+                    ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You have spec " + action.getResult().get(0));
             } catch (ProcessingException e) {
                 throw new RuntimeException(e);
             }
         }
-        channel.sendMessage("It's time for the hungry boys (30 sec)").queue();
+        sendPublicMessage("It's time for the hungry boys (30 sec)");
         Vote vote = new Vote(VoteType.werewolf, roles);
-        GuildManager.getInterface(channel.getGuild()).registerAction(id, vote);
+        GuildManager.getInterface(currentServer).registerAction(id, vote);
         Thread.sleep(30000); //DO NOT USE IN THE MAIN THREAD
         try {
             Role eliminated = vote.getResult().get(0);
@@ -81,14 +91,14 @@ public class Game extends Thread implements GameType {
             else manageDeath(eliminated);
         } catch (ProcessingException e) {
             if (e.getClass() == GameException.class) throw (GameException) e;
-            channel.sendMessage(e.getMessage()).queue();
+            sendPublicMessage(e.getMessage());
             if (RoleManagement.isRoleIn(roles, EnhanceRoleType.witch)) playWitch(null);
         }
     }
 
     private void playDayTime() throws InterruptedException, GameException {
         Vote vote = new Vote(VoteType.all, roles);
-        GuildManager.getInterface(channel.getGuild()).registerAction(id, vote);
+        if (!BotConfig.isSilence) GuildManager.getInterface(currentServer).registerAction(id, vote);
         Thread.sleep(30000); //DO NOT USE IN THE MAIN THREAD
         vote.terminate();
         try {
@@ -96,20 +106,24 @@ public class Game extends Thread implements GameType {
             manageDeath(eliminated);
         } catch (ProcessingException e) {
             if (e.getClass() == GameException.class) throw (GameException) e;
-            channel.sendMessage(e.getMessage()).queue();
+            sendPublicMessage(e.getMessage());
         }
     }
 
     private void playWitch(Role eliminated) throws GameException {
         try {
-            channel.sendMessage("The magic can appear ...(15 sec)").queue();
+            sendPublicMessage("The magic can appear ...(15 sec)");
             WitchRole witch = (WitchRole) RoleManagement.getByRole(roles, EnhanceRoleType.witch);
             if (!witch.isHealingAvailable() && !witch.isKillingAvailable()) {
-                if (witch.isHealingAvailable() || eliminated != null)
-                    ChannelManager.sendPrivateMessage(witch.getOwner(), "The wolf are about to eat " + eliminated.getOwner().getEffectiveName());
-                ChannelManager.sendPrivateMessage(witch.getOwner(), "You can still kill or save someone (/kill name or /save name) you have 15 s");
+                if (witch.isHealingAvailable() || eliminated != null) {
+                    if (!BotConfig.isSilence) {
+                        ChannelManager.sendPrivateMessage(witch.getOwner(), "The wolf are about to eat " + eliminated.getOwner().getEffectiveName());
+                    }
+                }
+                if (!BotConfig.isSilence)
+                    ChannelManager.sendPrivateMessage(witch.getOwner(), "You can still kill or save someone (/kill name or /save name) you have 15 s");
                 WitchAction action = new WitchAction(EnhanceRoleType.witch, roles, eliminated);
-                GuildManager.getInterface(channel.getGuild()).registerAction(id, action);
+                GuildManager.getInterface(currentServer).registerAction(id, action);
                 Waiter.register(this, action);
                 this.wait();
                 ArrayList<Role> death = action.getResult();
@@ -137,8 +151,8 @@ public class Game extends Thread implements GameType {
             eliminated.getOwner().mute(true).queue();
         } catch (Exception ignored) {
         }
-        channel.sendMessage("The village is now smaller ... : " + eliminated.getOwner().getUser().getName() + " has disappear !").queue();
-        channel.sendMessage("Its role was : " + eliminated.getRealRole()).queue();
+        sendPublicMessage("The village is now smaller ... : " + eliminated.getOwner().getUser().getName() + " has disappear !");
+        sendPublicMessage("Its role was : " + eliminated.getRealRole());
         RoleManagement.checkWin(roles);
     }
 
@@ -149,16 +163,19 @@ public class Game extends Thread implements GameType {
      */
     private void endOfGame(GameException e) {
         this.isActive = false;
-        channel.sendMessage("End Of Game !\n" + e.getMessage()).queue();
-        GuildManager.getInterface(channel.getGuild()).terminateGame(this);
+        sendPublicMessage("End Of Game !\n" + e.getMessage());
+        GuildManager.getInterface(currentServer).terminateGame(this);
     }
 
     /**
      * On usage methode use to tell to each player their roles in private
      */
     private void tellRoles() {
-        for (Role m : roles)
-            ChannelManager.sendPrivateMessage(m.getOwner(), "your role is :" + m.getRealRole());
+        for (Role player : roles) {
+            if (!BotConfig.isSilence) {
+                ChannelManager.sendPrivateMessage(player.getOwner(), "your role is :" + player.getRealRole());
+            }
+        }
     }
 
     @Override
@@ -190,6 +207,11 @@ public class Game extends Thread implements GameType {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
 
+    private void sendPublicMessage(String message) {
+        if (!BotConfig.isSilence) {
+            channel.sendMessage(message).queue();
+        }
     }
 }

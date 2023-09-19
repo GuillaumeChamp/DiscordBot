@@ -1,5 +1,6 @@
 package util;
 
+import bot.io.BotConfig;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.junit.jupiter.api.AfterAll;
@@ -13,6 +14,7 @@ public abstract class AbstractDiscordTest {
     public static void setup() {
         testChannel = DiscordTestUtil.createTestChannel();
         testMember = DiscordTestUtil.getOwner();
+        BotConfig.isSilence = Boolean.TRUE;
     }
 
     @AfterAll
