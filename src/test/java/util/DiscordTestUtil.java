@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class DiscordTestUtil {
     private static JDA api;
 
@@ -47,6 +49,7 @@ public class DiscordTestUtil {
     private static void initialize() {
         if (api == null) {
             String botToken = System.getenv("BOT-TOKEN");
+            assertThat(botToken).isNotNull();
             api = JDABuilder.createLight(botToken, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
                     .addEventListeners(new CommandListener())
                     .build();
