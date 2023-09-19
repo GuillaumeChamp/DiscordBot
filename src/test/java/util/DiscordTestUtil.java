@@ -53,7 +53,7 @@ public class DiscordTestUtil {
             try {
                 api.awaitReady();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Exception occurred during init" + e);
             }
         }
     }
