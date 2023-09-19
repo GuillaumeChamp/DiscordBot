@@ -33,5 +33,5 @@ jobs:
         env: # Or as an environment variable
           bot_token: ${{ secrets.TOKEN }}
         with:
-          arguments: build --stacktrace
+          arguments: build
 
