@@ -1,4 +1,4 @@
-package bot.game.game.mechanism;
+package bot.game.mechanism;
 
 import bot.game.roles.Role;
 import bot.io.ProcessingException;

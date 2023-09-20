@@ -1,19 +1,22 @@
 package bot.game.roles;
 
-import bot.game.game.mechanism.GameException;
+import bot.game.mechanism.GameException;
 import bot.io.ProcessingException;
 import net.dv8tion.jda.api.entities.Member;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 public class RoleManagement {
 
-    private RoleManagement(){}
+    private RoleManagement() {
+    }
 
     /**
      * Check if the game should end
      * Winning conditions are no remaining werewolf or no remain villager
+     *
      * @param roles all remaining roles
      * @throws GameException if the game is over
      */
@@ -21,8 +24,8 @@ public class RoleManagement {
         int numberVillager = 0;
         int numberWerewolf = 0;
         int numberSolo = 0;
-        for(Role r : roles){
-            switch (r.getType()){
+        for (Role r : roles) {
+            switch (r.getType()) {
                 case werewolf:
                     numberWerewolf++;
                     break;
@@ -34,12 +37,13 @@ public class RoleManagement {
                     break;
             }
         }
-        if (numberWerewolf+numberSolo<=0) throw new GameException("Villager win !",roles);
-        if (numberVillager+numberSolo<=0) throw new GameException("Werewolf win !",roles);
+        if (numberWerewolf + numberSolo <= 0) throw new GameException("Villager win !", roles);
+        if (numberVillager + numberSolo <= 0) throw new GameException("Werewolf win !", roles);
     }
 
     /**
      * Check if a member is in a game
+     *
      * @param roles all remaining roles
      * @param voter the personne we check
      * @return true if the player is in the list
@@ -53,22 +57,25 @@ public class RoleManagement {
 
     /**
      * Check the role of someone
+     *
      * @param roles list to search in
      * @param voter the personne we search
-     * @param type type to match
+     * @param type  type to match
      * @return true if voter is a type
      */
-    public static boolean isA(List<Role> roles, Member voter,EnhanceRoleType type) {
+    public static boolean isA(List<Role> roles, Member voter, EnhanceRoleType type) {
         for (Role r : roles) {
-            if (r.getId().equals(voter.getId())) return r.getRealRole()==type;
+            if (r.getId().equals(voter.getId())) return r.getRealRole() == type;
         }
         return false;
     }
+
     /**
      * Check the role of someone
+     *
      * @param roles list to search in
      * @param voter the personne we search
-     * @param type types to match
+     * @param type  types to match
      * @return true if voter is a type
      */
     public static boolean isA(List<Role> roles, Member voter, RoleType[] type) {
@@ -81,12 +88,13 @@ public class RoleManagement {
 
     /**
      * Recover the role using the member ID
-     * @param roles the list we want to look in. Usually all remaining player
+     *
+     * @param roles    the list we want to look in. Usually all remaining player
      * @param memberId User member.getId()
      * @return The role of the member
      * @throws ProcessingException If this member is not in the list (Maybe use isNotIn before)
      */
-    public static Role getRoleOf(List<Role> roles,String memberId) throws ProcessingException {
+    public static Role getRoleOf(List<Role> roles, String memberId) throws ProcessingException {
         for (Role r :
                 roles) {
             if (r.getId().equals(memberId)) return r;
@@ -96,28 +104,30 @@ public class RoleManagement {
 
     /**
      * Get all roles that is of this RoleType. Usually used for vote.
+     *
      * @param roles the list we want to look in. Usually all remaining player
-     * @param type the RoleType
+     * @param type  the RoleType
      * @return All the Role instance matching this type. An empty ArrayList if no remaining.
      */
-    public static List<Member> getAll(List<Role> roles,RoleType type){
+    public static List<Member> getAll(List<Role> roles, RoleType type) {
         ArrayList<Member> ans = new ArrayList<>();
         for (Role r :
                 roles) {
-            if (r.getType()==type) ans.add(r.getOwner());
+            if (r.getType() == type) ans.add(r.getOwner());
         }
         return ans;
     }
-    public static Role getByRole(List<Role> roles,EnhanceRoleType type) throws ProcessingException {
+
+    public static Role getByRole(List<Role> roles, EnhanceRoleType type) throws ProcessingException {
         for (Role r : roles) {
-            if (r.getRealRole()==type) return r;
+            if (r.getRealRole() == type) return r;
         }
         throw new ProcessingException("This role is not in the list");
     }
 
-    public static boolean isRoleIn(List<Role> roles,EnhanceRoleType type){
+    public static boolean isRoleIn(List<Role> roles, EnhanceRoleType type) {
         for (Role r : roles) {
-            if (r.getRealRole()==type) return true;
+            if (r.getRealRole() == type) return true;
         }
         return false;
     }

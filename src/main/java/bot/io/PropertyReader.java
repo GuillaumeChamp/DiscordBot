@@ -12,33 +12,32 @@ public class PropertyReader {
     private static final String TEXT_FR_PATH = "src/main/resources/textFR.properties";
     private static final String TEXT_EN_PATH = "src/main/resources/textEN.properties";
 
-    private PropertyReader(){}
+    private PropertyReader() {
+    }
 
     /**
      * Allow to retrieve value of a key in botConfiguration.properties
+     *
      * @param key key int the file
      */
-    public static String getBotProperty(String key){
+    public static String getBotProperty(String key) {
         Properties properties = new Properties();
         try (InputStream stream = Files.newInputStream(Paths.get(BOT_DATA_PATH))) {
             properties.load(stream);
         } catch (IOException e) {
-            BotLogger.log(Level.SEVERE,"Unable to read property " + key);
+            BotLogger.log(Level.SEVERE, "Unable to read property " + key);
         }
         return properties.getProperty(key);
     }
 
-    public static String getGameText(String key, boolean isFR) throws IOException {
+    public static String getProperty(String path, String key) throws IOException {
         Properties properties = new Properties();
-        String path = TEXT_EN_PATH;
-        if (isFR){
-            path = TEXT_FR_PATH;
-        }
         try (InputStream stream = Files.newInputStream(Paths.get(path))) {
             properties.load(stream);
         } catch (IOException e) {
-            BotLogger.log(Level.SEVERE,"Unable to recover text " + (isFR ? "FR" : "EN") + " " + key);
-            throw e;
+            String errorMessage = "Unable to open property file " + path;
+            BotLogger.log(Level.SEVERE, errorMessage);
+            throw new IOException(errorMessage);
         }
         return properties.getProperty(key);
     }

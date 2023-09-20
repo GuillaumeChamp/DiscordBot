@@ -20,10 +20,10 @@ public class Main {
                 .build();
         api.awaitReady();
         BotLogger.log(Level.INFO, "Bot started and start listening...");
+        BotLogger.log(Level.INFO, "Connected to : " + api.getGuilds());
         CommandStore.create(api);
         ChannelManager.clearAll(api.getGuilds().get(0));
     }
-    //TODO : Message loader
     //TODO : revoir héritage
     //TODO : implémenter agitateur
     //perm = 2646829136

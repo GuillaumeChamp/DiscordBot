@@ -1,15 +1,17 @@
 package bot.game;
 
-import bot.game.game.mechanism.*;
+import bot.game.mechanism.*;
 import bot.game.roles.*;
 import bot.io.BotConfig;
 import bot.io.ChannelManager;
 import bot.io.ProcessingException;
+import bot.io.TextPrompter;
 import bot.io.listener.GuildManager;
 import bot.io.listener.Waiter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,9 +45,9 @@ public class Game extends Thread implements GameType {
             this.currentServer = null;
         } else {
             this.currentServer = channel.getGuild();
+            sendPublicMessage("start", TextPrompter.TextLanguage.EN);
             if (!BotConfig.isSilence) {
                 ChannelManager.createRestrictedChannel(currentServer, RoleManagement.getAll(temporaryRoleList, RoleType.werewolf), "game" + id + "wolf");
-                channel.sendMessage("The game has started !").queue();
             }
         }
         this.tellRoles();
@@ -60,9 +62,9 @@ public class Game extends Thread implements GameType {
      */
     private void playTurn() throws GameException, InterruptedException {
         nbTurn++;
-        sendPublicMessage("You have 30 seconds to vote for someone (/vote)");
+        sendPublicMessage("=====================DAY TIME==========================");
         playDayTime();
-        sendPublicMessage("This is now the night be careful to not die");
+        sendPublicMessage("=====================NIGHT TIME========================");
         playNightTime();
     }
 
@@ -98,7 +100,8 @@ public class Game extends Thread implements GameType {
 
     private void playDayTime() throws InterruptedException, GameException {
         Vote vote = new Vote(VoteType.all, roles);
-        if (!BotConfig.isSilence) GuildManager.getInterface(currentServer).registerAction(id, vote);
+        TextPrompter.prompt("vote", TextPrompter.TextLanguage.EN);
+        GuildManager.getInterface(currentServer).registerAction(id, vote);
         Thread.sleep(30000); //DO NOT USE IN THE MAIN THREAD
         vote.terminate();
         try {
@@ -213,5 +216,18 @@ public class Game extends Thread implements GameType {
         if (!BotConfig.isSilence) {
             channel.sendMessage(message).queue();
         }
+    }
+
+    private void sendPublicMessage(String key, TextPrompter.TextLanguage language) {
+        sendPublicMessage(TextPrompter.prompt(key, language));
+    }
+
+    @SafeVarargs
+    private final void sendPublicMessage(String key, TextPrompter.TextLanguage language, Pair<String, String>... wards) {
+        String rawText = TextPrompter.prompt(key, language);
+        for (Pair<String, String> ward : wards) {
+            rawText = TextPrompter.parse(rawText, ward.getLeft(), ward.getRight());
+        }
+        sendPublicMessage(rawText);
     }
 }

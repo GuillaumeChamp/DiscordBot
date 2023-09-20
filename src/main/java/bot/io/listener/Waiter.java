@@ -1,7 +1,7 @@
 package bot.io.listener;
 
 import bot.game.Game;
-import bot.game.game.mechanism.ParallelAction;
+import bot.game.mechanism.ParallelAction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -11,7 +11,6 @@ import java.util.logging.SimpleFormatter;
 public class BotLogger {
     private static BotLogger instance;
     Logger logger;
-    //private static final String PATH = "./log/";
 
     private BotLogger() {
         logger = Logger.getLogger(BotLogger.class.getName());
@@ -33,6 +32,9 @@ public class BotLogger {
     }
 
     public static void log(Level level, String message) {
+        if (BotConfig.noLog) {
+            return;
+        }
         if (instance == null) {
             instance = new BotLogger();
         }

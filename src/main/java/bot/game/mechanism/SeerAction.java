@@ -1,4 +1,4 @@
-package bot.game.game.mechanism;
+package bot.game.mechanism;
 
 import bot.game.roles.EnhanceRoleType;
 import bot.game.roles.Role;
@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.Member;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SeerAction extends Action{
+public class SeerAction extends Action {
     private final List<Role> result = new ArrayList<>();
 
     public SeerAction(List<Role> roles) {
@@ -20,8 +20,8 @@ public class SeerAction extends Action{
     @Override
     public void handleAction(Member author, Member target, String action) throws ProcessingException {
         super.handleAction(author, target, action);
-        result.add(RoleManagement.getRoleOf(roles,target.getId()));
-        isActive=false;
+        result.add(RoleManagement.getRoleOf(roles, target.getId()));
+        isActive = false;
     }
 
     @Override
