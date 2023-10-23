@@ -24,4 +24,6 @@ public interface ParallelAction {
     List<Role> getResult() throws ProcessingException;
 
     void terminate();
+
+    boolean isActive();
 }

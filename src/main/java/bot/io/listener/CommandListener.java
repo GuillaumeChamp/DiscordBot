@@ -19,13 +19,11 @@ import java.util.logging.Level;
 public class CommandListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) return;// We don't want to respond to other bot accounts, including ourselves
+        if (event.getAuthor().isBot()) return;
         Message message = event.getMessage();
         String content = message.getContentRaw();
-        // getContentRaw() is an atomic getter
-        // getContentDisplay() is a lazy getter which modifies the content for e.g. console view (strip discord formatting)
         if (content.contains("quoi ?")) {
-            message.reply("Feur").queue(); // Important to call .queue() on the RestAction returned by sendMessage(...)
+            message.reply("Feur").queue();
         }
         if (content.contains("ça gaze")) {
             MessageChannel channel = event.getChannel();
@@ -39,7 +37,7 @@ public class CommandListener extends ListenerAdapter {
             handleAction(event);
         }
         StringJoiner logString = new StringJoiner(" ")
-                .add(Objects.requireNonNull(event.getMember()).getNickname())
+                .add(Objects.requireNonNull(event.getMember()).getEffectiveName())
                 .add("perform the following command")
                 .add(event.getName())
                 .add(event.getOptions().toString());
@@ -63,9 +61,6 @@ public class CommandListener extends ListenerAdapter {
             case "disconnect":
                 handleDisconnect(event);
                 BotLogger.log(Level.INFO, logString.toString());
-                break;
-            default:
-                event.reply("unknown command").queue();
                 break;
         }
     }
@@ -97,6 +92,7 @@ public class CommandListener extends ListenerAdapter {
         int gameIndex = Integer.parseInt(channel.getName().replace("game", ""));
         try {
             GuildManager.getInterface(event.getGuild()).performAction(gameIndex, event.getMember(), target, event.getName());
+            assert target != null;
             event.getHook().sendMessage(event.getName() + " registered against " + target.getEffectiveName()).setEphemeral(true).queue();
         } catch (ProcessingException e) {
             event.getHook().editOriginal(e.getMessage()).queue();

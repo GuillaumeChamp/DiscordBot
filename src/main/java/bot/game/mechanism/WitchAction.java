@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WitchAction extends Action {
+    private static final int DEFAULT_DURATION = 15;
     ArrayList<Role> deadPerson = new ArrayList<>();
 
     public WitchAction(EnhanceRoleType author, List<Role> roles, Role eliminated) {
-        super(author, roles);
+        super(author, roles, DEFAULT_DURATION);
         authorizedActions.add("kill");
         authorizedActions.add("save");
         deadPerson.add(eliminated);

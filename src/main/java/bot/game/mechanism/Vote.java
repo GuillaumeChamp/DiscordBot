@@ -1,5 +1,6 @@
 package bot.game.mechanism;
 
+import bot.game.roles.EnhanceRoleType;
 import bot.game.roles.Role;
 import bot.game.roles.RoleManagement;
 import bot.game.roles.RoleType;
@@ -11,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Vote implements ParallelAction {
-    private boolean isActive;
+public class Vote extends Action {
+    private static final int DEFAULT_DURATION = 60;
     private final RoleType[] rolesToVote;
     private final List<Role> roles;
     private final List<String> targetsId;
@@ -24,6 +25,7 @@ public class Vote implements ParallelAction {
      * @param roles       all player remaining in the game
      */
     public Vote(VoteType rolesToVote, List<Role> roles) {
+        super(EnhanceRoleType.simpleWolf, null, DEFAULT_DURATION);
 
         if (rolesToVote == VoteType.werewolf) {
             this.rolesToVote = new RoleType[]{RoleType.werewolf};
@@ -57,7 +59,7 @@ public class Vote implements ParallelAction {
         if (RoleManagement.isNotIn(roles, voter))
             throw new ProcessingException(voter.getEffectiveName() + " : You seem to not be in the game");
         if (!RoleManagement.isA(roles, voter, this.rolesToVote))
-            throw new ProcessingException("It's not your tour to vote");
+            throw new ProcessingException("It's not your turn to vote");
         for (int i = 0; i < roles.size(); i++) {
             if (roles.get(i).getOwner().getId().equals(voter.getId())) {
                 targetsId.set(i, target.getId());
@@ -97,16 +99,5 @@ public class Vote implements ParallelAction {
             throw new ProcessingException("The village was quiet and no one wanted to vote for some one\nIt's so sad, it's always funny to see someone burn !");
         ans.add(RoleManagement.getRoleOf(roles, first));
         return ans;
-    }
-
-    /**
-     * Is used at the end of the timer to prevent additional vote
-     */
-    public void terminate() {
-        this.isActive = false;
-    }
-
-    public boolean isActive() {
-        return isActive;
     }
 }

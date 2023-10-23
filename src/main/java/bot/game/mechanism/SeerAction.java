@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SeerAction extends Action {
+    private static final int DEFAULT_DURATION = 15;
     private final List<Role> result = new ArrayList<>();
 
     public SeerAction(List<Role> roles) {
-        super(EnhanceRoleType.seer, roles);
+        super(EnhanceRoleType.seer, roles, DEFAULT_DURATION);
         authorizedActions.add("see");
     }
 
@@ -25,7 +26,7 @@ public class SeerAction extends Action {
     }
 
     @Override
-    public List<Role> getResult() throws ProcessingException {
+    public List<Role> getResult() {
         return result;
     }
 }

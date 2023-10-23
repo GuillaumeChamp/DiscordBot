@@ -2,10 +2,7 @@ package bot.game;
 
 import bot.game.mechanism.*;
 import bot.game.roles.*;
-import bot.io.BotConfig;
-import bot.io.ChannelManager;
-import bot.io.ProcessingException;
-import bot.io.TextPrompter;
+import bot.io.*;
 import bot.io.listener.GuildManager;
 import bot.io.listener.Waiter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -15,14 +12,21 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
 
-public class Game extends Thread implements GameType {
+public class Game implements GameType {
+    private enum actionType {NULL, SEER, WOLF_VOTE, WITCH, VILLAGE_VOTE}
+
+    private Action action;
     private boolean isActive = true;
     private int nbTurn = 0;
     private final TextChannel channel;
     private final Integer id;
     private final List<Role> roles;
     private final Guild currentServer;
+    private actionType previousAction = actionType.NULL;
+    private final TextPrompter.TextLanguage gameLanguage = TextPrompter.TextLanguage.EN;
 
     /**
      * Start a game
@@ -45,67 +49,102 @@ public class Game extends Thread implements GameType {
             this.currentServer = null;
         } else {
             this.currentServer = channel.getGuild();
-            sendPublicMessage("start", TextPrompter.TextLanguage.EN);
+            sendPublicMessage("start", gameLanguage);
             if (!BotConfig.isSilence) {
                 ChannelManager.createRestrictedChannel(currentServer, RoleManagement.getAll(temporaryRoleList, RoleType.werewolf), "game" + id + "wolf");
             }
         }
         this.tellRoles();
-        this.start();
+        playNextAction();
     }
 
     /**
-     * Make the village vote for someone and the werewolf then
-     *
-     * @throws GameException        if the game is over
-     * @throws InterruptedException in case of thread error
+     * Make the game move to the next step
      */
-    private void playTurn() throws GameException, InterruptedException {
-        nbTurn++;
-        sendPublicMessage("=====================DAY TIME==========================");
-        playDayTime();
-        sendPublicMessage("=====================NIGHT TIME========================");
-        playNightTime();
+    public void playNextAction() {
+        if (!this.isActive) {
+            return;
+        }
+        try {
+            switch (previousAction) {
+                case NULL:
+                    playSeer();
+                    break;
+                case SEER:
+                    resolveSeer();
+                    playWolf();
+                    break;
+                case WOLF_VOTE:
+                    playWitch();
+                    break;
+                case WITCH:
+                    playVote();
+                    break;
+                case VILLAGE_VOTE:
+                    resolveVillagerVote();
+                    if (isActive) playSeer();
+                    break;
+            }
+        } catch (ProcessingException e) {
+            BotLogger.log(Level.WARNING, "Processing Error in " + e);
+        }
     }
 
-    private void playNightTime() throws InterruptedException, GameException {
-        if (RoleManagement.isRoleIn(roles, EnhanceRoleType.seer)) {
-            sendPublicMessage("Seer turn for 10 sec");
+    public void interruptGame() {
+        if (action != null) {
+            if (!Waiter.removeAction(this, action)) {
+                throw new RuntimeException("Tryed to interrupt a game but the game have no action");
+            }
+            this.isActive = false;
+        }
+    }
+
+    private void resolveSeer() throws ProcessingException {
+        if (!BotConfig.isSilence) {
             try {
-                if (!BotConfig.isSilence)
-                    ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You can spec someone (/see name) you have 10 s");
-                SeerAction action = new SeerAction(roles);
-                GuildManager.getInterface(currentServer).registerAction(id, action);
-                Thread.sleep(10000);
-                if (!BotConfig.isSilence)
-                    ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You have spec " + action.getResult().get(0));
+                Role target = action.getResult().get(0);
+                ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You have spec " + target.getRealRole());
             } catch (ProcessingException e) {
-                throw new RuntimeException(e);
+                ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You have spec nothing");
             }
         }
-        sendPublicMessage("It's time for the hungry boys (30 sec)");
-        Vote vote = new Vote(VoteType.werewolf, roles);
-        GuildManager.getInterface(currentServer).registerAction(id, vote);
-        Thread.sleep(30000); //DO NOT USE IN THE MAIN THREAD
+    }
+
+    private void playSeer() {
+        if (!RoleManagement.isRoleIn(roles, EnhanceRoleType.seer)) {
+            playWolf();
+            return;
+        }
+        sendPublicMessage("seerStart", gameLanguage);
         try {
-            Role eliminated = vote.getResult().get(0);
-            if (RoleManagement.isRoleIn(roles, EnhanceRoleType.witch)) playWitch(eliminated);
-            else manageDeath(eliminated);
+            if (!BotConfig.isSilence) {
+                ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You can spec someone (/see name) you have 10 s");
+            }
+            SeerAction action = new SeerAction(roles);
+            previousAction = actionType.SEER;
+            startAction(action);
         } catch (ProcessingException e) {
-            if (e.getClass() == GameException.class) throw (GameException) e;
-            sendPublicMessage(e.getMessage());
-            if (RoleManagement.isRoleIn(roles, EnhanceRoleType.witch)) playWitch(null);
+            throw new RuntimeException(e);
         }
     }
 
-    private void playDayTime() throws InterruptedException, GameException {
+    private void playWolf() {
+        sendPublicMessage("wolfStart", gameLanguage);
+        Vote vote = new Vote(VoteType.werewolf, roles);
+        this.previousAction = actionType.WOLF_VOTE;
+        startAction(vote);
+    }
+
+    private void playVote() throws GameException {
+        sendPublicMessage("vote", TextPrompter.TextLanguage.EN);
         Vote vote = new Vote(VoteType.all, roles);
-        TextPrompter.prompt("vote", TextPrompter.TextLanguage.EN);
-        GuildManager.getInterface(currentServer).registerAction(id, vote);
-        Thread.sleep(30000); //DO NOT USE IN THE MAIN THREAD
-        vote.terminate();
+        previousAction = actionType.VILLAGE_VOTE;
+        startAction(vote);
+    }
+
+    private void resolveVillagerVote() throws GameException {
         try {
-            Role eliminated = vote.getResult().get(0);
+            Role eliminated = action.getResult().get(0);
             manageDeath(eliminated);
         } catch (ProcessingException e) {
             if (e.getClass() == GameException.class) throw (GameException) e;
@@ -113,12 +152,31 @@ public class Game extends Thread implements GameType {
         }
     }
 
-    private void playWitch(Role eliminated) throws GameException {
+    private void playWitch() throws ProcessingException {
+        previousAction = actionType.WITCH;
+        if (!RoleManagement.isRoleIn(roles, EnhanceRoleType.witch)) {
+            try {
+                Role eliminated = action.getResult().get(0);
+                manageDeath(eliminated);
+                playNextAction();
+                return;
+            } catch (ProcessingException e) {
+                sendPublicMessage(e.getMessage());
+                playNextAction();
+                return;
+            }
+        }
         try {
-            sendPublicMessage("The magic can appear ...(15 sec)");
+            Role eliminated = null;
+            try {
+                eliminated = action.getResult().get(0);
+                manageDeath(eliminated);
+            } catch (ProcessingException ignored) {
+            }
+            sendPublicMessage("witchAction", gameLanguage);
             WitchRole witch = (WitchRole) RoleManagement.getByRole(roles, EnhanceRoleType.witch);
             if (!witch.isHealingAvailable() && !witch.isKillingAvailable()) {
-                if (witch.isHealingAvailable() || eliminated != null) {
+                if (witch.isHealingAvailable() && eliminated != null) {
                     if (!BotConfig.isSilence) {
                         ChannelManager.sendPrivateMessage(witch.getOwner(), "The wolf are about to eat " + eliminated.getOwner().getEffectiveName());
                     }
@@ -126,19 +184,14 @@ public class Game extends Thread implements GameType {
                 if (!BotConfig.isSilence)
                     ChannelManager.sendPrivateMessage(witch.getOwner(), "You can still kill or save someone (/kill name or /save name) you have 15 s");
                 WitchAction action = new WitchAction(EnhanceRoleType.witch, roles, eliminated);
-                GuildManager.getInterface(currentServer).registerAction(id, action);
-                Waiter.register(this, action);
-                this.wait();
+                startAction(action);
                 ArrayList<Role> death = action.getResult();
                 for (Role dead : death) {
                     manageDeath(dead);
                 }
             }
-        } catch (ProcessingException ignored) {
-            manageDeath(eliminated);
-            System.out.println("This is not possible if well coded ^^");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        } catch (ProcessingException e) {
+            BotLogger.log(Level.WARNING, "Processing Error in " + e);
         }
     }
 
@@ -151,12 +204,18 @@ public class Game extends Thread implements GameType {
     private void manageDeath(Role eliminated) throws GameException {
         roles.remove(eliminated);
         try {
-            eliminated.getOwner().mute(true).queue();
+            if (Objects.requireNonNull(eliminated.getOwner().getVoiceState()).inAudioChannel())
+                eliminated.getOwner().mute(true).queue();
         } catch (Exception ignored) {
+
         }
         sendPublicMessage("The village is now smaller ... : " + eliminated.getOwner().getUser().getName() + " has disappear !");
         sendPublicMessage("Its role was : " + eliminated.getRealRole());
-        RoleManagement.checkWin(roles);
+        try {
+            RoleManagement.checkWin(roles);
+        } catch (GameException endOfGame) {
+            this.terminateGame(endOfGame);
+        }
     }
 
     /**
@@ -164,7 +223,7 @@ public class Game extends Thread implements GameType {
      *
      * @param e passing exception to allow to have the remaining roles
      */
-    private void endOfGame(GameException e) {
+    private void terminateGame(GameException e) {
         this.isActive = false;
         sendPublicMessage("End Of Game !\n" + e.getMessage());
         GuildManager.getInterface(currentServer).terminateGame(this);
@@ -196,22 +255,6 @@ public class Game extends Thread implements GameType {
         return id;
     }
 
-    /**
-     * bot.Main threat methode. Basically an endless loop calling play turn that is stopped by an endOfGameException
-     */
-    @Override
-    public void run() {
-        try {
-            while (isActive) {
-                playTurn();
-            }
-        } catch (GameException e) {
-            endOfGame(e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
     private void sendPublicMessage(String message) {
         if (!BotConfig.isSilence) {
             channel.sendMessage(message).queue();
@@ -229,5 +272,11 @@ public class Game extends Thread implements GameType {
             rawText = TextPrompter.parse(rawText, ward.getLeft(), ward.getRight());
         }
         sendPublicMessage(rawText);
+    }
+
+    private void startAction(Action action) {
+        this.action = action;
+        GuildManager.getInterface(currentServer).registerAction(id, action);
+        Waiter.register(this, action);
     }
 }
