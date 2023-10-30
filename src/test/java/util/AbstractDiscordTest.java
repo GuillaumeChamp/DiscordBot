@@ -13,7 +13,7 @@ public abstract class AbstractDiscordTest {
     @BeforeAll
     public static void setup() {
         testChannel = DiscordTestUtil.createTestChannel();
-        testMember = DiscordTestUtil.getOwner();
+        testMember = DiscordTestUtil.getAMember(0);
         BotConfig.isSilence = Boolean.TRUE;
     }
 

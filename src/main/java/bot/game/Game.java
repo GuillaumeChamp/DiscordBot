@@ -55,7 +55,6 @@ public class Game implements GameType {
             }
         }
         this.tellRoles();
-        playNextAction();
     }
 
     /**
@@ -111,7 +110,7 @@ public class Game implements GameType {
     }
 
     private void playSeer() {
-        if (!RoleManagement.isRoleIn(roles, EnhanceRoleType.seer)) {
+        if (RoleManagement.roleIsNotIn(roles, EnhanceRoleType.seer)) {
             playWolf();
             return;
         }
@@ -154,7 +153,7 @@ public class Game implements GameType {
 
     private void playWitch() throws ProcessingException {
         previousAction = actionType.WITCH;
-        if (!RoleManagement.isRoleIn(roles, EnhanceRoleType.witch)) {
+        if (RoleManagement.roleIsNotIn(roles, EnhanceRoleType.witch)) {
             try {
                 Role eliminated = action.getResult().get(0);
                 manageDeath(eliminated);

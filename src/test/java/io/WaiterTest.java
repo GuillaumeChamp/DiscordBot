@@ -16,12 +16,14 @@ class WaiterTest extends AbstractDiscordTest {
         final int duration = 10;
         //-- Given
         Game game = new Game(0, Collections.singletonList(testMember), testChannel);
-        game.interruptGame();
         TestAction action = new TestAction(duration);
         //-- When
         Waiter.register(game, action);
         //-- Then
-        Awaitility.await().atLeast(duration - 1, TimeUnit.SECONDS).atMost(duration + 1, TimeUnit.SECONDS).until(() -> !action.isActive());
+        Awaitility.await()
+                .atLeast(duration - 1, TimeUnit.SECONDS)
+                .atMost(duration + 1, TimeUnit.SECONDS)
+                .until(() -> !action.isActive());
     }
 
     @Test
@@ -29,9 +31,7 @@ class WaiterTest extends AbstractDiscordTest {
         final int duration = 10;
         //-- Given
         Game game = new Game(0, Collections.singletonList(testMember), testChannel);
-        game.interruptGame();
         Game game1 = new Game(1, Collections.singletonList(testMember), testChannel);
-        game1.interruptGame();
 
         TestAction action = new TestAction(duration);
         TestAction action1 = new TestAction(duration);

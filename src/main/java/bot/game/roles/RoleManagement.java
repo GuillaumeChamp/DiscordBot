@@ -118,6 +118,14 @@ public class RoleManagement {
         return ans;
     }
 
+    /**
+     * Use to retrieve a role by looking for the enhance role type
+     *
+     * @param roles all the list
+     * @param type  the enhance role to look for
+     * @return the role if found
+     * @throws ProcessingException if the role is not found
+     */
     public static Role getByRole(List<Role> roles, EnhanceRoleType type) throws ProcessingException {
         for (Role r : roles) {
             if (r.getRealRole() == type) return r;
@@ -125,11 +133,18 @@ public class RoleManagement {
         throw new ProcessingException("This role is not in the list");
     }
 
-    public static boolean isRoleIn(List<Role> roles, EnhanceRoleType type) {
+    /**
+     * Check if a role is not in a composition
+     *
+     * @param roles all remaining roles
+     * @param type  the role to look for
+     * @return true if the role is not in the list
+     */
+    public static boolean roleIsNotIn(List<Role> roles, EnhanceRoleType type) {
         for (Role r : roles) {
-            if (r.getRealRole() == type) return true;
+            if (r.getRealRole() == type) return false;
         }
-        return false;
+        return true;
     }
 
 }

@@ -31,14 +31,6 @@ public class DiscordTestUtil {
         return members.get(number);
     }
 
-    /**
-     * Allow to retrieve the discord server owner of the first server
-     */
-    public static Member getOwner() {
-        initialize();
-        return api.getGuilds().get(0).retrieveOwner().complete();
-    }
-
     public static TextChannel createTestChannel() {
         initialize();
         Category category = api.getCategoriesByName("MUTE_ME", false).get(0);

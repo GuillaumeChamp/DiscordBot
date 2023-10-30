@@ -6,11 +6,10 @@ import bot.game.roles.WitchRole;
 import net.dv8tion.jda.api.entities.Member;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Composition {
-    int numberWerewolf;
-    int numberVillager;
-    ArrayList<EnhanceRoleType> stack = new ArrayList<>();
+    private final List<EnhanceRoleType> stack = new ArrayList<>();
 
     /**
      * Create a new composition performing operations depending on the game size
@@ -20,8 +19,8 @@ public class Composition {
      * @param gameSize number of role to assign (in fact can be more than that to add randomness on number of present roles)
      */
     public Composition(int gameSize) {
-        numberWerewolf = (int) Math.floor(0.3 * (gameSize));
-        numberVillager = (gameSize) - numberWerewolf;
+        int numberWerewolf = (int) Math.floor(0.3 * (gameSize));
+        int numberVillager = (gameSize) - numberWerewolf;
         for (int i = 0; i < numberWerewolf; i++) {
             stack.add(EnhanceRoleType.simpleWolf);
         }

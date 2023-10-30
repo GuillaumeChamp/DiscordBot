@@ -34,7 +34,9 @@ public class PendingGame implements GameType {
     public Game startGame() throws ProcessingException {
         if (isStarted) throw new ProcessingException("the game is already in progress");
         isStarted = true;
-        return new Game(id, players, channel);
+        Game newGame = new Game(id, players, channel);
+        newGame.playNextAction();
+        return newGame;
     }
 
     public Integer getGameId() {
