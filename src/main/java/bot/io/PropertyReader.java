@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
-import java.util.logging.Level;
 
 public class PropertyReader {
     private static final String BOT_DATA_PATH = "src/main/resources/botConfiguration.properties";
@@ -25,7 +24,7 @@ public class PropertyReader {
         try (InputStream stream = Files.newInputStream(Paths.get(BOT_DATA_PATH))) {
             properties.load(stream);
         } catch (IOException e) {
-            BotLogger.log(Level.SEVERE, "Unable to read property " + key);
+            BotLogger.log(BotLogger.FATAL, "Unable to read property " + key);
         }
         return properties.getProperty(key);
     }
@@ -36,7 +35,7 @@ public class PropertyReader {
             properties.load(stream);
         } catch (IOException e) {
             String errorMessage = "Unable to open property file " + path;
-            BotLogger.log(Level.SEVERE, errorMessage);
+            BotLogger.log(BotLogger.FATAL, errorMessage);
             throw new IOException(errorMessage);
         }
         return properties.getProperty(key);

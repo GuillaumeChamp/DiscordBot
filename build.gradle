@@ -12,10 +12,10 @@ idea {
     }
 }
 mainClassName = 'Main'
-sourceCompatibility = targetCompatibility = 1.8
+sourceCompatibility = targetCompatibility = 17
 group 'com.bot'
 version '1.0-SNAPSHOT'
-def jdaVersion = '5.0.0-beta.13'
+
 repositories {
     mavenCentral()
     maven { // on Kotlin DSL use `maven("https://m2.dv8tion.net/releases")` instead
@@ -24,17 +24,17 @@ repositories {
 }
 
 dependencies {
-    implementation("net.dv8tion:JDA:$jdaVersion")
+    implementation("net.dv8tion:JDA:5.0.1")
+    implementation("ch.qos.logback:logback-classic:1.5.6")
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+
+    // test dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '3.0.0'
     testImplementation("org.assertj:assertj-core:3.11.1")
-    // https://mvnrepository.com/artifact/org.mockito/mockito-core
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.1.0'
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
-
 }
 
 test {

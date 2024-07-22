@@ -13,7 +13,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
 
 public class Game implements GameType {
     private enum actionType {NULL, SEER, WOLF_VOTE, WITCH, VILLAGE_VOTE}
@@ -85,7 +84,7 @@ public class Game implements GameType {
                     break;
             }
         } catch (ProcessingException e) {
-            BotLogger.log(Level.WARNING, "Processing Error in " + e);
+            BotLogger.log(BotLogger.WARN, "Processing Error in " + e);
         }
     }
 
@@ -190,7 +189,7 @@ public class Game implements GameType {
                 }
             }
         } catch (ProcessingException e) {
-            BotLogger.log(Level.WARNING, "Processing Error in " + e);
+            BotLogger.log(BotLogger.WARN, "Processing Error in " + e);
         }
     }
 

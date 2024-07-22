@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
-import java.util.logging.Level;
 
 public class TextPrompter {
     public enum TextLanguage {EN, FR}
@@ -45,7 +44,7 @@ public class TextPrompter {
         }
         if (text == null) {
             String errorMessage = key + " not found in " + path;
-            BotLogger.log(Level.WARNING, errorMessage);
+            BotLogger.log(BotLogger.WARN, errorMessage);
             throw new InvalidParameterException(errorMessage);
         }
         return text;
@@ -61,7 +60,7 @@ public class TextPrompter {
      */
     public static String parse(String payload, String ward, String content) {
         if (!StringUtils.contains(payload, ward)) {
-            BotLogger.log(Level.INFO, ward + " not found in " + payload);
+            BotLogger.log(BotLogger.INFO, ward + " not found in " + payload);
             return payload;
         }
         return StringUtils.replace(payload, ward, content);

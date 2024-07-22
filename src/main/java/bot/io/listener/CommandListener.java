@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.logging.Level;
 
 public class CommandListener extends ListenerAdapter {
     @Override
@@ -44,23 +43,23 @@ public class CommandListener extends ListenerAdapter {
         switch (event.getName()) {
             case "create":
                 handleCreation(event);
-                BotLogger.log(Level.INFO, logString.toString());
+                BotLogger.log(BotLogger.INFO, logString.toString());
                 break;
             case "join":
                 handleJoin(event);
-                BotLogger.log(Level.INFO, logString.toString());
+                BotLogger.log(BotLogger.INFO, logString.toString());
                 break;
             case "stop":
                 handleStop(event);
-                BotLogger.log(Level.INFO, logString.toString());
+                BotLogger.log(BotLogger.INFO, logString.toString());
                 break;
             case "start":
                 handleStart(event);
-                BotLogger.log(Level.INFO, logString.toString());
+                BotLogger.log(BotLogger.INFO, logString.toString());
                 break;
             case "disconnect":
                 handleDisconnect(event);
-                BotLogger.log(Level.INFO, logString.toString());
+                BotLogger.log(BotLogger.INFO, logString.toString());
                 break;
         }
     }
@@ -74,7 +73,7 @@ public class CommandListener extends ListenerAdapter {
 
         if (password.equals(Objects.requireNonNull(event.getOption("password")).getAsString())) {
             event.reply("bye").setEphemeral(true).queue();
-            BotLogger.log(Level.INFO, event.getUser().getName() + " has shutdown the bot");
+            BotLogger.log(BotLogger.INFO, event.getUser().getName() + " has shutdown the bot");
             ChannelManager.clearAll(event.getGuild());
             event.getJDA().shutdown();
         } else event.reply("you are not allow to shutdown the bot").queue();

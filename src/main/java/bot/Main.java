@@ -8,8 +8,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
-import java.util.logging.Level;
-
 public class Main {
     static JDA api;
 
@@ -19,8 +17,8 @@ public class Main {
                 .addEventListeners(new CommandListener())
                 .build();
         api.awaitReady();
-        BotLogger.log(Level.INFO, "Bot started and start listening...");
-        BotLogger.log(Level.INFO, "Connected to : " + api.getGuilds());
+        BotLogger.log(BotLogger.INFO, "Bot started and start listening...");
+        BotLogger.log(BotLogger.INFO, "Connected to : " + api.getGuilds());
         CommandStore.create(api);
         ChannelManager.clearAll(api.getGuilds().get(0));
     }

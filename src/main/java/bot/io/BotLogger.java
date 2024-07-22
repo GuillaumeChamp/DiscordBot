@@ -1,46 +1,34 @@
 package bot.io;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 public class BotLogger {
-    private static BotLogger instance;
-    Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger(BotLogger.class);
+    // copy log level to ensure single responsibility and hide logging lib from caller
+    public static final Level INFO = Level.INFO;
+    public static final Level DEBUG = Level.DEBUG;
+    public static final Level ERROR = Level.ERROR;
+    public static final Level WARN = Level.WARN;
+    public static final Level FATAL = null;
 
     private BotLogger() {
-        logger = Logger.getLogger(BotLogger.class.getName());
-        try {
-            logger.addHandler(generateFileHandler());
-        } catch (IOException e) {
-            logger.warning("Unable to create file for bot log");
-        }
     }
 
-    private FileHandler generateFileHandler() throws IOException {
-        String generatedName = "botLog" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm")) + ".txt";
-        FileHandler fileHandler = new FileHandler(generatedName, 524288000, // 500 MB max size
-                1, // one log file at a time
-                true // if it exists: append, don't overwrite
-        );
-        fileHandler.setFormatter(new SimpleFormatter());
-        return fileHandler;
-    }
-
+    /**
+     * Log a message with bot logger as source.
+     *
+     * @param level   log level, use log level from BotLogger to hide logging lib
+     * @param message message to log
+     */
     public static void log(Level level, String message) {
+        if (level == FATAL) {
+            throw new RuntimeException("A fatal error has occurred, please check log");
+        }
         if (BotConfig.noLog) {
             return;
         }
-        if (instance == null) {
-            instance = new BotLogger();
-        }
-        if (Level.SEVERE.equals(level)) {
-            throw new RuntimeException("A fatal error has occurred, please check log");
-        }
-        instance.logger.log(level, message);
+        logger.atLevel(level).log(message);
     }
 }

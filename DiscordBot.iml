@@ -15,13 +15,26 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/5.0.0-alpha.21/9a724624bf26d3ce22c6a86d1f1e3492132c0f0/JDA-5.0.0-alpha.21.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/5.0.0-beta.13/21e130bd8c42091f5a676e8b45ba633861b3c1c2/JDA-5.0.0-beta.13.jar!/"/>
         </CLASSES>
         <JAVADOC>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/5.0.0-alpha.21/2689c7ea343e357a9037250be69526a4f6fc78a8/JDA-5.0.0-alpha.21-javadoc.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/5.0.0-beta.13/67a29f7d57c298b8af11fd275a27eac8095e6f8e/JDA-5.0.0-beta.13-javadoc.jar!/"/>
         </JAVADOC>
         <SOURCES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/5.0.0-alpha.21/8285efde268e083b08c964e6e8bd31742f15c4a0/JDA-5.0.0-alpha.21-sources.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/5.0.0-beta.13/3161ec1109839a0a43fc974601ebf2c114458edf/JDA-5.0.0-beta.13-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.0/8873bd0bb5cb9ee37f1b04578eb7e26fcdd44cb0/commons-lang3-3.0.jar!/"/>
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.0/14f3e1e7e593cdfa84048e96db9b142db93bf492/commons-lang3-3.0-javadoc.jar!/"/>
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.0/d48f964b56a931ec2712ce5d411a40d114a69753/commons-lang3-3.0-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
@@ -54,13 +67,13 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.9.3/b0b14b3d12980912723fb8b66afb48dcda742fcb/okhttp-4.9.3.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.10.0/cd63657ac15770ed1420647154c9f44645533bef/okhttp-4.10.0.jar!/"/>
         </CLASSES>
         <JAVADOC>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.9.3/c468742596f789a86593340b5d5749fe3de665f/okhttp-4.9.3-javadoc.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.10.0/982fa90054d87e7b49739908beba4f50f508fbed/okhttp-4.10.0-javadoc.jar!/"/>
         </JAVADOC>
         <SOURCES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.9.3/2d2338937cea04ac5321bc89f1ffdc93345df448/okhttp-4.9.3-sources.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/4.10.0/4afcb4a940f3411594ba7dc899086a882293f22a/okhttp-4.10.0-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
@@ -89,26 +102,52 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/2.8.0/49b64e09d81c0cc84b267edd0c2fd7df5a64c78c/okio-jvm-2.8.0.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio-jvm/3.0.0/ab5a73fa2ccb4a36b0b5c69fe10b16d0255bcf8/okio-jvm-3.0.0.jar!/"/>
         </CLASSES>
         <JAVADOC>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/2.8.0/4dbf7c706a17b6876c9a4bf8cae3ad543163acd9/okio-2.8.0-javadoc.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio-jvm/3.0.0/d80a56acc76c16c3eefae15c38ac9712e3fd6ca6/okio-jvm-3.0.0-javadoc.jar!/"/>
         </JAVADOC>
         <SOURCES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/2.8.0/6d1b6e0ce288800b8662b4983a002620cd6ada95/okio-2.8.0-sources.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio-jvm/3.0.0/73e518d3b5760645d525c24934e4efc01149060a/okio-jvm-3.0.0-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.4.10/ea29e063d2bbe695be13e9d044dcfb0c7add398e/kotlin-stdlib-1.4.10.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.5.31/ff5d99aecd328872494e8921b72bf6e3af97af3e/kotlin-stdlib-jdk8-1.5.31.jar!/"/>
         </CLASSES>
         <JAVADOC>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.4.10/5b8f86fea035328fc9e8c660773037a3401ce25f/kotlin-stdlib-1.4.10-javadoc.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.5.31/5b8f86fea035328fc9e8c660773037a3401ce25f/kotlin-stdlib-jdk8-1.5.31-javadoc.jar!/"/>
         </JAVADOC>
         <SOURCES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.4.10/4a5e4f984e6c3e380f100857f04aba4f3e5fbda8/kotlin-stdlib-1.4.10-sources.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.5.31/171265ccd1f7a4307c3cb8eedd9115e662013190/kotlin-stdlib-jdk8-1.5.31-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.5.31/77e0f2568912e45d26c31fd417a332458508acdf/kotlin-stdlib-jdk7-1.5.31.jar!/"/>
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.5.31/5b8f86fea035328fc9e8c660773037a3401ce25f/kotlin-stdlib-jdk7-1.5.31-javadoc.jar!/"/>
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.5.31/ccdfdab71f0f3ba104191d8f673d0620e7ed2e46/kotlin-stdlib-jdk7-1.5.31-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.6.20/6cedc143badbb4f1c6b7f5a340b04edff1743208/kotlin-stdlib-1.6.20.jar!/"/>
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.6.20/5b8f86fea035328fc9e8c660773037a3401ce25f/kotlin-stdlib-1.6.20-javadoc.jar!/"/>
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.6.20/bc58085192d5abb48080e3670915133715a33ce0/kotlin-stdlib-1.6.20-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
@@ -137,13 +176,13 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.4.10/6229be3465805c99db1142ad75e6c6ddeac0b04c/kotlin-stdlib-common-1.4.10.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.6.20/27b4562b6713d70f458c6d7ea39aadacb8e6a92b/kotlin-stdlib-common-1.6.20.jar!/"/>
         </CLASSES>
         <JAVADOC>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.4.10/5b8f86fea035328fc9e8c660773037a3401ce25f/kotlin-stdlib-common-1.4.10-javadoc.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.6.20/5b8f86fea035328fc9e8c660773037a3401ce25f/kotlin-stdlib-common-1.6.20-javadoc.jar!/"/>
         </JAVADOC>
         <SOURCES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.4.10/d971e5bb07a7f610eda65e5efc8decbd0548a270/kotlin-stdlib-common-1.4.10-sources.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.6.20/e81e108a2817747538df29b32a151db38e5da5a2/kotlin-stdlib-common-1.6.20-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
@@ -176,39 +215,39 @@
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.13.2/ec18851f1976d5b810ae1a5fcc32520d2d38f77a/jackson-annotations-2.13.2.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.14.1/2a6ad504d591a7903ffdec76b5b7252819a2d162/jackson-annotations-2.14.1.jar!/"/>
         </CLASSES>
         <JAVADOC>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.13.2/5d435ca7a03b6525a1ed0426db14d7800ca04dd2/jackson-annotations-2.13.2-javadoc.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.14.1/758ee1e88d236077a9319e3ae7d6d61393463fee/jackson-annotations-2.14.1-javadoc.jar!/"/>
         </JAVADOC>
         <SOURCES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.13.2/527158378d8c2e72c3e79122be86c896ad01129a/jackson-annotations-2.13.2-sources.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.14.1/35e08e7d5ac574fce3910e166f7e6c22a8afa98d/jackson-annotations-2.14.1-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.13.2.2/ffeb635597d093509f33e1e94274d14be610f933/jackson-databind-2.13.2.2.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.14.1/268524b9056cae1211b9f1f52560ef19347f4d17/jackson-databind-2.14.1.jar!/"/>
         </CLASSES>
         <JAVADOC>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.13.2.2/25952d9ece6be075dbbd544f8bd7e45246a4dc5f/jackson-databind-2.13.2.2-javadoc.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.14.1/ac168bcbf941c7938e0823c2628c6ea7af2bea24/jackson-databind-2.14.1-javadoc.jar!/"/>
         </JAVADOC>
         <SOURCES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.13.2.2/8268a225143ededca45ca24d0761f08ea398fd5b/jackson-databind-2.13.2.2-sources.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.14.1/9fda9f7d45ce1e79b678793433f697b6a9c66ff9/jackson-databind-2.14.1-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.13.2/a6a0e0620d51833feffc67bccb51937b2345763/jackson-core-2.13.2.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.14.1/7a07bc535ccf0b7f6929c4d0f2ab9b294ef7c4a3/jackson-core-2.14.1.jar!/"/>
         </CLASSES>
         <JAVADOC>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.13.2/f7894dbbe518ecabd8464bba8f23cb1dd52bcfb1/jackson-core-2.13.2-javadoc.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.14.1/67f9d57a059adac7cd1ecfb07ce23e2ea92a371a/jackson-core-2.14.1-javadoc.jar!/"/>
         </JAVADOC>
         <SOURCES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.13.2/f18990d027317810bb1a131a32ce4f001c8eaf2f/jackson-core-2.13.2-sources.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.14.1/118cdd7be74189927a927174f457e3d134685918/jackson-core-2.14.1-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
@@ -254,6 +293,45 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.awaitility/awaitility/3.0.0/7e6b79f2b1e57eaa967b229791f31ca55aea668a/awaitility-3.0.0.jar!/"/>
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.awaitility/awaitility/3.0.0/27366ac9ed7fb2e5e508a9d3b7139a7a7832ca56/awaitility-3.0.0-javadoc.jar!/"/>
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.awaitility/awaitility/3.0.0/e90e071621cc7f23a132acc09271ca586e389633/awaitility-3.0.0-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.assertj/assertj-core/3.11.1/fdac3217b804d6900fa3650f17b5cb48e620b140/assertj-core-3.11.1.jar!/"/>
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.assertj/assertj-core/3.11.1/c73ba1a8d0f6283e32837a7d2d35d385bb71664c/assertj-core-3.11.1-javadoc.jar!/"/>
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.assertj/assertj-core/3.11.1/55362d8f04018b1140c5a370057bf8cd4a63c3de/assertj-core-3.11.1-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.mockito/mockito-core/2.1.0/a8ca233b9d89b6e610b2e29a33ee78698f804843/mockito-core-2.1.0.jar!/"/>
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.mockito/mockito-core/2.1.0/acac78dcaf68e2765abfeb88cf4e6bf821dcaa/mockito-core-2.1.0-javadoc.jar!/"/>
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.mockito/mockito-core/2.1.0/37e390a1bd26ed8bb84f7d732aa5b8d51cbb9eec/mockito-core-2.1.0-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
           <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.2.0/28c11eb91f9b6d8e200631d46e20a7f407f2a046/opentest4j-1.2.0.jar!/"/>
         </CLASSES>
         <JAVADOC>
@@ -274,6 +352,45 @@
         </JAVADOC>
         <SOURCES>
           <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.apiguardian/apiguardian-api/1.1.2/e0787a997746ac32639e0bf3cb27af8dce8a3428/apiguardian-api-1.1.2-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-library/1.3/4785a3c21320980282f9f33d0d1264a69040538f/hamcrest-library-1.3.jar!/"/>
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-library/1.3/4324046c5f99f3dc91b5370899fa3ae65fd137d2/hamcrest-library-1.3-javadoc.jar!/"/>
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-library/1.3/47a7ee46628ab7133129cd7cef1e92657bc275e/hamcrest-library-1.3-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar!/"/>
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/ad09811315f1d4f5756986575b0ea16b99cd686f/hamcrest-core-1.3-javadoc.jar!/"/>
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/1dc37250fbc78e23a65a67fbbaf71d2e9cbc3c0b/hamcrest-core-1.3-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.objenesis/objenesis/2.5.1/272bab9a4e5994757044d1fc43ce480c8cb907a4/objenesis-2.5.1.jar!/"/>
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.objenesis/objenesis/2.5.1/bce5ac54ef3621dcf223fddb279289836ce453db/objenesis-2.5.1-javadoc.jar!/"/>
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/org.objenesis/objenesis/2.5.1/36bc7ecec5fb17144916c7012cc1a91a87c0ba95/objenesis-2.5.1-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
@@ -319,39 +436,65 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.13.2/ec18851f1976d5b810ae1a5fcc32520d2d38f77a/jackson-annotations-2.13.2.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.14.1/2a6ad504d591a7903ffdec76b5b7252819a2d162/jackson-annotations-2.14.1.jar!/"/>
         </CLASSES>
         <JAVADOC>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.13.2/5d435ca7a03b6525a1ed0426db14d7800ca04dd2/jackson-annotations-2.13.2-javadoc.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.14.1/758ee1e88d236077a9319e3ae7d6d61393463fee/jackson-annotations-2.14.1-javadoc.jar!/"/>
         </JAVADOC>
         <SOURCES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.13.2/527158378d8c2e72c3e79122be86c896ad01129a/jackson-annotations-2.13.2-sources.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.14.1/35e08e7d5ac574fce3910e166f7e6c22a8afa98d/jackson-annotations-2.14.1-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.13.2.2/ffeb635597d093509f33e1e94274d14be610f933/jackson-databind-2.13.2.2.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.14.1/268524b9056cae1211b9f1f52560ef19347f4d17/jackson-databind-2.14.1.jar!/"/>
         </CLASSES>
         <JAVADOC>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.13.2.2/25952d9ece6be075dbbd544f8bd7e45246a4dc5f/jackson-databind-2.13.2.2-javadoc.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.14.1/ac168bcbf941c7938e0823c2628c6ea7af2bea24/jackson-databind-2.14.1-javadoc.jar!/"/>
         </JAVADOC>
         <SOURCES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.13.2.2/8268a225143ededca45ca24d0761f08ea398fd5b/jackson-databind-2.13.2.2-sources.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.14.1/9fda9f7d45ce1e79b678793433f697b6a9c66ff9/jackson-databind-2.14.1-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.13.2/a6a0e0620d51833feffc67bccb51937b2345763/jackson-core-2.13.2.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.14.1/7a07bc535ccf0b7f6929c4d0f2ab9b294ef7c4a3/jackson-core-2.14.1.jar!/"/>
         </CLASSES>
         <JAVADOC>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.13.2/f7894dbbe518ecabd8464bba8f23cb1dd52bcfb1/jackson-core-2.13.2-javadoc.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.14.1/67f9d57a059adac7cd1ecfb07ce23e2ea92a371a/jackson-core-2.14.1-javadoc.jar!/"/>
         </JAVADOC>
         <SOURCES>
-          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.13.2/f18990d027317810bb1a131a32ce4f001c8eaf2f/jackson-core-2.13.2-sources.jar!/"/>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.14.1/118cdd7be74189927a927174f457e3d134685918/jackson-core-2.14.1-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy/1.4.26/c56b0e90e3b6f9f117a0a0356674e86e86ba8652/byte-buddy-1.4.26.jar!/"/>
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy/1.4.26/276ad23bbe48dbd9ef68075a6ab3894aad6f2829/byte-buddy-1.4.26-javadoc.jar!/"/>
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy/1.4.26/bdfa1de07d902c9fb0167c14a2a7a3a4a8bd40a2/byte-buddy-1.4.26-sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.4.26/1b9341217172cad476af43635161329015d3a58d/byte-buddy-agent-1.4.26.jar!/"/>
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.4.26/920e0928ab86c6a097b165acdd6f525e887a2267/byte-buddy-agent-1.4.26-javadoc.jar!/"/>
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://C:/Users/guill/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.4.26/fe316b903edc48523ad2e836139464063ed49c92/byte-buddy-agent-1.4.26-sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
