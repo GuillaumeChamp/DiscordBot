@@ -25,7 +25,7 @@ public class Game implements GameType {
     private final List<Role> roles;
     private final Guild currentServer;
     private actionType previousAction = actionType.NULL;
-    private final TextPrompter.TextLanguage gameLanguage = TextPrompter.TextLanguage.EN;
+    private final ScriptReader.TextLanguage gameLanguage = ScriptReader.TextLanguage.EN;
 
     /**
      * Start a game
@@ -134,7 +134,7 @@ public class Game implements GameType {
     }
 
     private void playVote() throws GameException {
-        sendPublicMessage("vote", TextPrompter.TextLanguage.EN);
+        sendPublicMessage("vote", ScriptReader.TextLanguage.EN);
         Vote vote = new Vote(VoteType.all, roles);
         previousAction = actionType.VILLAGE_VOTE;
         startAction(vote);
@@ -259,15 +259,15 @@ public class Game implements GameType {
         }
     }
 
-    private void sendPublicMessage(String key, TextPrompter.TextLanguage language) {
-        sendPublicMessage(TextPrompter.prompt(key, language));
+    private void sendPublicMessage(String key, ScriptReader.TextLanguage language) {
+        sendPublicMessage(ScriptReader.readLine(key, language));
     }
 
     @SafeVarargs
-    private final void sendPublicMessage(String key, TextPrompter.TextLanguage language, Pair<String, String>... wards) {
-        String rawText = TextPrompter.prompt(key, language);
+    private final void sendPublicMessage(String key, ScriptReader.TextLanguage language, Pair<String, String>... wards) {
+        String rawText = ScriptReader.readLine(key, language);
         for (Pair<String, String> ward : wards) {
-            rawText = TextPrompter.parse(rawText, ward.getLeft(), ward.getRight());
+            rawText = ScriptReader.parse(rawText, ward.getLeft(), ward.getRight());
         }
         sendPublicMessage(rawText);
     }

@@ -69,7 +69,7 @@ public class CommandListener extends ListenerAdapter {
      */
     private void handleDisconnect(SlashCommandInteractionEvent event) {
         String password;
-        password = PropertyReader.getBotProperty("password");
+        password = PropertyReader.getBotPropertyFromFile("password");
 
         if (password.equals(Objects.requireNonNull(event.getOption("password")).getAsString())) {
             event.reply("bye").setEphemeral(true).queue();

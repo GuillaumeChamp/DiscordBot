@@ -17,8 +17,7 @@ public class Main {
                 .addEventListeners(new CommandListener())
                 .build();
         api.awaitReady();
-        BotLogger.log(BotLogger.INFO, "Bot started and start listening...");
-        BotLogger.log(BotLogger.INFO, "Connected to : " + api.getGuilds());
+        BotLogger.log(BotLogger.INFO, "Bot started and start listening...\nConnected to : " + api.getGuilds());
         CommandStore.create(api);
         ChannelManager.clearAll(api.getGuilds().get(0));
     }

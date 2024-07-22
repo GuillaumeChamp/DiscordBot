@@ -9,9 +9,8 @@ public class BotLogger {
     // copy log level to ensure single responsibility and hide logging lib from caller
     public static final Level INFO = Level.INFO;
     public static final Level DEBUG = Level.DEBUG;
-    public static final Level ERROR = Level.ERROR;
     public static final Level WARN = Level.WARN;
-    public static final Level FATAL = null;
+    public static final Level FATAL = Level.ERROR;
 
     private BotLogger() {
     }
@@ -23,9 +22,6 @@ public class BotLogger {
      * @param message message to log
      */
     public static void log(Level level, String message) {
-        if (level == FATAL) {
-            throw new RuntimeException("A fatal error has occurred, please check log");
-        }
         if (BotConfig.noLog) {
             return;
         }

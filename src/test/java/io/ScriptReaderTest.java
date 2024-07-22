@@ -1,6 +1,6 @@
 package io;
 
-import bot.io.TextPrompter;
+import bot.io.ScriptReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TextPrompterTest {
+public class ScriptReaderTest {
     private static final String PATH_FR = "src/main/resources/textFR.properties";
     private static final String PATH_EN = "src/main/resources/textEN.properties";
 
@@ -20,8 +20,8 @@ public class TextPrompterTest {
      */
     @Test
     public void shouldRetrieveBasicMessage() {
-        String test = TextPrompter.prompt("vote", TextPrompter.TextLanguage.FR);
-        String test1 = TextPrompter.prompt("vote", TextPrompter.TextLanguage.EN);
+        String test = ScriptReader.readLine("vote", ScriptReader.TextLanguage.FR);
+        String test1 = ScriptReader.readLine("vote", ScriptReader.TextLanguage.EN);
         assertThat(test)
                 .isNotNull()
                 .isNotEqualTo(test1);

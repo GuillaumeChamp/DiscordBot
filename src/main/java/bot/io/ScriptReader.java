@@ -2,17 +2,15 @@ package bot.io;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.security.InvalidParameterException;
 
-public class TextPrompter {
+public class ScriptReader {
     public enum TextLanguage {EN, FR}
 
     private static final String PATH_FR = "src/main/resources/textFR.properties";
     private static final String PATH_EN = "src/main/resources/textEN.properties";
 
-    // Singleton
-    private TextPrompter() {
+    private ScriptReader() {
     }
 
     /**
@@ -23,25 +21,9 @@ public class TextPrompter {
      * @return the targeted text
      * @throws InvalidParameterException if key is not found in file
      */
-    public static String prompt(String key, TextLanguage language) throws InvalidParameterException {
-        String path;
-        switch (language) {
-            case EN:
-                path = PATH_EN;
-                break;
-            case FR:
-                path = PATH_FR;
-                break;
-            default:
-                path = PATH_EN;
-                break;
-        }
-        String text;
-        try {
-            text = PropertyReader.getProperty(path, key);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static String readLine(String key, TextLanguage language) throws InvalidParameterException {
+        String path = language == TextLanguage.FR ? PATH_FR : PATH_EN;
+        String text = PropertyReader.getPropertyFromFile(path, key);
         if (text == null) {
             String errorMessage = key + " not found in " + path;
             BotLogger.log(BotLogger.WARN, errorMessage);
@@ -51,18 +33,18 @@ public class TextPrompter {
     }
 
     /**
-     * Replace a ward by content
+     * Parse a line and replace all tag by the value
      *
      * @param payload raw string from file
-     * @param ward    ward to replace
-     * @param content replacement char
+     * @param tag     identifier
+     * @param content value
      * @return the new string if ward exist, the input string if ward not found and log it to bot log
      */
-    public static String parse(String payload, String ward, String content) {
-        if (!StringUtils.contains(payload, ward)) {
-            BotLogger.log(BotLogger.INFO, ward + " not found in " + payload);
+    public static String parse(String payload, String tag, String content) {
+        if (!StringUtils.contains(payload, tag)) {
+            BotLogger.log(BotLogger.WARN, tag + " not found in " + payload);
             return payload;
         }
-        return StringUtils.replace(payload, ward, content);
+        return StringUtils.replace(payload, tag, content);
     }
 }
