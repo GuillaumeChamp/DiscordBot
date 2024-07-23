@@ -19,7 +19,7 @@ public class Main {
         api.awaitReady();
         BotLogger.log(BotLogger.INFO, "Bot started and start listening...\nConnected to : " + api.getGuilds());
         CommandStore.create(api);
-        ChannelManager.clearAll(api.getGuilds().get(0));
+        ChannelManager.clearAllCreatedChannelsFromGuild(api.getGuilds().get(0));
     }
     //TODO : revoir héritage
     //TODO : implémenter agitateur

@@ -19,7 +19,7 @@ public class PendingGame implements GameType {
         this.players = new ArrayList<>();
         this.id = id;
         this.limit = limit;
-        channel = ChannelManager.createChannel(server, "game" + id);
+        channel = ChannelManager.createChannelForAGuild(server, "game" + id);
         channel.sendMessage("A new game will start !\n/join " + id + " to join it (" + limit + " players max )").queue();
     }
 

@@ -5,103 +5,99 @@ import bot.io.ChannelManager;
 import bot.io.ProcessingException;
 import bot.io.PropertyReader;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
+import java.security.InvalidParameterException;
 import java.util.Objects;
 import java.util.StringJoiner;
 
 public class CommandListener extends ListenerAdapter {
     @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) return;
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
-        if (content.contains("quoi ?")) {
-            message.reply("Feur").queue();
-        }
-        if (content.contains("ça gaze")) {
-            MessageChannel channel = event.getChannel();
-            channel.sendMessage("ça gaze").queue();
-        }
-    }
-
-    @Override
-    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        if (CommandStore.GameCommand.contains(event.getName())) {
-            handleAction(event);
-        }
-        StringJoiner logString = new StringJoiner(" ")
-                .add(Objects.requireNonNull(event.getMember()).getEffectiveName())
-                .add("perform the following command")
-                .add(event.getName())
-                .add(event.getOptions().toString());
-        switch (event.getName()) {
-            case "create":
-                handleCreation(event);
-                BotLogger.log(BotLogger.INFO, logString.toString());
-                break;
-            case "join":
-                handleJoin(event);
-                BotLogger.log(BotLogger.INFO, logString.toString());
-                break;
-            case "stop":
-                handleStop(event);
-                BotLogger.log(BotLogger.INFO, logString.toString());
-                break;
-            case "start":
-                handleStart(event);
-                BotLogger.log(BotLogger.INFO, logString.toString());
-                break;
-            case "disconnect":
-                handleDisconnect(event);
-                BotLogger.log(BotLogger.INFO, logString.toString());
-                break;
-        }
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        // don't read message
+        // if (event.getAuthor().isBot()) return;
     }
 
     /**
-     * ephemeral answer
+     * Override the command handler to customize actions.
+     *
+     * @param event command slash event
      */
-    private void handleDisconnect(SlashCommandInteractionEvent event) {
-        String password;
-        password = PropertyReader.getBotPropertyFromFile("password");
+    @Override
+    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+        if (CommandStore.GAME_COMMAND.contains(event.getName())) {
+            handleGameAction(event);
+        }
+        String logString = new StringJoiner(" ")
+                .add(Objects.requireNonNull(event.getMember()).getEffectiveName())
+                .add("perform the following command")
+                .add(event.getName())
+                .add(event.getOptions().toString())
+                .toString();
+        switch (event.getName()) {
+            case CommandStore.CREATE_GAME_COMMAND -> handleCreation(event);
+            case CommandStore.JOIN_GAME_COMMAND -> handleJoin(event);
+            case CommandStore.STOP_GAME_COMMAND -> handleStop(event);
+            case CommandStore.START_GAME_COMMAND -> handleStart(event);
+            case CommandStore.DISCONNECT_BOT_COMMAND -> handleDisconnect(event);
+            // no default case, the input control is ensure by discord
+        }
+        BotLogger.log(BotLogger.INFO, logString);
+    }
 
-        if (password.equals(Objects.requireNonNull(event.getOption("password")).getAsString())) {
+    private void handleDisconnect(SlashCommandInteractionEvent event) {
+        String expectedPassword = PropertyReader.getBotPropertyFromFile(CommandStore.ARGUMENT_PASSWORD);
+        String providedPassword = event.getOption(CommandStore.ARGUMENT_PASSWORD, OptionMapping::getAsString);
+        if (expectedPassword.equals(providedPassword)) {
             event.reply("bye").setEphemeral(true).queue();
             BotLogger.log(BotLogger.INFO, event.getUser().getName() + " has shutdown the bot");
-            ChannelManager.clearAll(event.getGuild());
+            ChannelManager.clearAllCreatedChannelsFromGuild(event.getGuild());
             event.getJDA().shutdown();
         } else event.reply("you are not allow to shutdown the bot").queue();
     }
 
-    private void handleAction(SlashCommandInteractionEvent event) {
-        if (event.getOption("user") == null) event.reply("You forget the user").setEphemeral(true).queue();
-        Member target = Objects.requireNonNull(event.getOption("user")).getAsMember();
-        TextChannel channel = event.getChannel().asTextChannel();
-        event.deferReply().queue();
-        if (!channel.getName().contains("game")) {
-            event.getHook().sendMessage("You are not in a game channel").setEphemeral(true).queue();
-            return;
-        }
-        int gameIndex = Integer.parseInt(channel.getName().replace("game", ""));
+    private void handleCreation(SlashCommandInteractionEvent event) {
+        event.deferReply().setEphemeral(true).queue();
+        int maximumPlayers = event.getOption(CommandStore.CREATE_GAME_COMMAND_ARG_1, 512, OptionMapping::getAsInt);
         try {
-            GuildManager.getInterface(event.getGuild()).performAction(gameIndex, event.getMember(), target, event.getName());
-            assert target != null;
-            event.getHook().sendMessage(event.getName() + " registered against " + target.getEffectiveName()).setEphemeral(true).queue();
+            GuildManager.getInterface(event.getGuild()).createGame(maximumPlayers);
+            event.getHook().sendMessage("the game have been create").setEphemeral(true).queue();
+        } catch (ProcessingException e) {
+            event.getHook().sendMessage(e.getMessage()).setEphemeral(true).queue();
+        }
+    }
+
+    private void handleJoin(SlashCommandInteractionEvent event) {
+        int option = event.getOption(CommandStore.ARGUMENT_ID, 0, OptionMapping::getAsInt);
+        try {
+            GuildManager.getInterface(event.getGuild()).addPlayer(event.getMember(), option);
+            event.reply(Objects.requireNonNull(event.getMember()).getEffectiveName() + ", You have been added to the game " + option)
+                    .setEphemeral(true)
+                    .queue();
+        } catch (ProcessingException exception) {
+            event.reply(exception.getMessage()).setEphemeral(true).queue();
+        }
+    }
+
+    private void handleStart(SlashCommandInteractionEvent event) {
+        int option = event.getOption(CommandStore.ARGUMENT_ID, 0, OptionMapping::getAsInt);
+        try {
+            event.reply("starting . . .").setEphemeral(true).queue();
+            GuildManager.getInterface(event.getGuild()).start(option);
         } catch (ProcessingException e) {
             event.getHook().editOriginal(e.getMessage()).queue();
         }
-
     }
 
     private void handleStop(SlashCommandInteractionEvent event) {
+        int option = event.getOption(CommandStore.ARGUMENT_ID, 0, OptionMapping::getAsInt);
         try {
-            int option = Objects.requireNonNull(event.getOption("id")).getAsInt();
             GuildManager.getInterface(event.getGuild()).stop(option);
             event.reply("game deleted").queue();
         } catch (NullPointerException ignored) {
@@ -110,62 +106,33 @@ public class CommandListener extends ListenerAdapter {
     }
 
     /**
-     * Handle start of a game
+     * This method handle command relative to a game.
+     * Will later be enriched and moved to a dedicated interface or util
      *
-     * @param event commandEvent
+     * @param event SlashCommandInteractionEvent
      */
-    private void handleStart(SlashCommandInteractionEvent event) {
-        int option = 0;
-        event.reply("starting . . .").setEphemeral(true).queue();
-        try {
-            option = Objects.requireNonNull(event.getOption("id")).getAsInt();
-        } catch (NullPointerException ignored) {
+    private void handleGameAction(SlashCommandInteractionEvent event) {
+        if (event.getOption(CommandStore.ARGUMENT_USER) == null) {
+            event.reply("You forget the user").setEphemeral(true).queue();
         }
+        event.deferReply().queue();
+
+        Member target = event.getOption(CommandStore.ARGUMENT_USER, OptionMapping::getAsMember);
+        Channel channel = event.getChannel();
+
+        if (!StringUtils.contains(channel.getName(), "game")) {
+            event.getHook().editOriginal("You are not in a game channel").queue();
+            return;
+        }
+
         try {
-            GuildManager.getInterface(event.getGuild()).start(option);
-        } catch (ProcessingException e) {
+            int gameIndex = ChannelManager.resolveGameIndex(channel);
+            GuildManager.getInterface(event.getGuild()).performAction(gameIndex, event.getMember(), target, event.getName());
+            assert target != null;
+            event.getHook().editOriginal(event.getName() + " registered against " + target.getEffectiveName()).queue();
+        } catch (ProcessingException | InvalidParameterException e) {
             event.getHook().editOriginal(e.getMessage()).queue();
         }
     }
 
-    /**
-     * Handle the join event with the optional game id.
-     * If no optional, add it to the first game available
-     *
-     * @param event commandEvent
-     */
-    private void handleJoin(SlashCommandInteractionEvent event) {
-        int option = 0;
-        try {
-            option = Objects.requireNonNull(event.getOption("id")).getAsInt();
-        } catch (NullPointerException ignore) {
-        }
-        try {
-            GuildManager.getInterface(event.getGuild()).addPlayer(event.getMember(), option);
-            event.reply(Objects.requireNonNull(event.getMember()).getEffectiveName() + ", You have been added to the game " + option).setEphemeral(true).queue();
-        } catch (ProcessingException exception) {
-            event.reply(exception.getMessage()).setEphemeral(true).queue();
-        }
-    }
-
-    /**
-     * Handle Creation of a party
-     *
-     * @param event commandEvent
-     */
-    private void handleCreation(SlashCommandInteractionEvent event) {
-        event.deferReply().setEphemeral(true).queue();
-        int option = 512;
-        try {
-            option = Objects.requireNonNull(event.getOption("max")).getAsInt();
-        } catch (NullPointerException ignored) {
-        }
-        try {
-            GuildManager.getInterface(event.getGuild()).createGame(option);
-            event.getHook().sendMessage("the game have been create").setEphemeral(true).queue();
-        } catch (ProcessingException e) {
-            event.getHook().sendMessage(e.getMessage()).setEphemeral(true).queue();
-        }
-
-    }
 }

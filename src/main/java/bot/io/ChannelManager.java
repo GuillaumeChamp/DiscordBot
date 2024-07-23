@@ -3,9 +3,12 @@ package bot.io;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import org.apache.commons.lang3.StringUtils;
 
+import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -30,7 +33,7 @@ public class ChannelManager {
     /**
      * Clear all the game channels
      */
-    public static void clearAll(Guild server) {
+    public static void clearAllCreatedChannelsFromGuild(Guild server) {
         if (server == null)
             return;
         server.getTextChannelsByName("game0", true).forEach(ChannelManager::deleteOldChannel);
@@ -47,7 +50,7 @@ public class ChannelManager {
      * @param name channel name
      * @return the channel
      */
-    public static TextChannel createChannel(Guild server, String name) {
+    public static TextChannel createChannelForAGuild(Guild server, String name) {
         try {
             deleteOldChannel(server.getTextChannelsByName(name, true).get(0));
         } catch (Exception ignored) {
@@ -80,7 +83,15 @@ public class ChannelManager {
     }
 
     public static void sendPrivateMessage(Member m, String message) {
-        m.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
+        m.getUser().openPrivateChannel()
+                .queue(privateChannel -> privateChannel.sendMessage(message).queue());
+    }
+
+    public static Integer resolveGameIndex(Channel channel) throws InvalidParameterException {
+        if (!StringUtils.contains(channel.getName(), "game")) {
+            throw new InvalidParameterException("This is not a game channel");
+        }
+        return Integer.parseInt(channel.getName().replace("game", ""));
     }
 
 }
