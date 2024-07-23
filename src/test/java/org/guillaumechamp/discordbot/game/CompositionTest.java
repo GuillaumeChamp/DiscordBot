@@ -1,6 +1,5 @@
-package game;
+package org.guillaumechamp.discordbot.game;
 
-import org.guillaumechamp.discordbot.game.Composition;
 import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +16,7 @@ public class CompositionTest {
     }
 
     @Test
-    public void shouldDistributionBeRandom() {
+    void shouldDistributionBeRandom() {
         //Assert for game size from 3 to 20
         for (int i = 4; i < 20; i++) {
             //roll 20 times

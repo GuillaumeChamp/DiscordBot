@@ -1,4 +1,4 @@
-package util;
+package org.guillaumechamp.discordbot.util;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;

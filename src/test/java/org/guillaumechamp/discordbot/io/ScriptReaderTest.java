@@ -1,6 +1,5 @@
-package io;
+package org.guillaumechamp.discordbot.io;
 
-import org.guillaumechamp.discordbot.io.ScriptReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -11,7 +10,7 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ScriptReaderTest {
+class ScriptReaderTest {
     private static final String PATH_FR = "src/main/resources/textFR.properties";
     private static final String PATH_EN = "src/main/resources/textEN.properties";
 
@@ -19,7 +18,7 @@ public class ScriptReaderTest {
      * Check file availability
      */
     @Test
-    public void shouldRetrieveBasicMessage() {
+    void shouldRetrieveBasicMessage() {
         String test = ScriptReader.readLine("vote", ScriptReader.TextLanguage.FR);
         String test1 = ScriptReader.readLine("vote", ScriptReader.TextLanguage.EN);
         assertThat(test)
@@ -31,7 +30,7 @@ public class ScriptReaderTest {
      * Check file integrity
      */
     @Test
-    public void shouldENFileBeUpToDate() throws IOException {
+    void shouldENFileBeUpToDate() throws IOException {
         //-- Given
         Properties sourceProperties = new Properties();
         InputStream stream = Files.newInputStream(Paths.get(PATH_FR));
@@ -48,7 +47,7 @@ public class ScriptReaderTest {
      * Check file integrity
      */
     @Test
-    public void shouldFRFileBeUpToDate() throws IOException {
+    void shouldFRFileBeUpToDate() throws IOException {
         //-- Given
         Properties sourceProperties = new Properties();
         InputStream stream = Files.newInputStream(Paths.get(PATH_EN));

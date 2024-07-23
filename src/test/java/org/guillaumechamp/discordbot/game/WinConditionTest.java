@@ -1,4 +1,4 @@
-package game;
+package org.guillaumechamp.discordbot.game;
 
 import org.guillaumechamp.discordbot.game.roles.Role;
 import org.guillaumechamp.discordbot.game.roles.RoleManagement;
@@ -9,10 +9,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-public class WinConditionTest {
+class WinConditionTest {
 
     @Test
-    public void shouldVillagerWinByEliminateAllWolf() {
+    void shouldVillagerWinByEliminateAllWolf() {
         List<Role> roles = GameUtil.createSampleComposition();
         assertDoesNotThrow(() -> RoleManagement.checkWin(roles));
         roles.remove(1);
@@ -25,7 +25,7 @@ public class WinConditionTest {
     }
 
     @Test
-    public void shouldWolfWinByEliminateAllVillager() {
+    void shouldWolfWinByEliminateAllVillager() {
         List<Role> roles = GameUtil.createSampleComposition();
         assertDoesNotThrow(() -> RoleManagement.checkWin(roles));
         List<Role> remaining = roles.subList(0, 1);

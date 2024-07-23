@@ -1,11 +1,11 @@
-package io;
+package org.guillaumechamp.discordbot.io;
 
 import org.awaitility.Awaitility;
 import org.guillaumechamp.discordbot.game.Game;
 import org.guillaumechamp.discordbot.io.listener.Waiter;
+import org.guillaumechamp.discordbot.util.AbstractDiscordTest;
+import org.guillaumechamp.discordbot.util.TestAction;
 import org.junit.jupiter.api.Test;
-import util.AbstractDiscordTest;
-import util.TestAction;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
