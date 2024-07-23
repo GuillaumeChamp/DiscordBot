@@ -1,7 +1,7 @@
 package game;
 
-import bot.game.roles.EnhanceRoleType;
-import bot.game.roles.Role;
+import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
+import org.guillaumechamp.discordbot.game.roles.Role;
 import util.DiscordTestUtil;
 
 import java.util.ArrayList;

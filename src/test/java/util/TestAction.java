@@ -1,8 +1,8 @@
 package util;
 
-import bot.game.mechanism.Action;
-import bot.game.roles.EnhanceRoleType;
-import bot.game.roles.Role;
+import org.guillaumechamp.discordbot.game.mechanism.Action;
+import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
+import org.guillaumechamp.discordbot.game.roles.Role;
 
 import java.util.Collections;
 import java.util.List;

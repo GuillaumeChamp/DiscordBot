@@ -1,7 +1,7 @@
 package game;
 
-import bot.game.roles.Role;
-import bot.game.roles.RoleManagement;
+import org.guillaumechamp.discordbot.game.roles.Role;
+import org.guillaumechamp.discordbot.game.roles.RoleManagement;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

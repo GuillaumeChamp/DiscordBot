@@ -1,8 +1,8 @@
 package io;
 
-import bot.game.Game;
-import bot.io.listener.Waiter;
 import org.awaitility.Awaitility;
+import org.guillaumechamp.discordbot.game.Game;
+import org.guillaumechamp.discordbot.io.listener.Waiter;
 import org.junit.jupiter.api.Test;
 import util.AbstractDiscordTest;
 import util.TestAction;

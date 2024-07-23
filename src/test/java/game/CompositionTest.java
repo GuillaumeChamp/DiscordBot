@@ -1,7 +1,7 @@
 package game;
 
-import bot.game.Composition;
-import bot.game.roles.EnhanceRoleType;
+import org.guillaumechamp.discordbot.game.Composition;
+import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

@@ -1,12 +1,12 @@
 package util;
 
-import bot.io.listener.CommandListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import org.guillaumechamp.discordbot.io.listener.CommandListener;
 
 import java.util.List;
 

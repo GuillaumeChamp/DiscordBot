@@ -1,6 +1,6 @@
 package io;
 
-import bot.io.ScriptReader;
+import org.guillaumechamp.discordbot.io.ScriptReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

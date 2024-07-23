@@ -1,8 +1,8 @@
 package util;
 
-import bot.io.BotConfig;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.guillaumechamp.discordbot.io.BotConfig;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
