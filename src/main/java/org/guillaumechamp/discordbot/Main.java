@@ -17,11 +17,9 @@ public class Main {
                 .addEventListeners(new CommandListener())
                 .build();
         api.awaitReady();
-        BotLogger.log(BotLogger.INFO, "Bot started and start listening...\nConnected to : " + api.getGuilds());
+        BotLogger.log(BotLogger.INFO, "Connected to : " + api.getGuilds());
         CommandStore.create(api);
-        ChannelManager.clearAllCreatedChannelsFromGuild(api.getGuilds().get(0));
+        api.getGuilds().forEach(ChannelManager::clearAllCreatedChannelsFromGuild);
     }
-    //TODO : revoir héritage
-    //TODO : implémenter agitateur
     //perm = 2646829136
 }

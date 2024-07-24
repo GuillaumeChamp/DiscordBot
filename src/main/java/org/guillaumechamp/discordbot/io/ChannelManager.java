@@ -34,8 +34,9 @@ public class ChannelManager {
      * Clear all the game channels
      */
     public static void clearAllCreatedChannelsFromGuild(Guild server) {
-        if (server == null)
+        if (server == null) {
             return;
+        }
         server.getTextChannelsByName("game0", true).forEach(ChannelManager::deleteOldChannel);
         server.getTextChannelsByName("game0wolf", true).forEach(ChannelManager::deleteOldChannel);
         server.getTextChannelsByName("game1", true).forEach(ChannelManager::deleteOldChannel);
@@ -51,10 +52,7 @@ public class ChannelManager {
      * @return the channel
      */
     public static TextChannel createChannelForAGuild(Guild server, String name) {
-        try {
-            deleteOldChannel(server.getTextChannelsByName(name, true).get(0));
-        } catch (Exception ignored) {
-        }
+        deleteOldChannel(server.getTextChannelsByName(name, true).get(0));
         return server.createTextChannel(name).complete();
     }
 
@@ -65,10 +63,7 @@ public class ChannelManager {
      * @param name    channel name
      */
     public static void createRestrictedChannel(Guild server, List<Member> members, String name) {
-        try {
-            deleteOldChannel(server.getTextChannelsByName(name, true).get(0));
-        } catch (Exception ignored) {
-        }
+        deleteOldChannel(server.getTextChannelsByName(name, true).get(0));
 
         Collection<Permission> grant = EnumSet.of(Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY);
         Collection<Permission> revoked = EnumSet.of(Permission.MESSAGE_ATTACH_FILES);

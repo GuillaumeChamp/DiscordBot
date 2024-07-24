@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 
 public class PropertyReader {
@@ -37,7 +38,7 @@ public class PropertyReader {
         } catch (IOException e) {
             String errorMessage = "Unable to open property file " + path;
             BotLogger.log(BotLogger.FATAL, errorMessage);
-            throw new RuntimeException(e);
+            throw new NoSuchElementException(e);
         }
     }
 }

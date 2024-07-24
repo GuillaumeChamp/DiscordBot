@@ -18,7 +18,7 @@ public class CommandStore {
     public static final String SAVE_COMMAND = "save";
     public static final String VOTE_COMMAND = "vote";
     public static final String SEE_COMMAND = "see";
-    public static final List<String> GAME_COMMAND = Arrays.asList(KILL_COMMAND, SAVE_COMMAND, VOTE_COMMAND, SEE_COMMAND);
+    protected static final List<String> GAME_COMMAND = Arrays.asList(KILL_COMMAND, SAVE_COMMAND, VOTE_COMMAND, SEE_COMMAND);
     public static final String CREATE_GAME_COMMAND = "create";
     public static final String CREATE_GAME_COMMAND_ARG_1 = "max";
     public static final String STOP_GAME_COMMAND = "stop";
@@ -26,10 +26,13 @@ public class CommandStore {
     public static final String START_GAME_COMMAND = "start";
     public static final String ARGUMENT_ID = "id";
     public static final String ARGUMENT_USER = "user";
+    private static final String USER_ARGUMENT_DESCRIPTION = "target";
     public static final String ARGUMENT_PASSWORD = "password";
     public static final String DISCONNECT_BOT_COMMAND = "disconnect";
-    public static final List<String> DEFAULT_COMMAND = Arrays.asList(CREATE_GAME_COMMAND, STOP_GAME_COMMAND, JOIN_GAME_COMMAND, START_GAME_COMMAND, DISCONNECT_BOT_COMMAND);
+    protected static final List<String> DEFAULT_COMMAND = Arrays.asList(CREATE_GAME_COMMAND, STOP_GAME_COMMAND, JOIN_GAME_COMMAND, START_GAME_COMMAND, DISCONNECT_BOT_COMMAND);
 
+    private CommandStore() {
+    }
 
     public static void create(JDA jda) {
         jda.updateCommands().addCommands(
@@ -51,16 +54,16 @@ public class CommandStore {
                         .addOption(OptionType.STRING, ARGUMENT_PASSWORD, "Pass Phrase")
                         .setDescriptionLocalization(DiscordLocale.FRENCH, "Stop le bot"),
                 Commands.slash(VOTE_COMMAND, "vote for someone")
-                        .addOption(OptionType.USER, ARGUMENT_USER, "target")
+                        .addOption(OptionType.USER, ARGUMENT_USER, USER_ARGUMENT_DESCRIPTION)
                         .setDescriptionLocalization(DiscordLocale.FRENCH, "Vote pour quelqu'un"),
                 Commands.slash(KILL_COMMAND, "[Witch] use it to kill someone (once a game)")
-                        .addOption(OptionType.USER, ARGUMENT_USER, "target")
+                        .addOption(OptionType.USER, ARGUMENT_USER, USER_ARGUMENT_DESCRIPTION)
                         .setDescriptionLocalization(DiscordLocale.FRENCH, "[sorcière] Uue un joueur (une fois par partie)"),
                 Commands.slash(SAVE_COMMAND, "[Witch] use it to save the target (once a game)")
-                        .addOption(OptionType.USER, ARGUMENT_USER, "target")
+                        .addOption(OptionType.USER, ARGUMENT_USER, USER_ARGUMENT_DESCRIPTION)
                         .setDescriptionLocalization(DiscordLocale.FRENCH, "[sorcière] Sauve une pesonne des loups (une fois par partie)"),
                 Commands.slash(SEE_COMMAND, "[Seer] use it to see a role (once a night)")
-                        .addOption(OptionType.USER, ARGUMENT_USER, "target")
+                        .addOption(OptionType.USER, ARGUMENT_USER, USER_ARGUMENT_DESCRIPTION)
                         .setDescriptionLocalization(DiscordLocale.FRENCH, "[Voyante] Permet de voir le role d'un joueur")
         ).queue();
     }

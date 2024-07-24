@@ -13,6 +13,7 @@ import org.guillaumechamp.discordbot.io.PropertyReader;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.InvalidParameterException;
+import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -39,10 +40,9 @@ public class CommandListener extends ListenerAdapter {
         }
 
         String logString = new StringJoiner(" ")
-                .add(Objects.requireNonNull(event.getMember()).getEffectiveName())
-                .add("perform the following command")
-                .add(event.getName())
-                .add(event.getOptions().toString())
+                .add(event.getInteraction().getUser().toString())
+                .add("/" + event.getName())
+                .add(stringifyOptions(event.getOptions()))
                 .toString();
         BotLogger.log(BotLogger.INFO, logString);
 
@@ -133,6 +133,16 @@ public class CommandListener extends ListenerAdapter {
         } catch (ProcessingException | InvalidParameterException e) {
             event.getHook().editOriginal(e.getMessage()).queue();
         }
+    }
+
+    private String stringifyOptions(List<OptionMapping> options) {
+        StringBuilder stringBuilder = new StringBuilder(" ");
+        for (OptionMapping mapping : options) {
+            stringBuilder.append(mapping.getName())
+                    .append('=')
+                    .append(mapping.getAsString());
+        }
+        return stringBuilder.toString();
     }
 
 }

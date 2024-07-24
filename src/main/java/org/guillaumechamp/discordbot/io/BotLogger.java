@@ -22,9 +22,6 @@ public class BotLogger {
      * @param message message to log
      */
     public static void log(Level level, String message) {
-        if (BotConfig.noLog) {
-            return;
-        }
         logger.atLevel(level).log(message);
     }
 }
