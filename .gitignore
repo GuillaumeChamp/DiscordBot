@@ -1,5 +1,9 @@
 # Project exclude paths
-/.gradle/
-/build/
-/build/classes/java/main/
-/build/classes/java/test/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+/.mvn/
+/target/
+/out/
+/mvnw.cmd
+/mvnw
