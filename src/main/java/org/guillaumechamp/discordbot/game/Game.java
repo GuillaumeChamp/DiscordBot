@@ -90,7 +90,7 @@ public class Game implements GameType {
 
     public void interruptGame() {
         if (action != null) {
-            if (!Waiter.removeAction(this, action)) {
+            if (!Waiter.removeAction(this)) {
                 throw new RuntimeException("Tryed to interrupt a game but the game have no action");
             }
             this.isActive = false;

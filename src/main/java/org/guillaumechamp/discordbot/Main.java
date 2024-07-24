@@ -7,6 +7,7 @@ import org.guillaumechamp.discordbot.io.BotLogger;
 import org.guillaumechamp.discordbot.io.ChannelManager;
 import org.guillaumechamp.discordbot.io.listener.CommandListener;
 import org.guillaumechamp.discordbot.io.listener.CommandStore;
+import org.guillaumechamp.discordbot.io.listener.Waiter;
 
 public class Main {
     static JDA api;
@@ -20,6 +21,7 @@ public class Main {
         BotLogger.log(BotLogger.INFO, "Connected to : " + api.getGuilds());
         CommandStore.create(api);
         api.getGuilds().forEach(ChannelManager::clearAllCreatedChannelsFromGuild);
+        Waiter.initWaiter();
     }
     //perm = 2646829136
 }
