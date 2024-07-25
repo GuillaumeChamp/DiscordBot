@@ -1,9 +1,10 @@
 package org.guillaumechamp.discordbot.game.roles;
 
 public enum EnhanceRoleType {
-    simpleVillager,
-    simpleWolf,
-    seer,
-    witch
+    ALL,
+    SIMPLE_VILLAGER,
+    SIMPLE_WOLF,
+    SEER,
+    WITCH
 
 }

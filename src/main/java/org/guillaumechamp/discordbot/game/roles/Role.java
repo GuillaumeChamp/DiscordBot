@@ -11,11 +11,11 @@ public class Role {
         this.owner = owner;
         this.realRole = realRole;
         switch (realRole) {
-            case simpleWolf:
-                type = RoleType.werewolf;
+            case SIMPLE_WOLF:
+                type = RoleType.WEREWOLF;
                 break;
             default:
-                type = RoleType.villager;
+                type = RoleType.VILLAGER;
                 break;
         }
     }

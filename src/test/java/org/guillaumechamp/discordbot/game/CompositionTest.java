@@ -27,8 +27,8 @@ public class CompositionTest {
                 first.add(composition.drawARole());
                 second.add(composition.drawARole());
             }
-            assertThat(first).contains(EnhanceRoleType.simpleVillager, EnhanceRoleType.simpleWolf);
-            assertThat(second).contains(EnhanceRoleType.simpleVillager, EnhanceRoleType.simpleWolf);
+            assertThat(first).contains(EnhanceRoleType.SIMPLE_VILLAGER, EnhanceRoleType.SIMPLE_WOLF);
+            assertThat(second).contains(EnhanceRoleType.SIMPLE_VILLAGER, EnhanceRoleType.SIMPLE_WOLF);
         }
     }
 }

@@ -24,11 +24,17 @@ public class PendingGame implements GameType {
     }
 
     public void addPlayer(Member member) throws ProcessingException {
-        if (isStarted) throw new ProcessingException("the game is already start");
-        if (players.size() >= limit) throw new ProcessingException("The game is full");
+        if (isStarted) {
+            throw new ProcessingException("the game is already start");
+        }
+        if (players.size() >= limit) {
+            throw new ProcessingException("The game is full");
+        }
         players.add(member);
         channel.sendMessage(member.getEffectiveName() + " join the game").queue();
-        if (players.size() == limit) this.startGame();
+        if (players.size() == limit) {
+            this.startGame();
+        }
     }
 
     public Game startGame() throws ProcessingException {

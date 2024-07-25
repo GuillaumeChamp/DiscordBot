@@ -1,5 +1,5 @@
 package org.guillaumechamp.discordbot.game.roles;
 
 public enum RoleType {
-    villager, werewolf, solo
+    VILLAGER, WEREWOLF, SOLO
 }

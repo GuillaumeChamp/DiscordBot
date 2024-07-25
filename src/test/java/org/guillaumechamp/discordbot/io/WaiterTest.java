@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 class WaiterTest extends AbstractDiscordTest {
     @Test
     void shouldWaiterAwakeGameProperly() {
-        final int duration = 10;
+        final int duration = 4;
         //-- Given
         Game game = new Game(0, Collections.singletonList(testMember), testChannel);
         TestAction action = new TestAction(duration);
@@ -23,12 +23,12 @@ class WaiterTest extends AbstractDiscordTest {
         Awaitility.await()
                 .atLeast(duration - 1, TimeUnit.SECONDS)
                 .atMost(duration + 1, TimeUnit.SECONDS)
-                .until(() -> !action.isActive());
+                .until(action::isExpired);
     }
 
     @Test
     void shouldWaiterHoldFewActions() {
-        final int duration = 10;
+        final int duration = 5;
         //-- Given
         Game game = new Game(0, Collections.singletonList(testMember), testChannel);
         Game game1 = new Game(1, Collections.singletonList(testMember), testChannel);
@@ -42,7 +42,7 @@ class WaiterTest extends AbstractDiscordTest {
         Awaitility.await()
                 .atLeast(duration - 1, TimeUnit.SECONDS)
                 .atMost(duration + 1, TimeUnit.SECONDS)
-                .until(() -> !action.isActive() && !action1.isActive());
+                .until(() -> action.isExpired() && action1.isExpired());
     }
 
 }

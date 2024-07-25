@@ -6,7 +6,7 @@ import org.guillaumechamp.discordbot.io.ProcessingException;
 import java.util.List;
 
 public class GameException extends ProcessingException {
-    final List<Role> winningTeam;
+    private final transient List<Role> winningTeam;
 
     public GameException(String message, List<Role> composition) {
         super(message);

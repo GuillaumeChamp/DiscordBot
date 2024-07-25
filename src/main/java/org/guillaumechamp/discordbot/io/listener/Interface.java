@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import org.guillaumechamp.discordbot.game.GameType;
 import org.guillaumechamp.discordbot.game.PendingGame;
-import org.guillaumechamp.discordbot.game.mechanism.ParallelAction;
+import org.guillaumechamp.discordbot.game.mechanism.BaseAction;
 import org.guillaumechamp.discordbot.io.ProcessingException;
 
 /**
@@ -13,7 +13,7 @@ import org.guillaumechamp.discordbot.io.ProcessingException;
 public class Interface {
     Guild server;
     GameType[] pendingGames;
-    ParallelAction[] votes = new ParallelAction[3];
+    BaseAction[] votes = new BaseAction[3];
 
     //Singleton
     public Interface(Guild server) {
@@ -71,7 +71,7 @@ public class Interface {
         votes[gameIndex].handleAction(member, target, action);
     }
 
-    public void registerAction(int index, ParallelAction vote) {
+    public void registerAction(int index, BaseAction vote) {
         votes[index] = vote;
     }
 

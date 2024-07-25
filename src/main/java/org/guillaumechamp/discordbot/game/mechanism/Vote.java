@@ -7,37 +7,28 @@ import org.guillaumechamp.discordbot.game.roles.RoleManagement;
 import org.guillaumechamp.discordbot.game.roles.RoleType;
 import org.guillaumechamp.discordbot.io.ProcessingException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class Vote extends Action {
-    private static final int DEFAULT_DURATION = 60;
-    private final RoleType[] rolesToVote;
-    private final List<Role> roles;
-    private final List<String> targetsId;
+public class Vote extends BaseAction {
+    public enum VoteType {ALL, WEREWOLF}
+
+    private final Map<Role, String> playerTargetMap = new HashMap<>();
+    private final RoleType roleToVote;
 
     /**
      * Create a new vote
      *
-     * @param rolesToVote macro to design who can vote
-     * @param roles       all player remaining in the game
+     * @param voteType macro to design who can vote
+     * @param roles    all player remaining in the game
      */
-    public Vote(VoteType rolesToVote, List<Role> roles) {
-        super(EnhanceRoleType.simpleWolf, null, DEFAULT_DURATION);
-
-        if (rolesToVote == VoteType.werewolf) {
-            this.rolesToVote = new RoleType[]{RoleType.werewolf};
-        } else {
-            this.rolesToVote = new RoleType[]{RoleType.werewolf, RoleType.villager};
+    public Vote(VoteType voteType, List<Role> roles) {
+        super(EnhanceRoleType.ALL, roles, Collections.singletonList("vote"));
+        for (Role role : roles) {
+            playerTargetMap.put(role, null);
         }
-        this.roles = roles;
-        this.targetsId = new ArrayList<>(roles.size());
-        for (int i = 0; i < roles.size(); i++) {
-            targetsId.add(null);
-        }
-        isActive = true;
+        this.roleToVote = voteType == VoteType.WEREWOLF ? RoleType.WEREWOLF : null;
     }
 
     /**
@@ -46,58 +37,41 @@ public class Vote extends Action {
      * @param voter  the personne who want to vote
      * @param target the personne for whom it wants to vote
      * @param action must be "vote" or the action will be rejected
-     * @throws ProcessingException if the voter is not in the game,
-     *                             if the target is not in the game, if the vote is close,
-     *                             if the voter role is not allowed for this vote
+     * @throws ProcessingException an exception that explain why nothing happen
      */
     @Override
     public void handleAction(Member voter, Member target, String action) throws ProcessingException {
-        if (!action.equals("vote")) throw new ProcessingException("This is not the time for this, this is vote time");
-        if (!isActive) throw new ProcessingException(voter.getEffectiveName() + " : the vote is close");
-        if (RoleManagement.isNotIn(roles, target))
-            throw new ProcessingException(target.getEffectiveName() + " this player is not in the game");
-        if (RoleManagement.isNotIn(roles, voter))
-            throw new ProcessingException(voter.getEffectiveName() + " : You seem to not be in the game");
-        if (!RoleManagement.isA(roles, voter, this.rolesToVote))
-            throw new ProcessingException("It's not your turn to vote");
-        for (int i = 0; i < roles.size(); i++) {
-            if (roles.get(i).getOwner().getId().equals(voter.getId())) {
-                targetsId.set(i, target.getId());
-                return;
-            }
+        super.handleAction(voter, target, action);
+        if (target == null) {
+            throw new ProcessingException("No player targeted");
         }
+        if (RoleType.WEREWOLF.equals(roleToVote) && !RoleManagement.isA(remainingPlayersList, target, RoleType.WEREWOLF)) {
+            throw new ProcessingException("You cannot vote");
+        }
+        playerTargetMap.put(RoleManagement.getRoleByMemberId(remainingPlayersList, voter.getId()), target.getId());
     }
 
     /**
      * Get the answer of a vote
      *
-     * @return the personne with the maximum of vote
+     * @return the person with the maximum of vote
      * @throws ProcessingException if two player have the same amount of vote, if the target disappear
      */
     public ArrayList<Role> getResult() throws ProcessingException {
-        String first = null;
-        int max = 0;
-        int max2 = 0;
-        Map<String, Integer> hm = new HashMap<>();
-        for (String i : targetsId) {
-            Integer j = hm.get(i);
-            hm.put(i, (j == null) ? 1 : j + 1);
+        Map<String, Long> numberOfVoteByMember = playerTargetMap
+                .values()
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(Function.identity(),
+                        HashMap::new,
+                        Collectors.counting()));
+        long maxNumberOfVote = numberOfVoteByMember.values().stream().max(Double::compare).orElse(0L);
+        List<String> tiedList = numberOfVoteByMember.entrySet().stream().filter(key -> maxNumberOfVote == key.getValue()).map(Map.Entry::getKey).toList();
+        if (tiedList.size() == 1) {
+            ArrayList<Role> ans = new ArrayList<>();
+            ans.add(RoleManagement.getRoleByMemberId(remainingPlayersList, tiedList.get(0)));
+            return ans;
         }
-        for (Map.Entry<String, Integer> val : hm.entrySet()) {
-            if (val.getValue() > max) {
-                max = val.getValue();
-                first = val.getKey();
-                continue;
-            }
-            if (val.getValue() == max) {
-                max2 = val.getValue();
-            }
-        }
-        if (max == max2) throw new ProcessingException("The choice is not unanimous no one will be kill");
-        ArrayList<Role> ans = new ArrayList<>();
-        if (first == null)
-            throw new ProcessingException("The village was quiet and no one wanted to vote for some one\nIt's so sad, it's always funny to see someone burn !");
-        ans.add(RoleManagement.getRoleOf(roles, first));
-        return ans;
+        throw new ProcessingException("The choice is not unanimous no one will be kill");
     }
 }

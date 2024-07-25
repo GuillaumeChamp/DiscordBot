@@ -1,7 +1,7 @@
 package org.guillaumechamp.discordbot.io.listener;
 
 import org.guillaumechamp.discordbot.game.Game;
-import org.guillaumechamp.discordbot.game.mechanism.ParallelAction;
+import org.guillaumechamp.discordbot.game.mechanism.BaseAction;
 import org.guillaumechamp.discordbot.io.BotLogger;
 
 import java.util.HashMap;
@@ -24,7 +24,7 @@ public class Waiter {
         threadPoolExecutor.setRemoveOnCancelPolicy(true);
     }
 
-    public static void register(Game game, ParallelAction action) {
+    public static void register(Game game, BaseAction action) {
         if (registeredActions.containsKey(game)) {
             BotLogger.log(BotLogger.FATAL, "two actions registered for the same game");
         }

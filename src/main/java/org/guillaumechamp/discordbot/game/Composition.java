@@ -22,16 +22,16 @@ public class Composition {
         int numberWerewolf = (int) Math.floor(0.3 * (gameSize));
         int numberVillager = (gameSize) - numberWerewolf;
         for (int i = 0; i < numberWerewolf; i++) {
-            stack.add(EnhanceRoleType.simpleWolf);
+            stack.add(EnhanceRoleType.SIMPLE_WOLF);
         }
         for (int i = 0; i < numberVillager; i++) {
-            stack.add(EnhanceRoleType.simpleVillager);
+            stack.add(EnhanceRoleType.SIMPLE_VILLAGER);
         }
         if (gameSize > 4) {
-            stack.remove(EnhanceRoleType.simpleVillager);
-            stack.add(EnhanceRoleType.seer);
-            stack.remove(EnhanceRoleType.simpleVillager);
-            stack.add(EnhanceRoleType.witch);
+            stack.remove(EnhanceRoleType.SIMPLE_VILLAGER);
+            stack.add(EnhanceRoleType.SEER);
+            stack.remove(EnhanceRoleType.SIMPLE_VILLAGER);
+            stack.add(EnhanceRoleType.WITCH);
         }
     }
 
@@ -43,7 +43,7 @@ public class Composition {
      */
     public Role getARole(Member m) {
         EnhanceRoleType realRole = drawARole();
-        if (realRole.equals(EnhanceRoleType.witch)) return new WitchRole(m);
+        if (realRole.equals(EnhanceRoleType.WITCH)) return new WitchRole(m);
         return new Role(m, realRole);
     }
 

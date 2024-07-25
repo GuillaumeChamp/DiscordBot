@@ -17,7 +17,7 @@ import java.util.Objects;
 public class Game implements GameType {
     private enum actionType {NULL, SEER, WOLF_VOTE, WITCH, VILLAGE_VOTE}
 
-    private Action action;
+    private BaseAction action;
     private boolean isActive = true;
     private int nbTurn = 0;
     private final TextChannel channel;
@@ -50,7 +50,7 @@ public class Game implements GameType {
             this.currentServer = channel.getGuild();
             sendPublicMessage("start", gameLanguage);
             if (!BotConfig.isSilence) {
-                ChannelManager.createRestrictedChannel(currentServer, RoleManagement.getAll(temporaryRoleList, RoleType.werewolf), "game" + id + "wolf");
+                ChannelManager.createRestrictedChannel(currentServer, RoleManagement.getAll(temporaryRoleList, RoleType.WEREWOLF), "game" + id + "wolf");
             }
         }
         this.tellRoles();
@@ -101,22 +101,22 @@ public class Game implements GameType {
         if (!BotConfig.isSilence) {
             try {
                 Role target = action.getResult().get(0);
-                ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You have spec " + target.getRealRole());
+                ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.SEER).getOwner(), "You have spec " + target.getRealRole());
             } catch (ProcessingException e) {
-                ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You have spec nothing");
+                ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.SEER).getOwner(), "You have spec nothing");
             }
         }
     }
 
     private void playSeer() {
-        if (RoleManagement.roleIsNotIn(roles, EnhanceRoleType.seer)) {
+        if (RoleManagement.roleIsNotIn(roles, EnhanceRoleType.SEER)) {
             playWolf();
             return;
         }
         sendPublicMessage("seerStart", gameLanguage);
         try {
             if (!BotConfig.isSilence) {
-                ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.seer).getOwner(), "You can spec someone (/see name) you have 10 s");
+                ChannelManager.sendPrivateMessage(RoleManagement.getByRole(roles, EnhanceRoleType.SEER).getOwner(), "You can spec someone (/see name) you have 10 s");
             }
             SeerAction action = new SeerAction(roles);
             previousAction = actionType.SEER;
@@ -128,14 +128,14 @@ public class Game implements GameType {
 
     private void playWolf() {
         sendPublicMessage("wolfStart", gameLanguage);
-        Vote vote = new Vote(VoteType.werewolf, roles);
+        Vote vote = new Vote(Vote.VoteType.WEREWOLF, roles);
         this.previousAction = actionType.WOLF_VOTE;
         startAction(vote);
     }
 
     private void playVote() throws GameException {
         sendPublicMessage("vote", ScriptReader.TextLanguage.EN);
-        Vote vote = new Vote(VoteType.all, roles);
+        Vote vote = new Vote(Vote.VoteType.WEREWOLF, roles);
         previousAction = actionType.VILLAGE_VOTE;
         startAction(vote);
     }
@@ -152,7 +152,7 @@ public class Game implements GameType {
 
     private void playWitch() throws ProcessingException {
         previousAction = actionType.WITCH;
-        if (RoleManagement.roleIsNotIn(roles, EnhanceRoleType.witch)) {
+        if (RoleManagement.roleIsNotIn(roles, EnhanceRoleType.WITCH)) {
             try {
                 Role eliminated = action.getResult().get(0);
                 manageDeath(eliminated);
@@ -172,7 +172,7 @@ public class Game implements GameType {
             } catch (ProcessingException ignored) {
             }
             sendPublicMessage("witchAction", gameLanguage);
-            WitchRole witch = (WitchRole) RoleManagement.getByRole(roles, EnhanceRoleType.witch);
+            WitchRole witch = (WitchRole) RoleManagement.getByRole(roles, EnhanceRoleType.WITCH);
             if (!witch.isHealingAvailable() && !witch.isKillingAvailable()) {
                 if (witch.isHealingAvailable() && eliminated != null) {
                     if (!BotConfig.isSilence) {
@@ -181,7 +181,7 @@ public class Game implements GameType {
                 }
                 if (!BotConfig.isSilence)
                     ChannelManager.sendPrivateMessage(witch.getOwner(), "You can still kill or save someone (/kill name or /save name) you have 15 s");
-                WitchAction action = new WitchAction(EnhanceRoleType.witch, roles, eliminated);
+                WitchAction action = new WitchAction(EnhanceRoleType.WITCH, roles, eliminated);
                 startAction(action);
                 ArrayList<Role> death = action.getResult();
                 for (Role dead : death) {
@@ -254,7 +254,7 @@ public class Game implements GameType {
     }
 
     private void sendPublicMessage(String message) {
-        if (!BotConfig.isSilence) {
+        if (Boolean.FALSE.equals(BotConfig.isSilence)) {
             channel.sendMessage(message).queue();
         }
     }
@@ -272,7 +272,7 @@ public class Game implements GameType {
         sendPublicMessage(rawText);
     }
 
-    private void startAction(Action action) {
+    private void startAction(BaseAction action) {
         this.action = action;
         GuildManager.getInterface(currentServer).registerAction(id, action);
         Waiter.register(this, action);

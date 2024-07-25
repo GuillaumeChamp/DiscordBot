@@ -15,10 +15,10 @@ public class GameUtil {
      */
     public static List<Role> createSampleComposition() {
         List<Role> ans = new ArrayList<>(8);
-        ans.add(new Role(DiscordTestUtil.getAMember(0), EnhanceRoleType.simpleWolf));
-        ans.add(new Role(DiscordTestUtil.getAMember(0), EnhanceRoleType.simpleWolf));
+        ans.add(new Role(DiscordTestUtil.getAMember(0), EnhanceRoleType.SIMPLE_WOLF));
+        ans.add(new Role(DiscordTestUtil.getAMember(0), EnhanceRoleType.SIMPLE_WOLF));
         for (int i = 0; i < 6; i++) {
-            ans.add(new Role(DiscordTestUtil.getAMember(0), EnhanceRoleType.simpleVillager));
+            ans.add(new Role(DiscordTestUtil.getAMember(0), EnhanceRoleType.SIMPLE_VILLAGER));
         }
         return ans;
     }

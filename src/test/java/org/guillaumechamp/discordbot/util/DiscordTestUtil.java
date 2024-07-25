@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.guillaumechamp.discordbot.io.listener.CommandListener;
 
 import java.util.List;
@@ -16,15 +17,17 @@ public class DiscordTestUtil {
     private static JDA api;
 
     /**
-     * Allow to retrieve the first member of the first server
-     * Be careful to not send message or do not get the bot itself
+     * Allow to retrieve a member of the first server for test purposes
+     * Warning : there is no guarantee that two different numbers mean two different members.
      *
-     * @param number position of the member in the server list
+     * @param number position of the member in the server list.
+     *               If there n is number of member connected, for any number greater or equal to n will give the member n-1
+     * @return guaranteed to have at least a member (the bot itself)
      */
     public static Member getAMember(int number) {
         initialize();
         List<Member> members = api.getGuilds().get(0).getMembers();
-        if (members.size() < number) {
+        if (members.size() <= number) {
             System.out.println("There are only " + members.size() + "member on this server, return the last");
             return members.get(members.size() - 1);
         }
@@ -43,6 +46,7 @@ public class DiscordTestUtil {
             String botToken = System.getenv("BOT_TOKEN");
             assertThat(botToken).isNotNull();
             api = JDABuilder.createLight(botToken, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
+                    .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .addEventListeners(new CommandListener())
                     .build();
             try {

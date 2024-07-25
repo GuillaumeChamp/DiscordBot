@@ -7,7 +7,7 @@ public class WitchRole extends Role {
     private boolean killingAvailable = true;
 
     public WitchRole(Member owner) {
-        super(owner, EnhanceRoleType.witch);
+        super(owner, EnhanceRoleType.WITCH);
     }
 
     public boolean isHealingAvailable() {

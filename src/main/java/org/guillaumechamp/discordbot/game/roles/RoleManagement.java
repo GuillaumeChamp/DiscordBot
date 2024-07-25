@@ -5,7 +5,6 @@ import org.guillaumechamp.discordbot.game.mechanism.GameException;
 import org.guillaumechamp.discordbot.io.ProcessingException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class RoleManagement {
@@ -26,10 +25,10 @@ public class RoleManagement {
         int numberSolo = 0;
         for (Role r : roles) {
             switch (r.getType()) {
-                case werewolf:
+                case WEREWOLF:
                     numberWerewolf++;
                     break;
-                case villager:
+                case VILLAGER:
                     numberVillager++;
                     break;
                 default:
@@ -58,14 +57,19 @@ public class RoleManagement {
     /**
      * Check the role of someone
      *
-     * @param roles list to search in
-     * @param voter the personne we search
-     * @param type  type to match
-     * @return true if voter is a type
+     * @param roles  list to search in
+     * @param target the person we search
+     * @param type   type to match
+     * @return true if target is a type
      */
-    public static boolean isA(List<Role> roles, Member voter, EnhanceRoleType type) {
+    public static boolean isA(List<Role> roles, Member target, EnhanceRoleType type) {
         for (Role r : roles) {
-            if (r.getId().equals(voter.getId())) return r.getRealRole() == type;
+            if (r.getId().equals(target.getId())) {
+                if (type == EnhanceRoleType.ALL) {
+                    return true;
+                }
+                return r.getRealRole() == type;
+            }
         }
         return false;
     }
@@ -74,14 +78,14 @@ public class RoleManagement {
      * Check the role of someone
      *
      * @param roles list to search in
-     * @param voter the personne we search
+     * @param voter the person we search
      * @param type  types to match
      * @return true if voter is a type
      */
-    public static boolean isA(List<Role> roles, Member voter, RoleType[] type) {
+    public static boolean isA(List<Role> roles, Member voter, RoleType type) {
         for (Role r : roles) {
             if (r.getId().equals(voter.getId()))
-                return Arrays.asList(type).contains(r.getType());
+                return r.getType() == type;
         }
         return false;
     }
@@ -94,9 +98,8 @@ public class RoleManagement {
      * @return The role of the member
      * @throws ProcessingException If this member is not in the list (Maybe use isNotIn before)
      */
-    public static Role getRoleOf(List<Role> roles, String memberId) throws ProcessingException {
-        for (Role r :
-                roles) {
+    public static Role getRoleByMemberId(List<Role> roles, String memberId) throws ProcessingException {
+        for (Role r : roles) {
             if (r.getId().equals(memberId)) return r;
         }
         throw new ProcessingException("This player is not in");
