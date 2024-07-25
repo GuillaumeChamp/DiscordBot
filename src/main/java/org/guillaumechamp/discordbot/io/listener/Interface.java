@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import org.guillaumechamp.discordbot.game.GameType;
 import org.guillaumechamp.discordbot.game.PendingGame;
+import org.guillaumechamp.discordbot.game.mechanism.ActionType;
 import org.guillaumechamp.discordbot.game.mechanism.BaseAction;
 import org.guillaumechamp.discordbot.io.ProcessingException;
 
@@ -68,7 +69,7 @@ public class Interface {
 
     public void performAction(int gameIndex, Member member, Member target, String action) throws ProcessingException {
         if (pendingGames[gameIndex] == null) throw new ProcessingException("This game is not active");
-        votes[gameIndex].handleAction(member, target, action);
+        votes[gameIndex].handleAction(member, target, ActionType.stringToActionType(action));
     }
 
     public void registerAction(int index, BaseAction vote) {

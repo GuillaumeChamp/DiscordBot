@@ -15,12 +15,12 @@ public class SeerAction extends BaseAction {
     private final List<Role> result = new ArrayList<>();
 
     public SeerAction(List<Role> roles) {
-        super(EnhanceRoleType.SEER, roles, Collections.singletonList("see"));
+        super(EnhanceRoleType.SEER, roles, Collections.singletonList(ActionType.SEER_SEE));
         this.durationInSecond = DEFAULT_DURATION;
     }
 
     @Override
-    public void handleAction(Member author, Member target, String action) throws ProcessingException {
+    public void handleAction(Member author, Member target, ActionType action) throws ProcessingException {
         super.handleAction(author, target, action);
         result.add(RoleManagement.getRoleByMemberId(remainingPlayersList, target.getId()));
         this.terminate();

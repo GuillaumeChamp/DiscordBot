@@ -11,12 +11,9 @@ public class Role {
         this.owner = owner;
         this.realRole = realRole;
         switch (realRole) {
-            case SIMPLE_WOLF:
-                type = RoleType.WEREWOLF;
-                break;
-            default:
-                type = RoleType.VILLAGER;
-                break;
+            case SIMPLE_WOLF -> type = RoleType.WEREWOLF;
+            case SIMPLE_VILLAGER, SEER, WITCH -> type = RoleType.VILLAGER;
+            default -> type = RoleType.SOLO;
         }
     }
 

@@ -1,6 +1,7 @@
 package org.guillaumechamp.discordbot.game;
 
 import net.dv8tion.jda.api.entities.Member;
+import org.guillaumechamp.discordbot.game.mechanism.ActionType;
 import org.guillaumechamp.discordbot.game.mechanism.Vote;
 import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.guillaumechamp.discordbot.game.roles.Role;
@@ -24,9 +25,9 @@ class VoteTest {
         Vote vote = new Vote(Vote.VoteType.ALL, testList);
         // --When
         assertThatCode(() -> {
-            vote.handleAction(memberList.get(0), memberList.get(0), "vote");
-            vote.handleAction(memberList.get(1), memberList.get(0), "vote");
-            vote.handleAction(memberList.get(2), memberList.get(0), "vote");
+            vote.handleAction(memberList.get(0), memberList.get(0), ActionType.VOTE);
+            vote.handleAction(memberList.get(1), memberList.get(0), ActionType.VOTE);
+            vote.handleAction(memberList.get(2), memberList.get(0), ActionType.VOTE);
         }).doesNotThrowAnyException();
         // --Then
         assertThat(assertDoesNotThrow(vote::getResult))
@@ -44,8 +45,8 @@ class VoteTest {
         Vote vote = new Vote(Vote.VoteType.ALL, testList);
         // --When
         assertThatCode(() -> {
-            vote.handleAction(memberList.get(0), memberList.get(0), "vote");
-            vote.handleAction(memberList.get(1), memberList.get(1), "vote");
+            vote.handleAction(memberList.get(0), memberList.get(0), ActionType.VOTE);
+            vote.handleAction(memberList.get(1), memberList.get(1), ActionType.VOTE);
         }).doesNotThrowAnyException();
         // --Then
         assertThatThrownBy(vote::getResult).isInstanceOf(ProcessingException.class)
@@ -73,7 +74,7 @@ class VoteTest {
         List<Role> testList = Collections.singletonList(new Role(member, EnhanceRoleType.SIMPLE_VILLAGER));
         Vote vote = new Vote(Vote.VoteType.ALL, testList);
         // --Then
-        assertThatThrownBy(() -> vote.handleAction(member, null, "vote"))
+        assertThatThrownBy(() -> vote.handleAction(member, null, ActionType.VOTE))
                 .isInstanceOf(ProcessingException.class)
                 .hasMessage("No player targeted");
     }
@@ -85,7 +86,7 @@ class VoteTest {
         List<Role> testList = Collections.singletonList(new Role(member, EnhanceRoleType.SIMPLE_VILLAGER));
         Vote vote = new Vote(Vote.VoteType.WEREWOLF, testList);
         // --Then
-        assertThatThrownBy(() -> vote.handleAction(member, member, "vote"))
+        assertThatThrownBy(() -> vote.handleAction(member, member, ActionType.VOTE))
                 .isInstanceOf(ProcessingException.class)
                 .hasMessage("You cannot vote");
     }

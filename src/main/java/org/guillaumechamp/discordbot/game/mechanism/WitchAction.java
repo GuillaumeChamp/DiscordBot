@@ -14,18 +14,18 @@ public class WitchAction extends BaseAction {
     ArrayList<Role> deadPerson = new ArrayList<>();
 
     public WitchAction(EnhanceRoleType author, List<Role> roles, Role eliminated) {
-        super(author, roles, List.of("kill", "save"));
+        super(author, roles, List.of(ActionType.WITCH_KILL, ActionType.WITCH_SAVE));
         this.durationInSecond = DEFAULT_DURATION;
         deadPerson.add(eliminated);
     }
 
     @Override
-    public void handleAction(Member author, Member target, String action) throws ProcessingException {
+    public void handleAction(Member author, Member target, ActionType action) throws ProcessingException {
         super.handleAction(author, target, action);
-        if (action.equals("save")) {
+        if (action.equals(ActionType.WITCH_SAVE)) {
             deadPerson.remove(0);
             this.terminate();
-        } else if (action.equals("kill")) {
+        } else if (action.equals(ActionType.WITCH_KILL)) {
             deadPerson.add(RoleManagement.getRoleByMemberId(remainingPlayersList, target.getId()));
             this.terminate();
         }

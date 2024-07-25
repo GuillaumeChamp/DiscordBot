@@ -24,7 +24,7 @@ public class Vote extends BaseAction {
      * @param roles    all player remaining in the game
      */
     public Vote(VoteType voteType, List<Role> roles) {
-        super(EnhanceRoleType.ALL, roles, Collections.singletonList("vote"));
+        super(EnhanceRoleType.ALL, roles, Collections.singletonList(ActionType.VOTE));
         for (Role role : roles) {
             playerTargetMap.put(role, null);
         }
@@ -40,7 +40,7 @@ public class Vote extends BaseAction {
      * @throws ProcessingException an exception that explain why nothing happen
      */
     @Override
-    public void handleAction(Member voter, Member target, String action) throws ProcessingException {
+    public void handleAction(Member voter, Member target, ActionType action) throws ProcessingException {
         super.handleAction(voter, target, action);
         if (target == null) {
             throw new ProcessingException("No player targeted");

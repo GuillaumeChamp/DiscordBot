@@ -15,10 +15,10 @@ public abstract class BaseAction {
     protected final EnhanceRoleType roleAllowedToAct;
     protected final List<Role> remainingPlayersList;
     private boolean isActive = true;
-    protected final List<String> authorizedActions;
+    protected final List<ActionType> authorizedActions;
     protected int durationInSecond = 60;
 
-    protected BaseAction(EnhanceRoleType roleAllowedToAct, List<Role> remainingPlayersList, List<String> authorizedActions) {
+    protected BaseAction(EnhanceRoleType roleAllowedToAct, List<Role> remainingPlayersList, List<ActionType> authorizedActions) {
         this.roleAllowedToAct = roleAllowedToAct;
         this.remainingPlayersList = remainingPlayersList;
         this.authorizedActions = authorizedActions;
@@ -33,7 +33,7 @@ public abstract class BaseAction {
      * @param action the action
      * @throws ProcessingException an exception that explain why nothing happen
      */
-    public void handleAction(Member author, Member target, String action) throws ProcessingException {
+    public void handleAction(Member author, Member target, ActionType action) throws ProcessingException {
         if (RoleManagement.isNotIn(remainingPlayersList, author)) {
             throw new ProcessingException("You are not in the game");
         }
