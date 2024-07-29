@@ -4,21 +4,21 @@ import net.dv8tion.jda.api.entities.Member;
 import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.guillaumechamp.discordbot.game.roles.Role;
 import org.guillaumechamp.discordbot.game.roles.RoleManagement;
-import org.guillaumechamp.discordbot.io.ProcessingException;
+import org.guillaumechamp.discordbot.io.UserIntendedException;
 
 import java.util.List;
 
 /**
  * Base class for all asynchronous actions
  */
-public abstract class BaseAction {
+public abstract class AbstractTurn {
     protected final EnhanceRoleType roleAllowedToAct;
     protected final List<Role> remainingPlayersList;
     private boolean isActive = true;
     protected final List<ActionType> authorizedActions;
     protected int durationInSecond = 60;
 
-    protected BaseAction(EnhanceRoleType roleAllowedToAct, List<Role> remainingPlayersList, List<ActionType> authorizedActions) {
+    protected AbstractTurn(EnhanceRoleType roleAllowedToAct, List<Role> remainingPlayersList, List<ActionType> authorizedActions) {
         this.roleAllowedToAct = roleAllowedToAct;
         this.remainingPlayersList = remainingPlayersList;
         this.authorizedActions = authorizedActions;
@@ -31,27 +31,27 @@ public abstract class BaseAction {
      * @param author the member performing the action
      * @param target the target of the action (can be null)
      * @param action the action
-     * @throws ProcessingException an exception that explain why nothing happen
+     * @throws UserIntendedException an exception that explain why nothing happen
      */
-    public void handleAction(Member author, Member target, ActionType action) throws ProcessingException {
+    public void handleAction(Member author, Member target, ActionType action) throws UserIntendedException {
         if (RoleManagement.isNotIn(remainingPlayersList, author)) {
-            throw new ProcessingException("You are not in the game");
+            throw new UserIntendedException("You are not in the game");
         }
         if (target != null && RoleManagement.isNotIn(remainingPlayersList, target)) {
-            throw new ProcessingException("The target is not in the game");
+            throw new UserIntendedException("The target is not in the game");
         }
         if (!RoleManagement.isA(remainingPlayersList, author, this.roleAllowedToAct)) {
-            throw new ProcessingException("You are not authorized to use this action at this moment");
+            throw new UserIntendedException("You are not authorized to use this action at this moment");
         }
         if (!isActive) {
-            throw new ProcessingException("This is too late, this action is no lounger authorized");
+            throw new UserIntendedException("This is too late, this action is no lounger authorized");
         }
         if (!authorizedActions.contains(action)) {
-            throw new ProcessingException("You can use command now but not this one");
+            throw new UserIntendedException("You can use command now but not this one");
         }
     }
 
-    public abstract List<Role> getResult() throws ProcessingException;
+    public abstract List<Role> getResult() throws UserIntendedException;
 
     public void terminate() {
         isActive = false;

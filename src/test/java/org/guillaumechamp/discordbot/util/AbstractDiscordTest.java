@@ -14,7 +14,7 @@ public abstract class AbstractDiscordTest {
     public static void setup() {
         testChannel = DiscordTestUtil.createTestChannel();
         testMember = DiscordTestUtil.getAMember(0);
-        BotConfig.isSilence = Boolean.TRUE;
+        BotConfig.changeBotMessagePolicy(Boolean.TRUE);
     }
 
     @AfterAll

@@ -4,11 +4,11 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.guillaumechamp.discordbot.io.ChannelManager;
-import org.guillaumechamp.discordbot.io.ProcessingException;
+import org.guillaumechamp.discordbot.io.UserIntendedException;
 
 import java.util.ArrayList;
 
-public class PendingGame implements GameType {
+public class PendingGame implements GameInterface {
     private final int id;
     private final int limit;
     private boolean isStarted = false;
@@ -19,16 +19,16 @@ public class PendingGame implements GameType {
         this.players = new ArrayList<>();
         this.id = id;
         this.limit = limit;
-        channel = ChannelManager.createChannelForAGuild(server, "game" + id);
+        channel = ChannelManager.createChannelForAGuild(server, ChannelManager.getGameChannelNameByIndexAndStatus(id, true));
         channel.sendMessage("A new game will start !\n/join " + id + " to join it (" + limit + " players max )").queue();
     }
 
-    public void addPlayer(Member member) throws ProcessingException {
+    public void addPlayer(Member member) throws UserIntendedException {
         if (isStarted) {
-            throw new ProcessingException("the game is already start");
+            throw new UserIntendedException("the game is already started");
         }
         if (players.size() >= limit) {
-            throw new ProcessingException("The game is full");
+            throw new UserIntendedException("The game is full");
         }
         players.add(member);
         channel.sendMessage(member.getEffectiveName() + " join the game").queue();
@@ -37,16 +37,14 @@ public class PendingGame implements GameType {
         }
     }
 
-    public Game startGame() throws ProcessingException {
-        if (isStarted) throw new ProcessingException("the game is already in progress");
+    public Game startGame() throws UserIntendedException {
+        if (isStarted) {
+            throw new UserIntendedException("the game is already in progress");
+        }
         isStarted = true;
         Game newGame = new Game(id, players, channel);
         newGame.playNextAction();
         return newGame;
-    }
-
-    public Integer getGameId() {
-        return id;
     }
 
 }

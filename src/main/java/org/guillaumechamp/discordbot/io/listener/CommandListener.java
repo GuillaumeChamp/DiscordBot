@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.guillaumechamp.discordbot.io.BotLogger;
 import org.guillaumechamp.discordbot.io.ChannelManager;
-import org.guillaumechamp.discordbot.io.ProcessingException;
 import org.guillaumechamp.discordbot.io.PropertyReader;
+import org.guillaumechamp.discordbot.io.UserIntendedException;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.InvalidParameterException;
@@ -73,7 +73,7 @@ public class CommandListener extends ListenerAdapter {
         try {
             GuildManager.getInterface(event.getGuild()).createGame(maximumPlayers);
             event.getHook().sendMessage("the game have been create").setEphemeral(true).queue();
-        } catch (ProcessingException e) {
+        } catch (UserIntendedException e) {
             event.getHook().sendMessage(e.getMessage()).setEphemeral(true).queue();
         }
     }
@@ -85,7 +85,7 @@ public class CommandListener extends ListenerAdapter {
             event.reply(Objects.requireNonNull(event.getMember()).getEffectiveName() + ", You have been added to the game " + option)
                     .setEphemeral(true)
                     .queue();
-        } catch (ProcessingException exception) {
+        } catch (UserIntendedException exception) {
             event.reply(exception.getMessage()).setEphemeral(true).queue();
         }
     }
@@ -95,7 +95,7 @@ public class CommandListener extends ListenerAdapter {
         try {
             event.reply("starting . . .").setEphemeral(true).queue();
             GuildManager.getInterface(event.getGuild()).start(option);
-        } catch (ProcessingException e) {
+        } catch (UserIntendedException e) {
             event.getHook().editOriginal(e.getMessage()).queue();
         }
     }
@@ -127,10 +127,10 @@ public class CommandListener extends ListenerAdapter {
 
         try {
             int gameIndex = ChannelManager.resolveGameIndex(channel);
-            GuildManager.getInterface(event.getGuild()).performAction(gameIndex, event.getMember(), target, event.getName());
+            GuildManager.getInterface(event.getGuild()).transferCommandToTheAction(gameIndex, event.getMember(), target, event.getName());
             assert target != null;
             event.getHook().editOriginal(event.getName() + " registered against " + target.getEffectiveName()).queue();
-        } catch (ProcessingException | InvalidParameterException e) {
+        } catch (UserIntendedException | InvalidParameterException e) {
             event.getHook().editOriginal(e.getMessage()).queue();
         }
     }

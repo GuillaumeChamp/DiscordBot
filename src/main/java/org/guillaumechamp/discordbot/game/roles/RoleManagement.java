@@ -2,8 +2,8 @@ package org.guillaumechamp.discordbot.game.roles;
 
 import net.dv8tion.jda.api.entities.Member;
 import org.guillaumechamp.discordbot.game.mechanism.GameException;
-import org.guillaumechamp.discordbot.io.ProcessingException;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,13 +96,13 @@ public class RoleManagement {
      * @param roles    the list we want to look in. Usually all remaining player
      * @param memberId User member.getId()
      * @return The role of the member
-     * @throws ProcessingException If this member is not in the list (Maybe use isNotIn before)
+     * @throws InvalidParameterException If this member is not in the list (Maybe use isNotIn before)
      */
-    public static Role getRoleByMemberId(List<Role> roles, String memberId) throws ProcessingException {
+    public static Role getRoleByMemberId(List<Role> roles, String memberId) throws InvalidParameterException {
         for (Role r : roles) {
             if (r.getId().equals(memberId)) return r;
         }
-        throw new ProcessingException("This player is not in");
+        throw new InvalidParameterException("This player is not in this list");
     }
 
     /**
@@ -112,7 +112,7 @@ public class RoleManagement {
      * @param type  the RoleType
      * @return All the Role instance matching this type. An empty ArrayList if no remaining.
      */
-    public static List<Member> getAll(List<Role> roles, RoleType type) {
+    public static List<Member> getAllByRoleType(List<Role> roles, RoleType type) {
         ArrayList<Member> ans = new ArrayList<>();
         for (Role r :
                 roles) {
@@ -127,13 +127,13 @@ public class RoleManagement {
      * @param roles all the list
      * @param type  the enhance role to look for
      * @return the role if found
-     * @throws ProcessingException if the role is not found
+     * @throws InvalidParameterException if the role is not found
      */
-    public static Role getByRole(List<Role> roles, EnhanceRoleType type) throws ProcessingException {
+    public static Role getByRole(List<Role> roles, EnhanceRoleType type) throws InvalidParameterException {
         for (Role r : roles) {
             if (r.getRealRole() == type) return r;
         }
-        throw new ProcessingException("This role is not in the list");
+        throw new InvalidParameterException("This role is not in the list");
     }
 
     /**

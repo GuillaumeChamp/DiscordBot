@@ -2,78 +2,90 @@ package org.guillaumechamp.discordbot.io.listener;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import org.guillaumechamp.discordbot.game.GameType;
+import org.apache.commons.collections4.list.FixedSizeList;
+import org.guillaumechamp.discordbot.game.GameInterface;
 import org.guillaumechamp.discordbot.game.PendingGame;
+import org.guillaumechamp.discordbot.game.mechanism.AbstractTurn;
 import org.guillaumechamp.discordbot.game.mechanism.ActionType;
-import org.guillaumechamp.discordbot.game.mechanism.BaseAction;
-import org.guillaumechamp.discordbot.io.ProcessingException;
+import org.guillaumechamp.discordbot.io.UserIntendedException;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * This class is an interface between the game and the bot
+ * Act as interface to map a guild (i.e. a server) to a set of game
  */
 public class Interface {
+    public static final Integer MAX_GAME_PER_GUILD = 3;
     Guild server;
-    GameType[] pendingGames;
-    BaseAction[] votes = new BaseAction[3];
+    List<GameInterface> gameList = FixedSizeList.fixedSizeList(Arrays.asList(new GameInterface[MAX_GAME_PER_GUILD]));
+    List<AbstractTurn> currentAction = FixedSizeList.fixedSizeList(Arrays.asList(new AbstractTurn[MAX_GAME_PER_GUILD]));
 
-    //Singleton
     public Interface(Guild server) {
         this.server = server;
-        pendingGames = new GameType[]{null, null, null};
     }
 
     /**
      * Create a new game
      *
-     * @param limit max size of the game
+     * @param maxPlayerSize max size of the game
      */
-    public void createGame(int limit) throws ProcessingException {
-        for (int i = 0; i < 3; i++)
-            if (pendingGames[i] == null) {
-                pendingGames[i] = new PendingGame(server, i, limit);
+    public void createGame(int maxPlayerSize) throws UserIntendedException {
+        for (int i = 0; i < MAX_GAME_PER_GUILD; i++)
+            if (gameList.get(i) == null) {
+                gameList.set(i, new PendingGame(server, i, maxPlayerSize));
                 return;
             }
-        throw new ProcessingException("max number of game reached");
+        throw new UserIntendedException("max number of game reached");
     }
 
     /**
      * Add a player to a specify party
      *
-     * @param member personne to add
-     * @param id     id of the party
-     * @throws ProcessingException if unable to add
+     * @param member person to add
+     * @param gameId id of the party
+     * @throws UserIntendedException if unable to add
      */
-    public void addPlayer(Member member, int id) throws ProcessingException {
-        if (member == null) throw new ProcessingException("Unable to find who talk");
-        if (pendingGames[id] == null) throw new ProcessingException("The game not exist yet use /create to create it");
-        pendingGames[id].addPlayer(member);
+    public void addPlayer(Member member, int gameId) throws UserIntendedException {
+        if (member == null) {
+            throw new UserIntendedException("Unable to find who talk");
+        }
+        if (gameList.get(gameId) == null) {
+            throw new UserIntendedException("The game not exist yet use /create to create it");
+        }
+        gameList.get(gameId).addPlayer(member);
     }
 
     /**
      * @param id of the game to launch
-     * @throws ProcessingException if unable to start
+     * @throws UserIntendedException if unable to start
      */
-    public void start(int id) throws ProcessingException {
-        if (pendingGames[id] == null) throw new ProcessingException("Create the game before using /create");
-        pendingGames[id] = pendingGames[id].startGame();
-
+    public void start(int id) throws UserIntendedException {
+        if (gameList.get(id) == null) {
+            throw new UserIntendedException("Create the game before using /create");
+        }
+        gameList.set(id, gameList.get(id).startGame());
     }
 
-    public void terminateGame(GameType game) {
-        pendingGames[game.getGameId()] = null;
+    /**
+     * Stop a game
+     *
+     * @param gameIndex index og the game to stop
+     *                  do not check if game exist
+     */
+    public void stop(int gameIndex) {
+        gameList.set(gameIndex, null);
     }
 
-    public void stop(int option) {
-        pendingGames[option] = null;
+    public void transferCommandToTheAction(int gameIndex, Member member, Member target, String action) throws UserIntendedException {
+        if (gameList.get(gameIndex) == null) {
+            throw new UserIntendedException("This game is not active");
+        }
+        currentAction.get(gameIndex).handleAction(member, target, ActionType.stringToActionType(action));
     }
 
-    public void performAction(int gameIndex, Member member, Member target, String action) throws ProcessingException {
-        if (pendingGames[gameIndex] == null) throw new ProcessingException("This game is not active");
-        votes[gameIndex].handleAction(member, target, ActionType.stringToActionType(action));
-    }
-
-    public void registerAction(int index, BaseAction vote) {
-        votes[index] = vote;
+    public void registerAction(int index, AbstractTurn vote) {
+        currentAction.set(index, vote);
     }
 
 }

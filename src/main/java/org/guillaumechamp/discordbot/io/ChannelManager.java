@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import org.apache.commons.lang3.StringUtils;
+import org.guillaumechamp.discordbot.io.listener.Interface;
 
 import java.security.InvalidParameterException;
 import java.util.Collection;
@@ -21,28 +22,36 @@ public class ChannelManager {
     }
 
     /**
-     * Clear discord function
-     *
-     * @param channel channel to delete
-     */
-    private static void deleteOldChannel(TextChannel channel) {
-        if (channel == null) return;
-        channel.delete().queue();
-    }
-
-    /**
      * Clear all the game channels
      */
     public static void clearAllCreatedChannelsFromGuild(Guild server) {
         if (server == null) {
             return;
         }
-        server.getTextChannelsByName("game0", true).forEach(ChannelManager::deleteOldChannel);
-        server.getTextChannelsByName("game0wolf", true).forEach(ChannelManager::deleteOldChannel);
-        server.getTextChannelsByName("game1", true).forEach(ChannelManager::deleteOldChannel);
-        server.getTextChannelsByName("game1wolf", true).forEach(ChannelManager::deleteOldChannel);
-        server.getTextChannelsByName("game2", true).forEach(ChannelManager::deleteOldChannel);
-        server.getTextChannelsByName("game2wolf", true).forEach(ChannelManager::deleteOldChannel);
+        for (int i = 0; i < Interface.MAX_GAME_PER_GUILD; i++) {
+            server.getTextChannelsByName(getGameChannelNameByIndexAndStatus(i, true), true).forEach(ChannelManager::deleteOldChannel);
+            server.getTextChannelsByName(getGameChannelNameByIndexAndStatus(i, false), true).forEach(ChannelManager::deleteOldChannel);
+        }
+    }
+
+    /**
+     * resolve game channel name using the parameters.
+     * Also check if the index is in bound.
+     *
+     * @param index  index of the game
+     * @param isWolf append wolf prefix if true
+     * @return the name of the channel
+     * @see Interface#MAX_GAME_PER_GUILD
+     */
+    public static String getGameChannelNameByIndexAndStatus(int index, boolean isWolf) {
+        if (index < 0 || index >= Interface.MAX_GAME_PER_GUILD) {
+            throw new InvalidParameterException("Index out of bound : index must be positive and lower than " + Interface.MAX_GAME_PER_GUILD);
+        }
+        StringBuilder builder = new StringBuilder().append("game").append(index);
+        if (isWolf) {
+            builder.append("wolf");
+        }
+        return builder.toString();
     }
 
     /**
@@ -63,6 +72,9 @@ public class ChannelManager {
      * @param name    channel name
      */
     public static void createRestrictedChannel(Guild server, List<Member> members, String name) {
+        if (Boolean.TRUE.equals(BotConfig.isSilence())) {
+            return;
+        }
         deleteOldChannel(server.getTextChannelsByName(name, true).get(0));
 
         Collection<Permission> grant = EnumSet.of(Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY);
@@ -77,16 +89,59 @@ public class ChannelManager {
         }
     }
 
-    public static void sendPrivateMessage(Member m, String message) {
-        m.getUser().openPrivateChannel()
-                .queue(privateChannel -> privateChannel.sendMessage(message).queue());
+    public static void sendPublicMessage(TextChannel channel, String message) {
+        if (Boolean.TRUE.equals(BotConfig.isSilence())) {
+            return;
+        }
+        channel.sendMessage(message).queue();
     }
 
+    /**
+     * Send a message in private to a member, checking if the bot is in mute mod
+     *
+     * @param member  member to send a message to
+     * @param message text to send
+     */
+    public static void sendPrivateMessage(Member member, String message) {
+        if (Boolean.TRUE.equals(BotConfig.isSilence())) {
+            return;
+        }
+        member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
+    }
+
+    /**
+     * extract game index from a channel name
+     *
+     * @param channel channel to parse to game index
+     * @return game index
+     * @throws InvalidParameterException if it cannot parse to integer
+     */
     public static Integer resolveGameIndex(Channel channel) throws InvalidParameterException {
         if (!StringUtils.contains(channel.getName(), "game")) {
             throw new InvalidParameterException("This is not a game channel");
         }
-        return Integer.parseInt(channel.getName().replace("game", ""));
+        return channel.getName().charAt(4) - '0';
     }
 
+    /**
+     * Mute a person.
+     * Check if the player is in an audio channel
+     *
+     * @param member jda member
+     */
+    public static void muteAMember(Member member) {
+        if (member.getVoiceState() != null && member.getVoiceState().inAudioChannel()) {
+            member.mute(true).queue();
+        }
+    }
+
+    /**
+     * Clear discord function
+     *
+     * @param channel channel to delete
+     */
+    private static void deleteOldChannel(TextChannel channel) {
+        if (channel == null) return;
+        channel.delete().queue();
+    }
 }

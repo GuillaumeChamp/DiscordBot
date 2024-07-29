@@ -5,13 +5,13 @@ import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.guillaumechamp.discordbot.game.roles.Role;
 import org.guillaumechamp.discordbot.game.roles.RoleManagement;
 import org.guillaumechamp.discordbot.game.roles.RoleType;
-import org.guillaumechamp.discordbot.io.ProcessingException;
+import org.guillaumechamp.discordbot.io.UserIntendedException;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Vote extends BaseAction {
+public class Vote extends AbstractTurn {
     public enum VoteType {ALL, WEREWOLF}
 
     private final Map<Role, String> playerTargetMap = new HashMap<>();
@@ -37,16 +37,16 @@ public class Vote extends BaseAction {
      * @param voter  the personne who want to vote
      * @param target the personne for whom it wants to vote
      * @param action must be "vote" or the action will be rejected
-     * @throws ProcessingException an exception that explain why nothing happen
+     * @throws UserIntendedException an exception that explain why nothing happen
      */
     @Override
-    public void handleAction(Member voter, Member target, ActionType action) throws ProcessingException {
+    public void handleAction(Member voter, Member target, ActionType action) throws UserIntendedException {
         super.handleAction(voter, target, action);
         if (target == null) {
-            throw new ProcessingException("No player targeted");
+            throw new UserIntendedException("No player targeted");
         }
         if (RoleType.WEREWOLF.equals(roleToVote) && !RoleManagement.isA(remainingPlayersList, target, RoleType.WEREWOLF)) {
-            throw new ProcessingException("You cannot vote");
+            throw new UserIntendedException("You cannot vote");
         }
         playerTargetMap.put(RoleManagement.getRoleByMemberId(remainingPlayersList, voter.getId()), target.getId());
     }
@@ -55,9 +55,9 @@ public class Vote extends BaseAction {
      * Get the answer of a vote
      *
      * @return the person with the maximum of vote
-     * @throws ProcessingException if two player have the same amount of vote, if the target disappear
+     * @throws UserIntendedException if two player have the same amount of vote, if the target disappear
      */
-    public ArrayList<Role> getResult() throws ProcessingException {
+    public ArrayList<Role> getResult() throws UserIntendedException {
         Map<String, Long> numberOfVoteByMember = playerTargetMap
                 .values()
                 .stream()
@@ -72,6 +72,6 @@ public class Vote extends BaseAction {
             ans.add(RoleManagement.getRoleByMemberId(remainingPlayersList, tiedList.get(0)));
             return ans;
         }
-        throw new ProcessingException("The choice is not unanimous no one will be kill");
+        throw new UserIntendedException("The choice is not unanimous no one will be kill");
     }
 }

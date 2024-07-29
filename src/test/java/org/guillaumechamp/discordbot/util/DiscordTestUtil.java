@@ -6,12 +6,12 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.guillaumechamp.discordbot.io.listener.CommandListener;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class DiscordTestUtil {
     private static JDA api;
@@ -28,7 +28,7 @@ public class DiscordTestUtil {
         initialize();
         List<Member> members = api.getGuilds().get(0).getMembers();
         if (members.size() <= number) {
-            System.out.println("There are only " + members.size() + "member on this server, return the last");
+            System.out.println("There are only " + members.size() + " member(s) on this server, return the last");
             return members.get(members.size() - 1);
         }
         return members.get(number);
@@ -44,9 +44,11 @@ public class DiscordTestUtil {
     private static void initialize() {
         if (api == null) {
             String botToken = System.getenv("BOT_TOKEN");
-            assertThat(botToken).isNotNull();
-            api = JDABuilder.createLight(botToken, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
-                    .setMemberCachePolicy(MemberCachePolicy.ALL)
+            api = JDABuilder.createDefault(botToken, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES)
+                    .setChunkingFilter(ChunkingFilter.ALL) // load all user of all guilds matching memberCache policy
+                    .setMemberCachePolicy(MemberCachePolicy.ONLINE) // cache only connected users
+                    .enableCache(CacheFlag.ONLINE_STATUS)
+                    .disableCache(CacheFlag.VOICE_STATE, CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.SCHEDULED_EVENTS)
                     .addEventListeners(new CommandListener())
                     .build();
             try {

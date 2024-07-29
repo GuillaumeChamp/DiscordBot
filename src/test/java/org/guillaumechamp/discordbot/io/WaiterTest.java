@@ -4,7 +4,7 @@ import org.awaitility.Awaitility;
 import org.guillaumechamp.discordbot.game.Game;
 import org.guillaumechamp.discordbot.io.listener.Waiter;
 import org.guillaumechamp.discordbot.util.AbstractDiscordTest;
-import org.guillaumechamp.discordbot.util.TestAction;
+import org.guillaumechamp.discordbot.util.TestTurn;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -16,7 +16,7 @@ class WaiterTest extends AbstractDiscordTest {
         final int duration = 4;
         //-- Given
         Game game = new Game(0, Collections.singletonList(testMember), testChannel);
-        TestAction action = new TestAction(duration);
+        TestTurn action = new TestTurn(duration);
         //-- When
         Waiter.register(game, action);
         //-- Then
@@ -33,8 +33,8 @@ class WaiterTest extends AbstractDiscordTest {
         Game game = new Game(0, Collections.singletonList(testMember), testChannel);
         Game game1 = new Game(1, Collections.singletonList(testMember), testChannel);
 
-        TestAction action = new TestAction(duration);
-        TestAction action1 = new TestAction(duration);
+        TestTurn action = new TestTurn(duration);
+        TestTurn action1 = new TestTurn(duration);
         //-- When
         Waiter.register(game, action);
         Waiter.register(game1, action1);

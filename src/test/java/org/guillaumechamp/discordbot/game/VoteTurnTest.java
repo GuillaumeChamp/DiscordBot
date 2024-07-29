@@ -5,7 +5,7 @@ import org.guillaumechamp.discordbot.game.mechanism.ActionType;
 import org.guillaumechamp.discordbot.game.mechanism.Vote;
 import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.guillaumechamp.discordbot.game.roles.Role;
-import org.guillaumechamp.discordbot.io.ProcessingException;
+import org.guillaumechamp.discordbot.io.UserIntendedException;
 import org.guillaumechamp.discordbot.util.DiscordTestUtil;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 
-class VoteTest {
+class VoteTurnTest {
     @Test
     void shouldGetResultNotThrowingExceptionIfUnanimousVote() {
         // --Given
@@ -49,7 +49,7 @@ class VoteTest {
             vote.handleAction(memberList.get(1), memberList.get(1), ActionType.VOTE);
         }).doesNotThrowAnyException();
         // --Then
-        assertThatThrownBy(vote::getResult).isInstanceOf(ProcessingException.class)
+        assertThatThrownBy(vote::getResult).isInstanceOf(UserIntendedException.class)
                 .hasMessage("The choice is not unanimous no one will be kill");
     }
 
@@ -63,7 +63,7 @@ class VoteTest {
 
         // --Then
         assertThatThrownBy(vote::getResult)
-                .isInstanceOf(ProcessingException.class)
+                .isInstanceOf(UserIntendedException.class)
                 .hasMessage("The choice is not unanimous no one will be kill");
     }
 
@@ -75,7 +75,7 @@ class VoteTest {
         Vote vote = new Vote(Vote.VoteType.ALL, testList);
         // --Then
         assertThatThrownBy(() -> vote.handleAction(member, null, ActionType.VOTE))
-                .isInstanceOf(ProcessingException.class)
+                .isInstanceOf(UserIntendedException.class)
                 .hasMessage("No player targeted");
     }
 
@@ -87,7 +87,7 @@ class VoteTest {
         Vote vote = new Vote(Vote.VoteType.WEREWOLF, testList);
         // --Then
         assertThatThrownBy(() -> vote.handleAction(member, member, ActionType.VOTE))
-                .isInstanceOf(ProcessingException.class)
+                .isInstanceOf(UserIntendedException.class)
                 .hasMessage("You cannot vote");
     }
 }
