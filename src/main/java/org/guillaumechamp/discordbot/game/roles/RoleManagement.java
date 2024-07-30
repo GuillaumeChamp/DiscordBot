@@ -1,7 +1,7 @@
 package org.guillaumechamp.discordbot.game.roles;
 
 import net.dv8tion.jda.api.entities.Member;
-import org.guillaumechamp.discordbot.game.mechanism.GameException;
+import org.guillaumechamp.discordbot.game.mechanism.EndOfGameException;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -17,9 +17,9 @@ public class RoleManagement {
      * Winning conditions are no remaining werewolf or no remain villager
      *
      * @param roles all remaining roles
-     * @throws GameException if the game is over
+     * @throws EndOfGameException if the game is over
      */
-    public static void checkWin(List<Role> roles) throws GameException {
+    public static void checkWin(List<Role> roles) throws EndOfGameException {
         int numberVillager = 0;
         int numberWerewolf = 0;
         int numberSolo = 0;
@@ -36,8 +36,8 @@ public class RoleManagement {
                     break;
             }
         }
-        if (numberWerewolf + numberSolo <= 0) throw new GameException("Villager win !", roles);
-        if (numberVillager + numberSolo <= 0) throw new GameException("Werewolf win !", roles);
+        if (numberWerewolf + numberSolo <= 0) throw new EndOfGameException("Villager win !", roles);
+        if (numberVillager + numberSolo <= 0) throw new EndOfGameException("Werewolf win !", roles);
     }
 
     /**

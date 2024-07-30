@@ -30,7 +30,7 @@ public class Game implements GameInterface {
     private final List<Role> deadPlayers;
     private final Guild currentServer;
     private playerTurn previousAction = playerTurn.INIT;
-    private static final ScriptReader.TextLanguage gameLanguage = ScriptReader.TextLanguage.EN;
+    private final ScriptReader.SupportedLanguage gameLanguage;
 
     /**
      * Start a game
@@ -41,29 +41,20 @@ public class Game implements GameInterface {
      */
     public Game(Integer id, List<Member> members, TextChannel channel) {
         this.id = id;
-        this.activePlayers = assignRoles(members);
+        this.activePlayers = Composition.assignRoles(members);
         this.deadPlayers = new ArrayList<>(members.size());
         this.channel = channel;
+        this.gameLanguage = ScriptReader.SupportedLanguage.EN;
         if (channel == null) {
             this.currentServer = null;
         } else {
             this.currentServer = channel.getGuild();
-            sendPublicMessage("start", gameLanguage);
+            sendPublicMessage(ScriptReader.KeyEntry.START_GAME);
             ChannelManager.createRestrictedChannel(currentServer, RoleManagement.getAllByRoleType(this.activePlayers, RoleType.WEREWOLF), getGameChannelNameByIndexAndStatus(id, true));
         }
         tellRoles();
     }
 
-    private List<Role> assignRoles(List<Member> members) {
-        int size = members.size();
-        Composition compo = new Composition(size);
-        List<Role> roleList = new ArrayList<>(size);
-
-        for (Member member : members) {
-            roleList.add(compo.getARole(member));
-        }
-        return roleList;
-    }
 
     /**
      * Make the game move to the next step
@@ -74,78 +65,74 @@ public class Game implements GameInterface {
         }
         try {
             switch (previousAction) {
-                case INIT -> playSeer();
+                case INIT -> beforeSeer();
                 case SEER -> {
-                    resolveSeer();
-                    playWolf();
+                    afterSeer();
+                    beforeWolf();
                 }
-                case WOLF_VOTE -> playWitch();
-                case WITCH -> playVote();
+                case WOLF_VOTE -> beforeWitch();
+                case WITCH -> beforeVillagerVote();
                 case VILLAGE_VOTE -> {
-                    resolveVillagerVote();
-                    if (isActive) {
-                        playSeer();
+                    afterVillagerVote();
+                    // afterVillagerVote the game can stop, instead of throwing exception set the game as inactive (and handle locally)
+                    if (this.isActive) {
+                        beforeSeer();
                     }
                 }
             }
-        } catch (UserIntendedException e) {
-            BotLogger.log(BotLogger.WARN, "Processing Error in " + e);
+        } catch (UserIntendedException userIntendedException) {
+            BotLogger.log(BotLogger.WARN, "Unintended user exception : " + userIntendedException);
         }
     }
 
-    private void resolveSeer() {
-        Member seerOwner = RoleManagement.getByRole(activePlayers, EnhanceRoleType.SEER).getOwner();
-        try {
-            if (action.getResult().isEmpty()) {
-                ChannelManager.sendPrivateMessage(seerOwner, "You have spec no one");
-            }
-            Role target = action.getResult().get(0);
-            ChannelManager.sendPrivateMessage(seerOwner, "You have spec " + target.getRealRole());
-        } catch (UserIntendedException e) {
-            ChannelManager.sendPrivateMessage(seerOwner, e.getMessage());
-        }
-
-    }
-
-    private void playSeer() {
+    private void beforeSeer() {
         if (RoleManagement.roleIsNotIn(activePlayers, EnhanceRoleType.SEER)) {
-            playWolf();
+            beforeWolf();
             return;
         }
-        sendPublicMessage("seerStart", gameLanguage);
-
-        ChannelManager.sendPrivateMessage(RoleManagement.getByRole(activePlayers, EnhanceRoleType.SEER).getOwner(), "You can spec someone (/see name) you have 10 s");
+        Member seerOwner = RoleManagement.getByRole(activePlayers, EnhanceRoleType.SEER).getOwner();
+        sendPublicMessage(ScriptReader.KeyEntry.START_SEER);
+        sendPrivateMessage(seerOwner, ScriptReader.KeyEntry.START_SEER_PRIVATE);
 
         SeerTurn nextAction = new SeerTurn(activePlayers);
         previousAction = playerTurn.SEER;
         startAction(nextAction);
     }
 
-    private void playWolf() {
-        sendPublicMessage("wolfStart", gameLanguage);
+    private void afterSeer() {
+        Member seerOwner = RoleManagement.getByRole(activePlayers, EnhanceRoleType.SEER).getOwner();
+        try {
+            Role target = action.getResult().get(0);
+            sendPrivateMessage(seerOwner, ScriptReader.KeyEntry.SEER_SPEC, Pair.of(ScriptReader.Tag.ROLE, target.getRealRole().toString()));
+        } catch (UserIntendedException e) {
+            ChannelManager.sendPrivateMessage(seerOwner, e.getMessage());
+        }
+    }
+
+    private void beforeWolf() {
+        sendPublicMessage(ScriptReader.KeyEntry.WOLF_START);
         Vote vote = new Vote(Vote.VoteType.WEREWOLF, activePlayers);
         this.previousAction = playerTurn.WOLF_VOTE;
         startAction(vote);
     }
 
-    private void playVote() {
-        sendPublicMessage("vote", ScriptReader.TextLanguage.EN);
+    private void beforeVillagerVote() {
+        sendPublicMessage(ScriptReader.KeyEntry.VOTE);
         Vote vote = new Vote(Vote.VoteType.WEREWOLF, activePlayers);
         previousAction = playerTurn.VILLAGE_VOTE;
         startAction(vote);
     }
 
-    private void resolveVillagerVote() throws GameException {
+    private void afterVillagerVote() {
         try {
             Role eliminated = action.getResult().get(0);
             manageDeath(eliminated);
         } catch (UserIntendedException e) {
-            if (e.getClass() == GameException.class) throw (GameException) e;
-            sendPublicMessage(e.getMessage());
+            sendExceptionMessagePublicly(e);
         }
     }
 
-    private void playWitch() throws UserIntendedException {
+    private void beforeWitch() throws UserIntendedException {
         previousAction = playerTurn.WITCH;
         if (RoleManagement.roleIsNotIn(activePlayers, EnhanceRoleType.WITCH)) {
             try {
@@ -154,14 +141,14 @@ public class Game implements GameInterface {
                 playNextAction();
                 return;
             } catch (UserIntendedException e) {
-                sendPublicMessage(e.getMessage());
+                sendExceptionMessagePublicly(e);
                 playNextAction();
                 return;
             }
         }
         try {
             Role eliminated = action.getResult().get(0);
-            sendPublicMessage("witchAction", gameLanguage);
+            sendPublicMessage(ScriptReader.KeyEntry.WITCH_PUBLIC);
             WitchRole witch = (WitchRole) RoleManagement.getByRole(activePlayers, EnhanceRoleType.WITCH);
 
             if (!witch.isHealingAvailable() && !witch.isKillingAvailable()) {
@@ -169,14 +156,14 @@ public class Game implements GameInterface {
             }
             //according to official rules witch don't know who will die if already used healing potion
             if (witch.isHealingAvailable() && eliminated != null) {
-                ChannelManager.sendPrivateMessage(witch.getOwner(), "The wolf are about to eat " + eliminated.getOwner().getEffectiveName() + " you can save it /save name");
+                sendPrivateMessage(witch.getOwner(), ScriptReader.KeyEntry.WITCH_SAVE, Pair.of(ScriptReader.Tag.NAME, eliminated.getOwner().getEffectiveName()));
             }
             if (witch.isKillingAvailable()) {
-                ChannelManager.sendPrivateMessage(witch.getOwner(), "You can kill someone (/kill name) you have 15 s");
+                sendPrivateMessage(witch.getOwner(), ScriptReader.KeyEntry.WITCH_SAVE);
             }
-            WitchTurn newtAction = new WitchTurn(EnhanceRoleType.WITCH, activePlayers, eliminated);
-            startAction(newtAction);
-            ArrayList<Role> death = newtAction.getResult();
+            WitchTurn newAction = new WitchTurn(EnhanceRoleType.WITCH, activePlayers, eliminated);
+            startAction(newAction);
+            ArrayList<Role> death = newAction.getResult();
             for (Role dead : death) {
                 manageDeath(dead);
             }
@@ -189,9 +176,8 @@ public class Game implements GameInterface {
      * Remove the person, tell it and check win
      *
      * @param eliminated the person to remove
-     * @throws GameException if the game is over
      */
-    private void manageDeath(Role eliminated) throws GameException {
+    private void manageDeath(Role eliminated) {
         // handle double death if a player died from different ways
         if (deadPlayers.contains(eliminated)) {
             return;
@@ -201,12 +187,13 @@ public class Game implements GameInterface {
         deadPlayers.add(eliminated);
 
         muteAMember(eliminated.getOwner());
+        sendPublicMessage(ScriptReader.KeyEntry.ELIMINATED,
+                Pair.of(ScriptReader.Tag.NAME, eliminated.getOwner().getUser().getName()),
+                Pair.of(ScriptReader.Tag.ROLE, eliminated.getRealRole().toString()));
 
-        sendPublicMessage("The village is now smaller ... : " + eliminated.getOwner().getUser().getName() + " has disappear !");
-        sendPublicMessage("Its role was : " + eliminated.getRealRole());
         try {
             RoleManagement.checkWin(activePlayers);
-        } catch (GameException endOfGame) {
+        } catch (EndOfGameException endOfGame) {
             this.terminateGame(endOfGame);
         }
     }
@@ -214,11 +201,11 @@ public class Game implements GameInterface {
     /**
      * End a game
      *
-     * @param gameException passing exception to allow to have the remaining roles
+     * @param endOfGameException passing exception to allow to have the remaining roles
      */
-    private void terminateGame(GameException gameException) {
+    private void terminateGame(EndOfGameException endOfGameException) {
         this.isActive = false;
-        sendPublicMessage("End Of Game !\n" + gameException.getMessage());
+        sendExceptionMessagePublicly(endOfGameException);
         GuildManager.getInterface(currentServer).stop(this.id);
     }
 
@@ -241,21 +228,26 @@ public class Game implements GameInterface {
         throw new UserIntendedException("The game is already start");
     }
 
-    private void sendPublicMessage(String message) {
-        ChannelManager.sendPublicMessage(channel, message);
-    }
-
-    private void sendPublicMessage(String key, ScriptReader.TextLanguage language) {
-        sendPublicMessage(ScriptReader.readLine(key, language));
+    private void sendExceptionMessagePublicly(Exception e) {
+        ChannelManager.sendPublicMessage(channel, e.getMessage());
     }
 
     @SafeVarargs
-    private void sendPublicMessage(String key, ScriptReader.TextLanguage language, Pair<String, String>... wards) {
-        String rawText = ScriptReader.readLine(key, language);
-        for (Pair<String, String> ward : wards) {
-            rawText = ScriptReader.parse(rawText, ward.getLeft(), ward.getRight());
-        }
-        sendPublicMessage(rawText);
+    public final void sendPublicMessage(ScriptReader.KeyEntry key, Pair<ScriptReader.Tag, String>... wards) {
+        ChannelManager.sendPublicMessage(channel, ScriptReader.readLineAndParse(key, gameLanguage, wards));
+    }
+
+    private void sendPublicMessage(ScriptReader.KeyEntry key) {
+        ChannelManager.sendPublicMessage(channel, ScriptReader.readLine(key, gameLanguage));
+    }
+
+    private void sendPrivateMessage(Member destination, ScriptReader.KeyEntry key) {
+        ChannelManager.sendPrivateMessage(destination, ScriptReader.readLine(key, gameLanguage));
+    }
+
+    @SafeVarargs
+    private void sendPrivateMessage(Member destination, ScriptReader.KeyEntry key, Pair<ScriptReader.Tag, String>... wards) {
+        ChannelManager.sendPrivateMessage(destination, ScriptReader.readLineAndParse(key, gameLanguage, wards));
     }
 
     private void startAction(AbstractTurn action) {

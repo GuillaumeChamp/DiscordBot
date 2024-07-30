@@ -41,7 +41,7 @@ public class Composition {
      * @param m member to assign
      * @return a new random type role instance
      */
-    public Role getARole(Member m) {
+    private Role getARole(Member m) {
         EnhanceRoleType realRole = drawARole();
         if (realRole.equals(EnhanceRoleType.WITCH)) return new WitchRole(m);
         return new Role(m, realRole);
@@ -51,6 +51,17 @@ public class Composition {
         double rng = Math.random();
         int position = (int) Math.floor(rng * stack.size());
         return stack.remove(position);
+    }
+
+    public static List<Role> assignRoles(List<Member> members) {
+        int size = members.size();
+        Composition compo = new Composition(size);
+        List<Role> roleList = new ArrayList<>(size);
+
+        for (Member member : members) {
+            roleList.add(compo.getARole(member));
+        }
+        return roleList;
     }
 
     /**

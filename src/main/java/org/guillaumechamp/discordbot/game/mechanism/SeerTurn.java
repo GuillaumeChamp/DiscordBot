@@ -27,7 +27,10 @@ public class SeerTurn extends AbstractTurn {
     }
 
     @Override
-    public List<Role> getResult() {
+    public List<Role> getResult() throws UserIntendedException {
+        if (result.isEmpty()) {
+            throw new UserIntendedException("You have spec no one");
+        }
         return result;
     }
 }

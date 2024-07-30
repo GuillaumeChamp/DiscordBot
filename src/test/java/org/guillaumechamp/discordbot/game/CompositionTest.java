@@ -8,12 +8,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CompositionTest {
-    public static void main(String[] args) {
-        for (int i = 4; i < 20; i++) {
-            System.out.println(i + " joueurs " + new Composition(i));
-        }
-    }
+class CompositionTest {
 
     @Test
     void shouldDistributionBeRandom() {
