@@ -8,6 +8,4 @@ The main features are :
 - Multiple game handling
 
   
-This project use JDA and have a gradle structure.
-
-At this moment this project is a proof of concept and is no longer maintained.
+This project use JDA and have a maven structure.
