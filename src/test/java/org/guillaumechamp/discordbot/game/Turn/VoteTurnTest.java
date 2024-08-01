@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.game;
+package org.guillaumechamp.discordbot.game.Turn;
 
 import net.dv8tion.jda.api.entities.Member;
 import org.guillaumechamp.discordbot.game.mechanism.ActionType;

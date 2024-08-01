@@ -54,10 +54,10 @@ public class Vote extends AbstractTurn {
     /**
      * Get the answer of a vote
      *
-     * @return the person with the maximum of vote
-     * @throws UserIntendedException if two player have the same amount of vote, if the target disappear
+     * @return a List holding only one element, the most voted person
+     * @throws UserIntendedException if the vote is tied (including 0 vote)
      */
-    public ArrayList<Role> getResult() throws UserIntendedException {
+    public List<Role> getResult() throws UserIntendedException {
         Map<String, Long> numberOfVoteByMember = playerTargetMap
                 .values()
                 .stream()

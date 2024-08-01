@@ -5,6 +5,7 @@ public enum EnhanceRoleType {
     SIMPLE_VILLAGER,
     SIMPLE_WOLF,
     SEER,
-    WITCH
+    WITCH,
+    NONE
 
 }

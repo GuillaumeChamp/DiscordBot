@@ -5,6 +5,7 @@ import org.guillaumechamp.discordbot.game.mechanism.EndOfGameException;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class RoleManagement {
@@ -19,7 +20,7 @@ public class RoleManagement {
      * @param roles all remaining roles
      * @throws EndOfGameException if the game is over
      */
-    public static void checkWin(List<Role> roles) throws EndOfGameException {
+    public static void checkWin(Collection<Role> roles) throws EndOfGameException {
         int numberVillager = 0;
         int numberWerewolf = 0;
         int numberSolo = 0;
@@ -47,7 +48,7 @@ public class RoleManagement {
      * @param voter the personne we check
      * @return true if the player is in the list
      */
-    public static boolean isNotIn(List<Role> roles, Member voter) {
+    public static boolean isNotIn(Collection<Role> roles, Member voter) {
         for (Role r : roles) {
             if (r.getId().equals(voter.getId())) return false;
         }
@@ -62,7 +63,7 @@ public class RoleManagement {
      * @param type   type to match
      * @return true if target is a type
      */
-    public static boolean isA(List<Role> roles, Member target, EnhanceRoleType type) {
+    public static boolean isA(Collection<Role> roles, Member target, EnhanceRoleType type) {
         for (Role r : roles) {
             if (r.getId().equals(target.getId())) {
                 if (type == EnhanceRoleType.ALL) {
@@ -82,7 +83,7 @@ public class RoleManagement {
      * @param type  types to match
      * @return true if voter is a type
      */
-    public static boolean isA(List<Role> roles, Member voter, RoleType type) {
+    public static boolean isA(Collection<Role> roles, Member voter, RoleType type) {
         for (Role r : roles) {
             if (r.getId().equals(voter.getId()))
                 return r.getType() == type;
@@ -98,7 +99,7 @@ public class RoleManagement {
      * @return The role of the member
      * @throws InvalidParameterException If this member is not in the list (Maybe use isNotIn before)
      */
-    public static Role getRoleByMemberId(List<Role> roles, String memberId) throws InvalidParameterException {
+    public static Role getRoleByMemberId(Collection<Role> roles, String memberId) throws InvalidParameterException {
         for (Role r : roles) {
             if (r.getId().equals(memberId)) return r;
         }
@@ -112,8 +113,8 @@ public class RoleManagement {
      * @param type  the RoleType
      * @return All the Role instance matching this type. An empty ArrayList if no remaining.
      */
-    public static List<Member> getAllByRoleType(List<Role> roles, RoleType type) {
-        ArrayList<Member> ans = new ArrayList<>();
+    public static List<Member> getAllByRoleType(Collection<Role> roles, RoleType type) {
+        List<Member> ans = new ArrayList<>();
         for (Role r :
                 roles) {
             if (r.getType() == type) ans.add(r.getOwner());
@@ -129,7 +130,7 @@ public class RoleManagement {
      * @return the role if found
      * @throws InvalidParameterException if the role is not found
      */
-    public static Role getByRole(List<Role> roles, EnhanceRoleType type) throws InvalidParameterException {
+    public static Role getByRole(Collection<Role> roles, EnhanceRoleType type) throws InvalidParameterException {
         for (Role r : roles) {
             if (r.getRealRole() == type) return r;
         }
@@ -143,7 +144,7 @@ public class RoleManagement {
      * @param type  the role to look for
      * @return true if the role is not in the list
      */
-    public static boolean roleIsNotIn(List<Role> roles, EnhanceRoleType type) {
+    public static boolean roleIsNotIn(Collection<Role> roles, EnhanceRoleType type) {
         for (Role r : roles) {
             if (r.getRealRole() == type) return false;
         }

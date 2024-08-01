@@ -44,7 +44,7 @@ public abstract class AbstractTurn {
             throw new UserIntendedException("You are not authorized to use this action at this moment");
         }
         if (!isActive) {
-            throw new UserIntendedException("This is too late, this action is no lounger authorized");
+            throw new UserIntendedException("This is too late, this action is no longer authorized");
         }
         if (!authorizedActions.contains(action)) {
             throw new UserIntendedException("You can use command now but not this one");

@@ -24,7 +24,8 @@ public class ScriptReader {
         WITCH_PUBLIC("witchAction"),
         WITCH_SAVE("witchSave"),
         WITCH_KILL("witchKill", Tag.NAME),
-        ELIMINATED("eliminated", Tag.NAME, Tag.ROLE);
+        ELIMINATED("eliminated", Tag.NAME, Tag.ROLE),
+        NO_DEATH("noDeath");
         public final String keyName;
         private final Tag[] tags;
 

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WitchTurn extends AbstractTurn {
-    private static final int DEFAULT_DURATION = 15;
+    public static final int DEFAULT_DURATION = 15;
     ArrayList<Role> deadPerson = new ArrayList<>();
 
     public WitchTurn(EnhanceRoleType author, List<Role> roles, Role eliminated) {
@@ -32,8 +32,7 @@ public class WitchTurn extends AbstractTurn {
     }
 
     @Override
-    public ArrayList<Role> getResult() throws UserIntendedException {
+    public ArrayList<Role> getResult() {
         return deadPerson;
-
     }
 }

@@ -3,10 +3,10 @@ package org.guillaumechamp.discordbot.game;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.guillaumechamp.discordbot.game.mechanism.*;
 import org.guillaumechamp.discordbot.game.roles.*;
-import org.guillaumechamp.discordbot.io.BotLogger;
 import org.guillaumechamp.discordbot.io.ChannelManager;
 import org.guillaumechamp.discordbot.io.ScriptReader;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
@@ -14,6 +14,7 @@ import org.guillaumechamp.discordbot.io.listener.GuildManager;
 import org.guillaumechamp.discordbot.io.listener.Waiter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.guillaumechamp.discordbot.io.ChannelManager.getGameChannelNameByIndexAndStatus;
@@ -71,31 +72,37 @@ public class Game implements GameInterface {
                     beforeWolf();
                 }
                 case WOLF_VOTE -> beforeWitch();
-                case WITCH -> beforeVillagerVote();
+                case WITCH -> {
+                    afterNight();
+                    beforeVillagerVote();
+                }
                 case VILLAGE_VOTE -> {
                     afterVillagerVote();
-                    // afterVillagerVote the game can stop, instead of throwing exception set the game as inactive (and handle locally)
-                    if (this.isActive) {
-                        beforeSeer();
-                    }
+                    beforeSeer();
                 }
             }
-        } catch (UserIntendedException userIntendedException) {
-            BotLogger.log(BotLogger.WARN, "Unintended user exception : " + userIntendedException);
+        } catch (EndOfGameException endOfGame) {
+            this.terminateGame(endOfGame);
         }
     }
 
     private void beforeSeer() {
+        previousAction = playerTurn.SEER;
+        Collection<Role> everyone = CollectionUtils.union(activePlayers, deadPlayers);
+        if (RoleManagement.roleIsNotIn(everyone, EnhanceRoleType.SEER)) {
+            playNextAction();
+            return;
+        }
+
+        sendPublicMessage(ScriptReader.KeyEntry.START_SEER);
         if (RoleManagement.roleIsNotIn(activePlayers, EnhanceRoleType.SEER)) {
-            beforeWolf();
+            registerDummyTurn(SeerTurn.DEFAULT_DURATION);
             return;
         }
         Member seerOwner = RoleManagement.getByRole(activePlayers, EnhanceRoleType.SEER).getOwner();
-        sendPublicMessage(ScriptReader.KeyEntry.START_SEER);
         sendPrivateMessage(seerOwner, ScriptReader.KeyEntry.START_SEER_PRIVATE);
 
         SeerTurn nextAction = new SeerTurn(activePlayers);
-        previousAction = playerTurn.SEER;
         startAction(nextAction);
     }
 
@@ -105,70 +112,80 @@ public class Game implements GameInterface {
             Role target = action.getResult().get(0);
             sendPrivateMessage(seerOwner, ScriptReader.KeyEntry.SEER_SPEC, Pair.of(ScriptReader.Tag.ROLE, target.getRealRole().toString()));
         } catch (UserIntendedException e) {
-            ChannelManager.sendPrivateMessage(seerOwner, e.getMessage());
+            sendExceptionMessagePrivately(seerOwner, e);
         }
     }
 
     private void beforeWolf() {
-        sendPublicMessage(ScriptReader.KeyEntry.WOLF_START);
-        Vote vote = new Vote(Vote.VoteType.WEREWOLF, activePlayers);
         this.previousAction = playerTurn.WOLF_VOTE;
+        Vote vote = new Vote(Vote.VoteType.WEREWOLF, activePlayers);
+        sendPublicMessage(ScriptReader.KeyEntry.WOLF_START);
         startAction(vote);
     }
 
     private void beforeVillagerVote() {
+        this.previousAction = playerTurn.VILLAGE_VOTE;
+        Vote vote = new Vote(Vote.VoteType.ALL, activePlayers);
         sendPublicMessage(ScriptReader.KeyEntry.VOTE);
-        Vote vote = new Vote(Vote.VoteType.WEREWOLF, activePlayers);
-        previousAction = playerTurn.VILLAGE_VOTE;
         startAction(vote);
     }
 
-    private void afterVillagerVote() {
+    private void afterVillagerVote() throws EndOfGameException {
         try {
             Role eliminated = action.getResult().get(0);
             manageDeath(eliminated);
+            RoleManagement.checkWin(activePlayers);
         } catch (UserIntendedException e) {
             sendExceptionMessagePublicly(e);
         }
     }
 
-    private void beforeWitch() throws UserIntendedException {
+    private void beforeWitch() {
         previousAction = playerTurn.WITCH;
-        if (RoleManagement.roleIsNotIn(activePlayers, EnhanceRoleType.WITCH)) {
-            try {
-                Role eliminated = action.getResult().get(0);
-                manageDeath(eliminated);
-                playNextAction();
-                return;
-            } catch (UserIntendedException e) {
-                sendExceptionMessagePublicly(e);
-                playNextAction();
-                return;
-            }
+        Collection<Role> everyone = CollectionUtils.union(activePlayers, deadPlayers);
+        if (RoleManagement.roleIsNotIn(everyone, EnhanceRoleType.WITCH)) {
+            playNextAction();
+            return;
         }
-        try {
-            Role eliminated = action.getResult().get(0);
-            sendPublicMessage(ScriptReader.KeyEntry.WITCH_PUBLIC);
-            WitchRole witch = (WitchRole) RoleManagement.getByRole(activePlayers, EnhanceRoleType.WITCH);
+        sendPublicMessage(ScriptReader.KeyEntry.WITCH_PUBLIC);
 
-            if (!witch.isHealingAvailable() && !witch.isKillingAvailable()) {
-                return;
+        if (RoleManagement.roleIsNotIn(activePlayers, EnhanceRoleType.WITCH)) {
+            registerDummyTurn(WitchTurn.DEFAULT_DURATION);
+            return;
+        }
+
+        Role eliminated;
+        try {
+            eliminated = action.getResult().get(0);
+        } catch (UserIntendedException ignored) {
+            eliminated = null;
+        }
+        WitchRole witch = (WitchRole) RoleManagement.getByRole(activePlayers, EnhanceRoleType.WITCH);
+
+        if (!witch.isHealingAvailable() && !witch.isKillingAvailable()) {
+            return;
+        }
+        //according to official rules witch don't know who will die if already used healing potion
+        if (witch.isHealingAvailable() && eliminated != null) {
+            sendPrivateMessage(witch.getOwner(), ScriptReader.KeyEntry.WITCH_SAVE, Pair.of(ScriptReader.Tag.NAME, eliminated.getOwner().getEffectiveName()));
+        }
+        if (witch.isKillingAvailable()) {
+            sendPrivateMessage(witch.getOwner(), ScriptReader.KeyEntry.WITCH_SAVE);
+        }
+        WitchTurn newAction = new WitchTurn(EnhanceRoleType.WITCH, activePlayers, eliminated);
+        startAction(newAction);
+    }
+
+    private void afterNight() throws EndOfGameException {
+        try {
+            List<Role> death = action.getResult();
+            for (Role role : death) {
+                this.manageDeath(role);
             }
-            //according to official rules witch don't know who will die if already used healing potion
-            if (witch.isHealingAvailable() && eliminated != null) {
-                sendPrivateMessage(witch.getOwner(), ScriptReader.KeyEntry.WITCH_SAVE, Pair.of(ScriptReader.Tag.NAME, eliminated.getOwner().getEffectiveName()));
-            }
-            if (witch.isKillingAvailable()) {
-                sendPrivateMessage(witch.getOwner(), ScriptReader.KeyEntry.WITCH_SAVE);
-            }
-            WitchTurn newAction = new WitchTurn(EnhanceRoleType.WITCH, activePlayers, eliminated);
-            startAction(newAction);
-            ArrayList<Role> death = newAction.getResult();
-            for (Role dead : death) {
-                manageDeath(dead);
-            }
+            RoleManagement.checkWin(activePlayers);
+
         } catch (UserIntendedException e) {
-            BotLogger.log(BotLogger.WARN, "Processing Error in " + e);
+            sendPublicMessage(ScriptReader.KeyEntry.NO_DEATH);
         }
     }
 
@@ -190,12 +207,6 @@ public class Game implements GameInterface {
         sendPublicMessage(ScriptReader.KeyEntry.ELIMINATED,
                 Pair.of(ScriptReader.Tag.NAME, eliminated.getOwner().getUser().getName()),
                 Pair.of(ScriptReader.Tag.ROLE, eliminated.getRealRole().toString()));
-
-        try {
-            RoleManagement.checkWin(activePlayers);
-        } catch (EndOfGameException endOfGame) {
-            this.terminateGame(endOfGame);
-        }
     }
 
     /**
@@ -248,6 +259,16 @@ public class Game implements GameInterface {
     @SafeVarargs
     private void sendPrivateMessage(Member destination, ScriptReader.KeyEntry key, Pair<ScriptReader.Tag, String>... wards) {
         ChannelManager.sendPrivateMessage(destination, ScriptReader.readLineAndParse(key, gameLanguage, wards));
+    }
+
+    private void sendExceptionMessagePrivately(Member destination, Exception e) {
+        ChannelManager.sendPrivateMessage(destination, e.getMessage());
+    }
+
+    private void registerDummyTurn(int durationInSecond) {
+        DummyTurn dummyTurn = new DummyTurn(durationInSecond);
+        GuildManager.getInterface(currentServer).registerAction(id, dummyTurn);
+        Waiter.register(this, dummyTurn);
     }
 
     private void startAction(AbstractTurn action) {
