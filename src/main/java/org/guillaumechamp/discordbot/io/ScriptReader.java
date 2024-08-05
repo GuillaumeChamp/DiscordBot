@@ -24,6 +24,7 @@ public class ScriptReader {
         WITCH_PUBLIC("witchAction"),
         WITCH_SAVE("witchSave"),
         WITCH_KILL("witchKill", Tag.NAME),
+        WITCH_NOTHING("witchNothing"),
         ELIMINATED("eliminated", Tag.NAME, Tag.ROLE),
         NO_DEATH("noDeath");
         public final String keyName;
@@ -77,6 +78,7 @@ public class ScriptReader {
      */
     public static String readLine(KeyEntry keyEntry, SupportedLanguage language) {
         if (!ArrayUtils.isEmpty(keyEntry.tags)) {
+            BotLogger.log(Level.WARN,"No tag provided, expected :" + Arrays.toString(keyEntry.tags));
             throw new InvalidParameterException("No tag provided, expected :" + Arrays.toString(keyEntry.tags));
         }
         return unsafeReadLine(keyEntry, language);
@@ -84,12 +86,7 @@ public class ScriptReader {
 
     @SafeVarargs
     public static String readLineAndParse(KeyEntry keyEntry, SupportedLanguage language, Pair<Tag, String>... wards) {
-        try {
-            keyEntry.assertTagsAreFilled(Arrays.stream(wards).map(Pair::getLeft).toList());
-        } catch (InvalidParameterException parameterException) {
-            BotLogger.log(Level.WARN, parameterException.getMessage());
-        }
-
+        keyEntry.assertTagsAreFilled(Arrays.stream(wards).map(Pair::getLeft).toList());
         String rawText = unsafeReadLine(keyEntry, language);
         for (Pair<Tag, String> ward : wards) {
             rawText = parse(rawText, ward.getLeft().tagName, ward.getRight());

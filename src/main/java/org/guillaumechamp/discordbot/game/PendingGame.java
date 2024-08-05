@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class PendingGame implements GameInterface {
     private final int id;
     private final int limit;
-    private boolean isStarted = false;
+    private boolean isExpired = false;
     private final ArrayList<Member> players;
     private final TextChannel channel;
 
@@ -24,7 +24,7 @@ public class PendingGame implements GameInterface {
     }
 
     public void addPlayer(Member member) throws UserIntendedException {
-        if (isStarted) {
+        if (isExpired) {
             throw new UserIntendedException("the game is already started");
         }
         if (players.size() >= limit) {
@@ -37,11 +37,16 @@ public class PendingGame implements GameInterface {
         }
     }
 
+    @Override
+    public void terminate() {
+        this.isExpired = true;
+    }
+
     public Game startGame() throws UserIntendedException {
-        if (isStarted) {
+        if (isExpired) {
             throw new UserIntendedException("the game is already in progress");
         }
-        isStarted = true;
+        isExpired = true;
         Game newGame = new Game(id, players, channel);
         newGame.playNextAction();
         return newGame;

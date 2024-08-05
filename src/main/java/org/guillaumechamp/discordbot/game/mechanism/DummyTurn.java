@@ -7,9 +7,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class DummyTurn extends AbstractTurn {
-    public DummyTurn(int durationInSecond) {
+    public DummyTurn(int durationInSecond, PlayerTurn replacedTurn) {
         super(EnhanceRoleType.NONE, null, null);
         this.durationInSecond = durationInSecond;
+        this.playerTurn = replacedTurn;
     }
 
     @Override

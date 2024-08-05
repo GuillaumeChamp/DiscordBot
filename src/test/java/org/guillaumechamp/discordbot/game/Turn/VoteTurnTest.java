@@ -2,6 +2,7 @@ package org.guillaumechamp.discordbot.game.Turn;
 
 import net.dv8tion.jda.api.entities.Member;
 import org.guillaumechamp.discordbot.game.mechanism.ActionType;
+import org.guillaumechamp.discordbot.game.mechanism.PlayerTurn;
 import org.guillaumechamp.discordbot.game.mechanism.Vote;
 import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.guillaumechamp.discordbot.game.roles.Role;
@@ -22,7 +23,7 @@ class VoteTurnTest {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1), DiscordTestUtil.getAMember(2));
         List<Role> testList = memberList.stream().map(member -> new Role(member, EnhanceRoleType.SIMPLE_VILLAGER)).toList();
-        Vote vote = new Vote(Vote.VoteType.ALL, testList);
+        Vote vote = new Vote(PlayerTurn.VILLAGE_VOTE, testList);
         // --When
         assertThatCode(() -> {
             vote.handleAction(memberList.get(0), memberList.get(0), ActionType.VOTE);
@@ -42,7 +43,7 @@ class VoteTurnTest {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1));
         List<Role> testList = memberList.stream().map(member -> new Role(member, EnhanceRoleType.SIMPLE_VILLAGER)).toList();
-        Vote vote = new Vote(Vote.VoteType.ALL, testList);
+        Vote vote = new Vote(PlayerTurn.VILLAGE_VOTE, testList);
         // --When
         assertThatCode(() -> {
             vote.handleAction(memberList.get(0), memberList.get(0), ActionType.VOTE);
@@ -58,7 +59,7 @@ class VoteTurnTest {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1));
         List<Role> testList = memberList.stream().map(member -> new Role(member, EnhanceRoleType.SIMPLE_VILLAGER)).toList();
-        Vote vote = new Vote(Vote.VoteType.ALL, testList);
+        Vote vote = new Vote(PlayerTurn.VILLAGE_VOTE, testList);
         // --When
 
         // --Then
@@ -72,7 +73,7 @@ class VoteTurnTest {
         // --Given
         Member member = DiscordTestUtil.getAMember(0);
         List<Role> testList = Collections.singletonList(new Role(member, EnhanceRoleType.SIMPLE_VILLAGER));
-        Vote vote = new Vote(Vote.VoteType.ALL, testList);
+        Vote vote = new Vote(PlayerTurn.VILLAGE_VOTE, testList);
         // --Then
         assertThatThrownBy(() -> vote.handleAction(member, null, ActionType.VOTE))
                 .isInstanceOf(UserIntendedException.class)
@@ -84,7 +85,7 @@ class VoteTurnTest {
         // --Given
         Member member = DiscordTestUtil.getAMember(0);
         List<Role> testList = Collections.singletonList(new Role(member, EnhanceRoleType.SIMPLE_VILLAGER));
-        Vote vote = new Vote(Vote.VoteType.WEREWOLF, testList);
+        Vote vote = new Vote(PlayerTurn.WOLF_VOTE, testList);
         // --Then
         assertThatThrownBy(() -> vote.handleAction(member, member, ActionType.VOTE))
                 .isInstanceOf(UserIntendedException.class)

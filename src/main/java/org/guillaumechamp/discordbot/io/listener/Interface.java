@@ -74,6 +74,7 @@ public class Interface {
      *                  do not check if game exist
      */
     public void stop(int gameIndex) {
+        gameList.get(gameIndex).terminate();
         gameList.set(gameIndex, null);
     }
 

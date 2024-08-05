@@ -17,6 +17,7 @@ public abstract class AbstractTurn {
     private boolean isActive = true;
     protected final List<ActionType> authorizedActions;
     protected int durationInSecond = 60;
+    protected PlayerTurn playerTurn = PlayerTurn.NONE;
 
     protected AbstractTurn(EnhanceRoleType roleAllowedToAct, List<Role> remainingPlayersList, List<ActionType> authorizedActions) {
         this.roleAllowedToAct = roleAllowedToAct;
@@ -52,6 +53,10 @@ public abstract class AbstractTurn {
     }
 
     public abstract List<Role> getResult() throws UserIntendedException;
+
+    public PlayerTurn getPlayerTurn() {
+        return playerTurn;
+    }
 
     public void terminate() {
         isActive = false;

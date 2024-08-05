@@ -17,6 +17,7 @@ public class SeerTurn extends AbstractTurn {
     public SeerTurn(List<Role> roles) {
         super(EnhanceRoleType.SEER, roles, Collections.singletonList(ActionType.SEER_SEE));
         this.durationInSecond = DEFAULT_DURATION;
+        this.playerTurn = PlayerTurn.SEER;
     }
 
     @Override

@@ -97,4 +97,10 @@ class ScriptReaderTest {
                 .isInstanceOf(InvalidParameterException.class)
                 .hasMessageContaining("tag " + ScriptReader.Tag.NAME + " is missing");
     }
+    @Test
+    void shouldReadLineWithTagReturnAnError(){
+        assertThatThrownBy(()->ScriptReader.readLine(ScriptReader.KeyEntry.ELIMINATED, ScriptReader.SupportedLanguage.FR))
+                .isInstanceOf(InvalidParameterException.class)
+                .hasMessageContaining(Arrays.toString(new ScriptReader.Tag[]{ScriptReader.Tag.NAME, ScriptReader.Tag.ROLE}));
+    }
 }

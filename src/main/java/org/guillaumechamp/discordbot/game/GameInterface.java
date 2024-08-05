@@ -9,4 +9,5 @@ public interface GameInterface {
 
     void addPlayer(Member member) throws UserIntendedException;
 
+    void terminate();
 }

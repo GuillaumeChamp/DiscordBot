@@ -1,5 +1,6 @@
 package org.guillaumechamp.discordbot.io.listener;
 
+import com.sun.jdi.request.InvalidRequestStateException;
 import org.guillaumechamp.discordbot.game.Game;
 import org.guillaumechamp.discordbot.game.mechanism.AbstractTurn;
 import org.guillaumechamp.discordbot.io.BotLogger;
@@ -27,6 +28,7 @@ public class Waiter {
     public static void register(Game game, AbstractTurn action) {
         if (registeredActions.containsKey(game)) {
             BotLogger.log(BotLogger.FATAL, "two actions registered for the same game");
+            throw new InvalidRequestStateException("two actions registered for the same game");
         }
         ScheduledFuture<?> future = threadPoolExecutor.schedule(() -> {
             registeredActions.remove(game);
@@ -41,7 +43,7 @@ public class Waiter {
      *
      * @return true if successful, false if action not found
      */
-    public static boolean removeAction(Game source) {
+    public static boolean triggerActionEarlier(Game source) {
         ScheduledFuture<?> future = registeredActions.get(source);
         if (future == null) {
             BotLogger.log(BotLogger.WARN, "No action registered for this game");
@@ -49,6 +51,7 @@ public class Waiter {
         }
         future.cancel(false);
         registeredActions.remove(source);
+        source.playNextAction();
         return true;
     }
 }

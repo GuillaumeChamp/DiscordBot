@@ -93,6 +93,10 @@ public class ChannelManager {
         if (Boolean.TRUE.equals(BotConfig.isSilence())) {
             return;
         }
+        if (channel==null){
+            BotLogger.log(BotLogger.WARN,"Tried to send a message but channel is null");
+            throw new InvalidParameterException("Channel is null");
+        }
         channel.sendMessage(message).queue();
     }
 

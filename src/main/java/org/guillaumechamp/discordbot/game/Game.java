@@ -21,17 +21,18 @@ import static org.guillaumechamp.discordbot.io.ChannelManager.getGameChannelName
 import static org.guillaumechamp.discordbot.io.ChannelManager.muteAMember;
 
 public class Game implements GameInterface {
-    private enum playerTurn {INIT, SEER, WOLF_VOTE, WITCH, VILLAGE_VOTE}
-
-    private AbstractTurn action;
-    private boolean isActive = true;
-    private final TextChannel channel;
+    // Discord Related Data
     private final Integer id;
+    private final Guild currentServer;
+    private final TextChannel channel;
+    private final ScriptReader.SupportedLanguage gameLanguage;
+
+    // Game Related Data
+    private boolean isActive = true;
     private final List<Role> activePlayers;
     private final List<Role> deadPlayers;
-    private final Guild currentServer;
-    private playerTurn previousAction = playerTurn.INIT;
-    private final ScriptReader.SupportedLanguage gameLanguage;
+    private AbstractTurn action;
+
 
     /**
      * Start a game
@@ -50,12 +51,18 @@ public class Game implements GameInterface {
             this.currentServer = null;
         } else {
             this.currentServer = channel.getGuild();
-            sendPublicMessage(ScriptReader.KeyEntry.START_GAME);
             ChannelManager.createRestrictedChannel(currentServer, RoleManagement.getAllByRoleType(this.activePlayers, RoleType.WEREWOLF), getGameChannelNameByIndexAndStatus(id, true));
         }
-        tellRoles();
+        this.initGame();
     }
 
+    public void initGame() {
+        sendPublicMessage(ScriptReader.KeyEntry.START_GAME);
+
+        for (Role player : activePlayers) {
+            ChannelManager.sendPrivateMessage(player.getOwner(), "your role is :" + player.getRealRole());
+        }
+    }
 
     /**
      * Make the game move to the next step
@@ -65,38 +72,35 @@ public class Game implements GameInterface {
             return;
         }
         try {
-            switch (previousAction) {
-                case INIT -> beforeSeer();
-                case SEER -> {
-                    afterSeer();
-                    beforeWolf();
-                }
-                case WOLF_VOTE -> beforeWitch();
-                case WITCH -> {
-                    afterNight();
-                    beforeVillagerVote();
-                }
-                case VILLAGE_VOTE -> {
-                    afterVillagerVote();
-                    beforeSeer();
-                }
-            }
+            TurnResolver.triggerNextAction(this, action.getPlayerTurn());
         } catch (EndOfGameException endOfGame) {
             this.terminateGame(endOfGame);
         }
     }
 
-    private void beforeSeer() {
-        previousAction = playerTurn.SEER;
+    /**
+     * Make the game move to the next step
+     */
+    private void playNextAction(PlayerTurn playerTurn) {
+        if (!this.isActive) {
+            return;
+        }
+        try {
+            TurnResolver.triggerNextAction(this, playerTurn);
+        } catch (EndOfGameException endOfGame) {
+            this.terminateGame(endOfGame);
+        }
+    }
+    void beforeSeer() {
         Collection<Role> everyone = CollectionUtils.union(activePlayers, deadPlayers);
         if (RoleManagement.roleIsNotIn(everyone, EnhanceRoleType.SEER)) {
-            playNextAction();
+            playNextAction(PlayerTurn.SEER);
             return;
         }
 
         sendPublicMessage(ScriptReader.KeyEntry.START_SEER);
         if (RoleManagement.roleIsNotIn(activePlayers, EnhanceRoleType.SEER)) {
-            registerDummyTurn(SeerTurn.DEFAULT_DURATION);
+            registerDummyTurn(SeerTurn.DEFAULT_DURATION, PlayerTurn.SEER);
             return;
         }
         Member seerOwner = RoleManagement.getByRole(activePlayers, EnhanceRoleType.SEER).getOwner();
@@ -106,7 +110,10 @@ public class Game implements GameInterface {
         startAction(nextAction);
     }
 
-    private void afterSeer() {
+    void afterSeer() {
+        if (RoleManagement.roleIsNotIn(activePlayers, EnhanceRoleType.SEER)) {
+            return;
+        }
         Member seerOwner = RoleManagement.getByRole(activePlayers, EnhanceRoleType.SEER).getOwner();
         try {
             Role target = action.getResult().get(0);
@@ -116,21 +123,19 @@ public class Game implements GameInterface {
         }
     }
 
-    private void beforeWolf() {
-        this.previousAction = playerTurn.WOLF_VOTE;
-        Vote vote = new Vote(Vote.VoteType.WEREWOLF, activePlayers);
+    void beforeWolf() {
+        Vote vote = new Vote(PlayerTurn.WOLF_VOTE, activePlayers);
         sendPublicMessage(ScriptReader.KeyEntry.WOLF_START);
         startAction(vote);
     }
 
-    private void beforeVillagerVote() {
-        this.previousAction = playerTurn.VILLAGE_VOTE;
-        Vote vote = new Vote(Vote.VoteType.ALL, activePlayers);
+    void beforeVillagerVote() {
+        Vote vote = new Vote(PlayerTurn.VILLAGE_VOTE, activePlayers);
         sendPublicMessage(ScriptReader.KeyEntry.VOTE);
         startAction(vote);
     }
 
-    private void afterVillagerVote() throws EndOfGameException {
+    void afterVillagerVote() throws EndOfGameException {
         try {
             Role eliminated = action.getResult().get(0);
             manageDeath(eliminated);
@@ -140,17 +145,16 @@ public class Game implements GameInterface {
         }
     }
 
-    private void beforeWitch() {
-        previousAction = playerTurn.WITCH;
+    void beforeWitch() {
         Collection<Role> everyone = CollectionUtils.union(activePlayers, deadPlayers);
         if (RoleManagement.roleIsNotIn(everyone, EnhanceRoleType.WITCH)) {
-            playNextAction();
+            playNextAction(PlayerTurn.WITCH);
             return;
         }
         sendPublicMessage(ScriptReader.KeyEntry.WITCH_PUBLIC);
 
         if (RoleManagement.roleIsNotIn(activePlayers, EnhanceRoleType.WITCH)) {
-            registerDummyTurn(WitchTurn.DEFAULT_DURATION);
+            registerDummyTurn(WitchTurn.DEFAULT_DURATION, PlayerTurn.WITCH);
             return;
         }
 
@@ -163,7 +167,7 @@ public class Game implements GameInterface {
         WitchRole witch = (WitchRole) RoleManagement.getByRole(activePlayers, EnhanceRoleType.WITCH);
 
         if (!witch.isHealingAvailable() && !witch.isKillingAvailable()) {
-            return;
+            sendPrivateMessage(witch.getOwner(), ScriptReader.KeyEntry.WITCH_NOTHING);
         }
         //according to official rules witch don't know who will die if already used healing potion
         if (witch.isHealingAvailable() && eliminated != null) {
@@ -176,7 +180,7 @@ public class Game implements GameInterface {
         startAction(newAction);
     }
 
-    private void afterNight() throws EndOfGameException {
+    void afterNight() throws EndOfGameException {
         try {
             List<Role> death = action.getResult();
             for (Role role : death) {
@@ -220,14 +224,6 @@ public class Game implements GameInterface {
         GuildManager.getInterface(currentServer).stop(this.id);
     }
 
-    /**
-     * On usage methode use to tell to each player their roles in private
-     */
-    private void tellRoles() {
-        for (Role player : activePlayers) {
-            ChannelManager.sendPrivateMessage(player.getOwner(), "your role is :" + player.getRealRole());
-        }
-    }
 
     @Override
     public GameInterface startGame() throws UserIntendedException {
@@ -237,6 +233,11 @@ public class Game implements GameInterface {
     @Override
     public void addPlayer(Member member) throws UserIntendedException {
         throw new UserIntendedException("The game is already start");
+    }
+
+    @Override
+    public void terminate() {
+        this.isActive=false;
     }
 
     private void sendExceptionMessagePublicly(Exception e) {
@@ -265,8 +266,8 @@ public class Game implements GameInterface {
         ChannelManager.sendPrivateMessage(destination, e.getMessage());
     }
 
-    private void registerDummyTurn(int durationInSecond) {
-        DummyTurn dummyTurn = new DummyTurn(durationInSecond);
+    private void registerDummyTurn(int durationInSecond, PlayerTurn replacedTurn) {
+        DummyTurn dummyTurn = new DummyTurn(durationInSecond, replacedTurn);
         GuildManager.getInterface(currentServer).registerAction(id, dummyTurn);
         Waiter.register(this, dummyTurn);
     }

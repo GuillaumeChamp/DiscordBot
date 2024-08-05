@@ -12,10 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Vote extends AbstractTurn {
-    public enum VoteType {ALL, WEREWOLF}
-
     private final Map<Role, String> playerTargetMap = new HashMap<>();
-    private final RoleType roleToVote;
 
     /**
      * Create a new vote
@@ -23,12 +20,16 @@ public class Vote extends AbstractTurn {
      * @param voteType macro to design who can vote
      * @param roles    all player remaining in the game
      */
-    public Vote(VoteType voteType, List<Role> roles) {
+    public Vote(PlayerTurn voteType, List<Role> roles) {
         super(EnhanceRoleType.ALL, roles, Collections.singletonList(ActionType.VOTE));
         for (Role role : roles) {
             playerTargetMap.put(role, null);
         }
-        this.roleToVote = voteType == VoteType.WEREWOLF ? RoleType.WEREWOLF : null;
+        if (voteType!=PlayerTurn.VILLAGE_VOTE && voteType!=PlayerTurn.WOLF_VOTE){
+            throw new IllegalArgumentException("Vote can only handle WOLF_VOTE or VILLAGE_VOTE");
+        }
+        this.playerTurn = voteType;
+
     }
 
     /**
@@ -45,7 +46,7 @@ public class Vote extends AbstractTurn {
         if (target == null) {
             throw new UserIntendedException("No player targeted");
         }
-        if (RoleType.WEREWOLF.equals(roleToVote) && !RoleManagement.isA(remainingPlayersList, target, RoleType.WEREWOLF)) {
+        if (PlayerTurn.WOLF_VOTE.equals(playerTurn) && !RoleManagement.isA(remainingPlayersList, target, RoleType.WEREWOLF)) {
             throw new UserIntendedException("You cannot vote");
         }
         playerTargetMap.put(RoleManagement.getRoleByMemberId(remainingPlayersList, voter.getId()), target.getId());

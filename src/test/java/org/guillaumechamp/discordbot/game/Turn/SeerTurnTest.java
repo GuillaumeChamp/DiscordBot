@@ -49,6 +49,8 @@ class SeerTurnTest {
         // --When
         assertThatCode(() -> turn.handleAction(memberList.get(0), memberList.get(0), ActionType.SEER_SEE)).doesNotThrowAnyException();
         // --Then
-        assertThat(turn.getResult()).hasSize(1).element(0).isEqualTo(testList.get(0));
+        assertThat(turn.getResult())
+                .singleElement()
+                .isEqualTo(testList.get(0));
     }
 }
