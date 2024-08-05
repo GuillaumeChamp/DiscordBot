@@ -18,8 +18,10 @@ public class WitchRole extends Role {
         return killingAvailable;
     }
 
-    public void use(String type) {
-        if (type.equals("heal")) healingAvailable = false;
-        else killingAvailable = false;
+    public void useHeal(){
+        healingAvailable = false;
+    }
+    public void useKill(){
+        killingAvailable = false;
     }
 }

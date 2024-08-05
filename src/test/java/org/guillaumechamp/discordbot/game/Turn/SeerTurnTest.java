@@ -21,7 +21,7 @@ class SeerTurnTest {
         List<Role> testList = List.of(new Role(memberList.get(0), EnhanceRoleType.SEER), new Role(memberList.get(1), EnhanceRoleType.SIMPLE_VILLAGER));
         SeerTurn turn = new SeerTurn(testList);
         // --When
-        assertThatCode(() -> turn.handleAction(memberList.get(0), memberList.get(0), ActionType.SEER_SEE)).doesNotThrowAnyException();
+        assertThatNoException().isThrownBy(() -> turn.handleAction(memberList.get(0), memberList.get(0), ActionType.SEER_SEE));
         // --Then
         assertThatThrownBy(() -> turn.handleAction(memberList.get(0), memberList.get(0), ActionType.SEER_SEE))
                 .hasMessage("This is too late, this action is no longer authorized");
@@ -47,7 +47,7 @@ class SeerTurnTest {
         List<Role> testList = List.of(new Role(memberList.get(0), EnhanceRoleType.SEER), new Role(memberList.get(1), EnhanceRoleType.SIMPLE_VILLAGER));
         SeerTurn turn = new SeerTurn(testList);
         // --When
-        assertThatCode(() -> turn.handleAction(memberList.get(0), memberList.get(0), ActionType.SEER_SEE)).doesNotThrowAnyException();
+        assertThatNoException().isThrownBy(() -> turn.handleAction(memberList.get(0), memberList.get(0), ActionType.SEER_SEE));
         // --Then
         assertThat(turn.getResult())
                 .singleElement()

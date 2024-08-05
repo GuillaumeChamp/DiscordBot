@@ -17,6 +17,7 @@ public class ScriptReader {
     public enum KeyEntry {
         VOTE("vote"),
         START_GAME("start"),
+        ROLE_GIVEN("roleGiven",Tag.ROLE),
         START_SEER("seerStart"),
         START_SEER_PRIVATE("seerStartPrivate"),
         SEER_SPEC("seerSpec", Tag.ROLE),

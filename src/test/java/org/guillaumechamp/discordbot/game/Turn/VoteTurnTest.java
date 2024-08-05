@@ -14,24 +14,23 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 
 class VoteTurnTest {
     @Test
-    void shouldGetResultNotThrowingExceptionIfUnanimousVote() {
+    void shouldGetResultNotThrowingExceptionIfUnanimousVote() throws UserIntendedException {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1), DiscordTestUtil.getAMember(2));
         List<Role> testList = memberList.stream().map(member -> new Role(member, EnhanceRoleType.SIMPLE_VILLAGER)).toList();
         Vote vote = new Vote(PlayerTurn.VILLAGE_VOTE, testList);
         // --When
-        assertThatCode(() -> {
+        assertThatNoException().isThrownBy(() -> {
             vote.handleAction(memberList.get(0), memberList.get(0), ActionType.VOTE);
             vote.handleAction(memberList.get(1), memberList.get(0), ActionType.VOTE);
             vote.handleAction(memberList.get(2), memberList.get(0), ActionType.VOTE);
-        }).doesNotThrowAnyException();
+        });
         // --Then
-        assertThat(assertDoesNotThrow(vote::getResult))
+        assertThat(vote.getResult())
                 .hasSize(1)
                 .element(0)
                 .extracting(Role::getOwner)
@@ -45,10 +44,10 @@ class VoteTurnTest {
         List<Role> testList = memberList.stream().map(member -> new Role(member, EnhanceRoleType.SIMPLE_VILLAGER)).toList();
         Vote vote = new Vote(PlayerTurn.VILLAGE_VOTE, testList);
         // --When
-        assertThatCode(() -> {
+        assertThatNoException().isThrownBy(() -> {
             vote.handleAction(memberList.get(0), memberList.get(0), ActionType.VOTE);
             vote.handleAction(memberList.get(1), memberList.get(1), ActionType.VOTE);
-        }).doesNotThrowAnyException();
+        });
         // --Then
         assertThatThrownBy(vote::getResult).isInstanceOf(UserIntendedException.class)
                 .hasMessage("The choice is not unanimous no one will be kill");

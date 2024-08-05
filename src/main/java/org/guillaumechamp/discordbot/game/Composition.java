@@ -43,7 +43,9 @@ public class Composition {
      */
     private Role getARole(Member m) {
         EnhanceRoleType realRole = drawARole();
-        if (realRole.equals(EnhanceRoleType.WITCH)) return new WitchRole(m);
+        if (realRole.equals(EnhanceRoleType.WITCH)) {
+            return new WitchRole(m);
+        }
         return new Role(m, realRole);
     }
 
