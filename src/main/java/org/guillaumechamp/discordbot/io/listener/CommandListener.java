@@ -12,13 +12,12 @@ import org.guillaumechamp.discordbot.io.PropertyReader;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 import org.jetbrains.annotations.NotNull;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
 /**
- * Handle all commands
+ * Service that listen all text message (command and regular message)
  *
  * @see ListenerAdapter
  */
@@ -39,12 +38,7 @@ public class CommandListener extends ListenerAdapter {
             handleGameAction(event);
         }
 
-        String logString = new StringJoiner(" ")
-                .add(event.getInteraction().getUser().toString())
-                .add("/" + event.getName())
-                .add(stringifyOptions(event.getOptions()))
-                .toString();
-        BotLogger.log(BotLogger.INFO, logString);
+        logEvent(event);
 
         switch (event.getName()) {
             case CommandStore.CREATE_GAME_COMMAND -> handleCreation(event);
@@ -130,9 +124,18 @@ public class CommandListener extends ListenerAdapter {
             GuildManager.getInterface(event.getGuild()).transferCommandToTheAction(gameIndex, event.getMember(), target, event.getName());
             assert target != null;
             event.getHook().editOriginal(event.getName() + " registered against " + target.getEffectiveName()).queue();
-        } catch (UserIntendedException | InvalidParameterException e) {
+        } catch (UserIntendedException e) {
             event.getHook().editOriginal(e.getMessage()).queue();
         }
+    }
+
+    private void logEvent(SlashCommandInteractionEvent event){
+        String logString = new StringJoiner(" ")
+                .add(event.getInteraction().getUser().toString())
+                .add("/" + event.getName())
+                .add(stringifyOptions(event.getOptions()))
+                .toString();
+        BotLogger.log(BotLogger.INFO, logString);
     }
 
     private String stringifyOptions(List<OptionMapping> options) {

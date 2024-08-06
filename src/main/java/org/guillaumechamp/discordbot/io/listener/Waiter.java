@@ -2,7 +2,7 @@ package org.guillaumechamp.discordbot.io.listener;
 
 import com.sun.jdi.request.InvalidRequestStateException;
 import org.guillaumechamp.discordbot.game.Game;
-import org.guillaumechamp.discordbot.game.mechanism.AbstractTurn;
+import org.guillaumechamp.discordbot.game.turn.AbstractTurn;
 import org.guillaumechamp.discordbot.io.BotLogger;
 
 import java.util.HashMap;

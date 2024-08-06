@@ -1,8 +1,7 @@
-package org.guillaumechamp.discordbot.game.Turn;
+package org.guillaumechamp.discordbot.game.turn;
 
 import net.dv8tion.jda.api.entities.Member;
-import org.guillaumechamp.discordbot.game.mechanism.ActionType;
-import org.guillaumechamp.discordbot.game.mechanism.SeerTurn;
+import org.guillaumechamp.discordbot.game.roles.ActionType;
 import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.guillaumechamp.discordbot.game.roles.Role;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
@@ -24,7 +23,8 @@ class SeerTurnTest {
         assertThatNoException().isThrownBy(() -> turn.handleAction(memberList.get(0), memberList.get(0), ActionType.SEER_SEE));
         // --Then
         assertThatThrownBy(() -> turn.handleAction(memberList.get(0), memberList.get(0), ActionType.SEER_SEE))
-                .hasMessage("This is too late, this action is no longer authorized");
+                .isInstanceOf(UserIntendedException.class)
+                .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_ACTION_EXPIRED);
     }
 
     @Test
@@ -36,8 +36,9 @@ class SeerTurnTest {
         // --When
 
         // --Then
-        assertThatThrownBy(turn::getResult).isInstanceOf(UserIntendedException.class)
-                .hasMessage("You have spec no one");
+        assertThatThrownBy(turn::getResult)
+                .isInstanceOf(UserIntendedException.class)
+                .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_SEER_NO_SPEC);
     }
 
     @Test

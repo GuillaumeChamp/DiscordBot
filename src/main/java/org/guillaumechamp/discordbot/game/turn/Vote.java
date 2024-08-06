@@ -1,10 +1,7 @@
-package org.guillaumechamp.discordbot.game.mechanism;
+package org.guillaumechamp.discordbot.game.turn;
 
 import net.dv8tion.jda.api.entities.Member;
-import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
-import org.guillaumechamp.discordbot.game.roles.Role;
-import org.guillaumechamp.discordbot.game.roles.RoleManagement;
-import org.guillaumechamp.discordbot.game.roles.RoleType;
+import org.guillaumechamp.discordbot.game.roles.*;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 
 import java.util.*;

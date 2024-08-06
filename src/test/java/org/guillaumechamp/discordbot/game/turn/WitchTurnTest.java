@@ -1,8 +1,7 @@
-package org.guillaumechamp.discordbot.game.Turn;
+package org.guillaumechamp.discordbot.game.turn;
 
 import net.dv8tion.jda.api.entities.Member;
-import org.guillaumechamp.discordbot.game.mechanism.ActionType;
-import org.guillaumechamp.discordbot.game.mechanism.WitchTurn;
+import org.guillaumechamp.discordbot.game.roles.ActionType;
 import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.guillaumechamp.discordbot.game.roles.Role;
 import org.guillaumechamp.discordbot.game.roles.WitchRole;

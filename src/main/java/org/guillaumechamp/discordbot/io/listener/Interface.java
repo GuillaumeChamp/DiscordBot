@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.entities.Member;
 import org.apache.commons.collections4.list.FixedSizeList;
 import org.guillaumechamp.discordbot.game.GameInterface;
 import org.guillaumechamp.discordbot.game.PendingGame;
-import org.guillaumechamp.discordbot.game.mechanism.AbstractTurn;
-import org.guillaumechamp.discordbot.game.mechanism.ActionType;
+import org.guillaumechamp.discordbot.game.turn.AbstractTurn;
+import org.guillaumechamp.discordbot.game.roles.ActionType;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 
 import java.util.Arrays;

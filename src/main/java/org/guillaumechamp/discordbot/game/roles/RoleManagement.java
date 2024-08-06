@@ -1,7 +1,7 @@
 package org.guillaumechamp.discordbot.game.roles;
 
 import net.dv8tion.jda.api.entities.Member;
-import org.guillaumechamp.discordbot.game.mechanism.EndOfGameException;
+import org.guillaumechamp.discordbot.game.EndOfGameException;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;

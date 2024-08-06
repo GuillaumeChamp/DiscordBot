@@ -1,12 +1,15 @@
-package org.guillaumechamp.discordbot.game.mechanism;
+package org.guillaumechamp.discordbot.game.turn;
 
 import net.dv8tion.jda.api.entities.Member;
+import org.guillaumechamp.discordbot.game.roles.ActionType;
 import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.guillaumechamp.discordbot.game.roles.Role;
 import org.guillaumechamp.discordbot.game.roles.RoleManagement;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 
 import java.util.List;
+
+import static org.guillaumechamp.discordbot.io.UserIntendedException.*;
 
 /**
  * Base class for all asynchronous actions
@@ -36,19 +39,19 @@ public abstract class AbstractTurn {
      */
     public void handleAction(Member author, Member target, ActionType action) throws UserIntendedException {
         if (RoleManagement.isNotIn(remainingPlayersList, author)) {
-            throw new UserIntendedException("You are not in the game");
-        }
-        if (target != null && RoleManagement.isNotIn(remainingPlayersList, target)) {
-            throw new UserIntendedException("The target is not in the game");
+            throw new UserIntendedException(EXCEPTION_MESSAGE_AUTHOR_NOT_IN_THE_GAME);
         }
         if (!RoleManagement.isA(remainingPlayersList, author, this.roleAllowedToAct)) {
-            throw new UserIntendedException("You are not authorized to use this action at this moment");
+            throw new UserIntendedException(EXCEPTION_MESSAGE_ACTION_NOT_ALLOWED);
         }
-        if (!isActive) {
-            throw new UserIntendedException("This is too late, this action is no longer authorized");
+        if (target != null && RoleManagement.isNotIn(remainingPlayersList, target)) {
+            throw new UserIntendedException(EXCEPTION_MESSAGE_TARGET_NOT_IN_THE_GAME);
+        }
+        if (isExpired()) {
+            throw new UserIntendedException(EXCEPTION_MESSAGE_ACTION_EXPIRED);
         }
         if (!authorizedActions.contains(action)) {
-            throw new UserIntendedException("You can use command now but not this one");
+            throw new UserIntendedException(EXCEPTION_MESSAGE_WRONG_COMMAND);
         }
     }
 

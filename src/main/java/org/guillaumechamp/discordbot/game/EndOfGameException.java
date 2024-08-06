@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.game.mechanism;
+package org.guillaumechamp.discordbot.game;
 
 import org.guillaumechamp.discordbot.game.roles.Role;
 

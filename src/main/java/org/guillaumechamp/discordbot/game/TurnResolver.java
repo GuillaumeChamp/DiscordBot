@@ -1,7 +1,6 @@
 package org.guillaumechamp.discordbot.game;
 
-import org.guillaumechamp.discordbot.game.mechanism.EndOfGameException;
-import org.guillaumechamp.discordbot.game.mechanism.PlayerTurn;
+import org.guillaumechamp.discordbot.game.turn.PlayerTurn;
 
 public class TurnResolver {
     private TurnResolver(){}

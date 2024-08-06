@@ -7,3 +7,4 @@
 /mvnw
 /.idea/
 /src/main/resources/botConfiguration.properties
+/logs/

@@ -1,9 +1,7 @@
-package org.guillaumechamp.discordbot.game.Turn;
+package org.guillaumechamp.discordbot.game.turn;
 
 import net.dv8tion.jda.api.entities.Member;
-import org.guillaumechamp.discordbot.game.mechanism.ActionType;
-import org.guillaumechamp.discordbot.game.mechanism.PlayerTurn;
-import org.guillaumechamp.discordbot.game.mechanism.Vote;
+import org.guillaumechamp.discordbot.game.roles.ActionType;
 import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.guillaumechamp.discordbot.game.roles.Role;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
@@ -17,6 +15,20 @@ import static org.assertj.core.api.Assertions.*;
 
 
 class VoteTurnTest {
+
+    @Test
+    void shouldVoteWorkOnlyForAllRoleAndWolf(){
+        // --Given
+        List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1), DiscordTestUtil.getAMember(2));
+        List<Role> testList = memberList.stream().map(member -> new Role(member, EnhanceRoleType.SIMPLE_VILLAGER)).toList();
+        // --Then
+        assertThatNoException().isThrownBy(()->new Vote(PlayerTurn.VILLAGE_VOTE, testList));
+        assertThatNoException().isThrownBy(()->new Vote(PlayerTurn.WOLF_VOTE, testList));
+        assertThatThrownBy(()->new Vote(PlayerTurn.SEER, testList))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Vote can only handle WOLF_VOTE or VILLAGE_VOTE");
+
+    }
     @Test
     void shouldGetResultNotThrowingExceptionIfUnanimousVote() throws UserIntendedException {
         // --Given

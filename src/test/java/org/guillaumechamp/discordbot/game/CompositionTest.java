@@ -1,5 +1,6 @@
 package org.guillaumechamp.discordbot.game;
 
+import org.guillaumechamp.discordbot.game.roles.Composition;
 import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.junit.jupiter.api.Test;
 

@@ -1,9 +1,6 @@
-package org.guillaumechamp.discordbot.game;
+package org.guillaumechamp.discordbot.game.roles;
 
 import net.dv8tion.jda.api.entities.Member;
-import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
-import org.guillaumechamp.discordbot.game.roles.Role;
-import org.guillaumechamp.discordbot.game.roles.WitchRole;
 
 import java.util.ArrayList;
 import java.util.List;

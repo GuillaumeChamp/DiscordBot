@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.game.mechanism;
+package org.guillaumechamp.discordbot.game.roles;
 
 import static org.guillaumechamp.discordbot.io.listener.CommandStore.*;
 

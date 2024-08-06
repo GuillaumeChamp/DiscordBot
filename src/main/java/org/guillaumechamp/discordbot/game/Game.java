@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.guillaumechamp.discordbot.game.mechanism.*;
+import org.guillaumechamp.discordbot.game.turn.*;
 import org.guillaumechamp.discordbot.game.roles.*;
 import org.guillaumechamp.discordbot.io.ChannelManager;
 import org.guillaumechamp.discordbot.io.ScriptReader;

@@ -1,6 +1,7 @@
-package org.guillaumechamp.discordbot.game.mechanism;
+package org.guillaumechamp.discordbot.game.turn;
 
 import net.dv8tion.jda.api.entities.Member;
+import org.guillaumechamp.discordbot.game.roles.ActionType;
 import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
 import org.guillaumechamp.discordbot.game.roles.Role;
 import org.guillaumechamp.discordbot.game.roles.RoleManagement;
@@ -30,7 +31,7 @@ public class SeerTurn extends AbstractTurn {
     @Override
     public List<Role> getResult() throws UserIntendedException {
         if (result.isEmpty()) {
-            throw new UserIntendedException("You have spec no one");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_SEER_NO_SPEC);
         }
         return result;
     }
