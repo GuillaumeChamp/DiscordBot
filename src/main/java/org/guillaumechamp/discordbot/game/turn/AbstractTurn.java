@@ -2,9 +2,9 @@ package org.guillaumechamp.discordbot.game.turn;
 
 import net.dv8tion.jda.api.entities.Member;
 import org.guillaumechamp.discordbot.game.roles.ActionType;
-import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
-import org.guillaumechamp.discordbot.game.roles.Role;
-import org.guillaumechamp.discordbot.game.roles.RoleManagement;
+import org.guillaumechamp.discordbot.game.roles.RoleType;
+import org.guillaumechamp.discordbot.game.roles.PlayerData;
+import org.guillaumechamp.discordbot.game.roles.PlayerDataUtil;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 
 import java.util.List;
@@ -15,15 +15,15 @@ import static org.guillaumechamp.discordbot.io.UserIntendedException.*;
  * Base class for all asynchronous actions
  */
 public abstract class AbstractTurn {
-    protected final EnhanceRoleType roleAllowedToAct;
-    protected final List<Role> remainingPlayersList;
+    protected final RoleType roleTypeAllowedToAct;
+    protected final List<PlayerData> remainingPlayersList;
     private boolean isActive = true;
     protected final List<ActionType> authorizedActions;
     protected int durationInSecond = 60;
     protected PlayerTurn playerTurn = PlayerTurn.NONE;
 
-    protected AbstractTurn(EnhanceRoleType roleAllowedToAct, List<Role> remainingPlayersList, List<ActionType> authorizedActions) {
-        this.roleAllowedToAct = roleAllowedToAct;
+    protected AbstractTurn(RoleType roleTypeAllowedToAct, List<PlayerData> remainingPlayersList, List<ActionType> authorizedActions) {
+        this.roleTypeAllowedToAct = roleTypeAllowedToAct;
         this.remainingPlayersList = remainingPlayersList;
         this.authorizedActions = authorizedActions;
     }
@@ -38,13 +38,13 @@ public abstract class AbstractTurn {
      * @throws UserIntendedException an exception that explain why nothing happen
      */
     public void handleAction(Member author, Member target, ActionType action) throws UserIntendedException {
-        if (RoleManagement.isNotIn(remainingPlayersList, author)) {
+        if (PlayerDataUtil.isMemberNotIn(remainingPlayersList, author)) {
             throw new UserIntendedException(EXCEPTION_MESSAGE_AUTHOR_NOT_IN_THE_GAME);
         }
-        if (!RoleManagement.isA(remainingPlayersList, author, this.roleAllowedToAct)) {
+        if (!PlayerDataUtil.isMemberA(remainingPlayersList, author, this.roleTypeAllowedToAct)) {
             throw new UserIntendedException(EXCEPTION_MESSAGE_ACTION_NOT_ALLOWED);
         }
-        if (target != null && RoleManagement.isNotIn(remainingPlayersList, target)) {
+        if (target != null && PlayerDataUtil.isMemberNotIn(remainingPlayersList, target)) {
             throw new UserIntendedException(EXCEPTION_MESSAGE_TARGET_NOT_IN_THE_GAME);
         }
         if (isExpired()) {
@@ -55,7 +55,7 @@ public abstract class AbstractTurn {
         }
     }
 
-    public abstract List<Role> getResult() throws UserIntendedException;
+    public abstract List<PlayerData> getResult() throws UserIntendedException;
 
     public PlayerTurn getPlayerTurn() {
         return playerTurn;

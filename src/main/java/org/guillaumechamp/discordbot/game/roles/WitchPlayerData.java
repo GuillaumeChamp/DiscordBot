@@ -2,12 +2,12 @@ package org.guillaumechamp.discordbot.game.roles;
 
 import net.dv8tion.jda.api.entities.Member;
 
-public class WitchRole extends Role {
+public class WitchPlayerData extends PlayerData {
     private boolean healingAvailable = true;
     private boolean killingAvailable = true;
 
-    public WitchRole(Member owner) {
-        super(owner, EnhanceRoleType.WITCH);
+    public WitchPlayerData(Member owner) {
+        super(owner, RoleType.WITCH);
     }
 
     public boolean isHealingAvailable() {

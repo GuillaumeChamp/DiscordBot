@@ -10,10 +10,10 @@ import java.util.List;
 
 public class WitchTurn extends AbstractTurn {
     public static final int DEFAULT_DURATION = 15;
-    ArrayList<Role> deadPerson = new ArrayList<>();
+    ArrayList<PlayerData> deadPerson = new ArrayList<>();
 
-    public WitchTurn(List<Role> roles, Role eliminated) {
-        super(EnhanceRoleType.WITCH, roles, List.of(ActionType.WITCH_KILL, ActionType.WITCH_SAVE));
+    public WitchTurn(List<PlayerData> roles, PlayerData eliminated) {
+        super(RoleType.WITCH, roles, List.of(ActionType.WITCH_KILL, ActionType.WITCH_SAVE));
         this.durationInSecond = DEFAULT_DURATION;
         if (eliminated!=null){
             deadPerson.add(eliminated);
@@ -23,7 +23,7 @@ public class WitchTurn extends AbstractTurn {
     @Override
     public void handleAction(Member author, Member target, ActionType action) throws UserIntendedException {
         super.handleAction(author, target, action);
-        WitchRole witch = (WitchRole) RoleManagement.getByRole(remainingPlayersList, EnhanceRoleType.WITCH);
+        WitchPlayerData witch = (WitchPlayerData) PlayerDataUtil.getPlayerDataByRole(remainingPlayersList, RoleType.WITCH);
         if (action.equals(ActionType.WITCH_SAVE)) {
             handleSaveAction(witch,target);
         } else if (action.equals(ActionType.WITCH_KILL)) {
@@ -31,7 +31,7 @@ public class WitchTurn extends AbstractTurn {
         }
     }
 
-    private void handleSaveAction(WitchRole witch, Member target) throws UserIntendedException {
+    private void handleSaveAction(WitchPlayerData witch, Member target) throws UserIntendedException {
         if (!witch.isHealingAvailable()){
             throw new UserIntendedException("You already used this power !");
         }
@@ -45,16 +45,16 @@ public class WitchTurn extends AbstractTurn {
         deadPerson.remove(0);
     }
 
-    private void handleKillAction(WitchRole witch, Member target) throws UserIntendedException {
+    private void handleKillAction(WitchPlayerData witch, Member target) throws UserIntendedException {
         if (!witch.isKillingAvailable()){
             throw new UserIntendedException("You already used this power !");
         }
         witch.useKill();
-        deadPerson.add(RoleManagement.getRoleByMemberId(remainingPlayersList, target.getId()));
+        deadPerson.add(PlayerDataUtil.getRoleByMemberId(remainingPlayersList, target.getId()));
     }
 
     @Override
-    public List<Role> getResult() {
+    public List<PlayerData> getResult() {
         return deadPerson;
     }
 }

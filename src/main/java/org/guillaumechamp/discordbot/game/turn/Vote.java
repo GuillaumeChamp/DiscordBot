@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Vote extends AbstractTurn {
-    private final Map<Role, String> playerTargetMap = new HashMap<>();
+    private final Map<PlayerData, String> playerTargetMap = new HashMap<>();
 
     /**
      * Create a new vote
@@ -17,9 +17,9 @@ public class Vote extends AbstractTurn {
      * @param voteType macro to design who can vote
      * @param roles    all player remaining in the game
      */
-    public Vote(PlayerTurn voteType, List<Role> roles) {
-        super(EnhanceRoleType.ALL, roles, Collections.singletonList(ActionType.VOTE));
-        for (Role role : roles) {
+    public Vote(PlayerTurn voteType, List<PlayerData> roles) {
+        super(RoleType.ALL, roles, Collections.singletonList(ActionType.VOTE));
+        for (PlayerData role : roles) {
             playerTargetMap.put(role, null);
         }
         if (voteType!=PlayerTurn.VILLAGE_VOTE && voteType!=PlayerTurn.WOLF_VOTE){
@@ -43,10 +43,10 @@ public class Vote extends AbstractTurn {
         if (target == null) {
             throw new UserIntendedException("No player targeted");
         }
-        if (PlayerTurn.WOLF_VOTE.equals(playerTurn) && !RoleManagement.isA(remainingPlayersList, target, RoleType.WEREWOLF)) {
+        if (PlayerTurn.WOLF_VOTE.equals(playerTurn) && !PlayerDataUtil.isMemberIn(remainingPlayersList, target, RoleSide.WEREWOLF)) {
             throw new UserIntendedException("You cannot vote");
         }
-        playerTargetMap.put(RoleManagement.getRoleByMemberId(remainingPlayersList, voter.getId()), target.getId());
+        playerTargetMap.put(PlayerDataUtil.getRoleByMemberId(remainingPlayersList, voter.getId()), target.getId());
     }
 
     /**
@@ -55,7 +55,7 @@ public class Vote extends AbstractTurn {
      * @return a List holding only one element, the most voted person
      * @throws UserIntendedException if the vote is tied (including 0 vote)
      */
-    public List<Role> getResult() throws UserIntendedException {
+    public List<PlayerData> getResult() throws UserIntendedException {
         Map<String, Long> numberOfVoteByMember = playerTargetMap
                 .values()
                 .stream()
@@ -66,8 +66,8 @@ public class Vote extends AbstractTurn {
         long maxNumberOfVote = numberOfVoteByMember.values().stream().max(Double::compare).orElse(0L);
         List<String> tiedList = numberOfVoteByMember.entrySet().stream().filter(key -> maxNumberOfVote == key.getValue()).map(Map.Entry::getKey).toList();
         if (tiedList.size() == 1) {
-            ArrayList<Role> ans = new ArrayList<>();
-            ans.add(RoleManagement.getRoleByMemberId(remainingPlayersList, tiedList.get(0)));
+            ArrayList<PlayerData> ans = new ArrayList<>();
+            ans.add(PlayerDataUtil.getRoleByMemberId(remainingPlayersList, tiedList.get(0)));
             return ans;
         }
         throw new UserIntendedException("The choice is not unanimous no one will be kill");

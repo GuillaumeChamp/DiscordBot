@@ -1,5 +1,11 @@
 package org.guillaumechamp.discordbot.game.roles;
 
 public enum RoleType {
-    VILLAGER, WEREWOLF, SOLO
+    ALL,
+    SIMPLE_VILLAGER,
+    SIMPLE_WOLF,
+    SEER,
+    WITCH,
+    NONE
+
 }

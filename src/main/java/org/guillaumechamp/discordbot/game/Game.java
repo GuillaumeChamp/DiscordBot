@@ -29,8 +29,8 @@ public class Game implements GameInterface {
 
     // Game Related Data
     private boolean isActive = true;
-    private final List<Role> activePlayers;
-    private final List<Role> deadPlayers;
+    private final List<PlayerData> activePlayers;
+    private final List<PlayerData> deadPlayers;
     private AbstractTurn currentTurn;
 
 
@@ -51,7 +51,7 @@ public class Game implements GameInterface {
             this.currentServer = null;
         } else {
             this.currentServer = channel.getGuild();
-            ChannelManager.createRestrictedChannel(currentServer, RoleManagement.getAllByRoleType(this.activePlayers, RoleType.WEREWOLF), getGameChannelNameByIndexAndStatus(id, true));
+            ChannelManager.createRestrictedChannel(currentServer, PlayerDataUtil.getAllMembersBySide(this.activePlayers, RoleSide.WEREWOLF), getGameChannelNameByIndexAndStatus(id, true));
         }
         this.initGame();
     }
@@ -59,8 +59,8 @@ public class Game implements GameInterface {
     private void initGame() {
         sendPublicMessage(ScriptReader.KeyEntry.START_GAME);
 
-        for (Role player : activePlayers) {
-            sendPrivateMessage(player.getOwner(), ScriptReader.KeyEntry.ROLE_GIVEN, Pair.of(ScriptReader.Tag.ROLE,player.getRealRole().toString()));
+        for (PlayerData player : activePlayers) {
+            sendPrivateMessage(player.getOwner(), ScriptReader.KeyEntry.ROLE_GIVEN, Pair.of(ScriptReader.Tag.ROLE,player.getRole().toString()));
         }
     }
 
@@ -92,11 +92,11 @@ public class Game implements GameInterface {
         }
     }
     void beforeSeer() {
-        if (shortCircuitActionIfNeeded(EnhanceRoleType.SEER,PlayerTurn.SEER, ScriptReader.KeyEntry.START_SEER, SeerTurn.DEFAULT_DURATION)){
+        if (shortCircuitActionIfNeeded(RoleType.SEER,PlayerTurn.SEER, ScriptReader.KeyEntry.START_SEER, SeerTurn.DEFAULT_DURATION)){
             return;
         }
 
-        Member seerOwner = RoleManagement.getByRole(activePlayers, EnhanceRoleType.SEER).getOwner();
+        Member seerOwner = PlayerDataUtil.getPlayerDataByRole(activePlayers, RoleType.SEER).getOwner();
         sendPrivateMessage(seerOwner, ScriptReader.KeyEntry.START_SEER_PRIVATE);
 
         SeerTurn nextAction = new SeerTurn(activePlayers);
@@ -104,13 +104,13 @@ public class Game implements GameInterface {
     }
 
     void afterSeer() {
-        if (RoleManagement.roleIsNotIn(activePlayers, EnhanceRoleType.SEER)) {
+        if (PlayerDataUtil.isRoleNotIn(activePlayers, RoleType.SEER)) {
             return;
         }
-        Member seerOwner = RoleManagement.getByRole(activePlayers, EnhanceRoleType.SEER).getOwner();
+        Member seerOwner = PlayerDataUtil.getPlayerDataByRole(activePlayers, RoleType.SEER).getOwner();
         try {
-            Role target = currentTurn.getResult().get(0);
-            sendPrivateMessage(seerOwner, ScriptReader.KeyEntry.SEER_SPEC, Pair.of(ScriptReader.Tag.ROLE, target.getRealRole().toString()));
+            PlayerData target = currentTurn.getResult().get(0);
+            sendPrivateMessage(seerOwner, ScriptReader.KeyEntry.SEER_SPEC, Pair.of(ScriptReader.Tag.ROLE, target.getRole().toString()));
         } catch (UserIntendedException e) {
             sendExceptionMessagePrivately(seerOwner, e);
         }
@@ -130,26 +130,26 @@ public class Game implements GameInterface {
 
     void afterVillagerVote() throws EndOfGameException {
         try {
-            Role eliminated = currentTurn.getResult().get(0);
+            PlayerData eliminated = currentTurn.getResult().get(0);
             manageDeath(eliminated);
-            RoleManagement.checkWin(activePlayers);
+            PlayerDataUtil.checkWin(activePlayers);
         } catch (UserIntendedException e) {
             sendExceptionMessagePublicly(e);
         }
     }
 
     void beforeWitch() {
-        if (shortCircuitActionIfNeeded(EnhanceRoleType.WITCH,PlayerTurn.WITCH, ScriptReader.KeyEntry.WITCH_PUBLIC, WitchTurn.DEFAULT_DURATION)){
+        if (shortCircuitActionIfNeeded(RoleType.WITCH,PlayerTurn.WITCH, ScriptReader.KeyEntry.WITCH_PUBLIC, WitchTurn.DEFAULT_DURATION)){
             return;
         }
 
-        Role eliminated;
+        PlayerData eliminated;
         try {
             eliminated = currentTurn.getResult().get(0);
         } catch (UserIntendedException ignored) {
             eliminated = null;
         }
-        WitchRole witch = (WitchRole) RoleManagement.getByRole(activePlayers, EnhanceRoleType.WITCH);
+        WitchPlayerData witch = (WitchPlayerData) PlayerDataUtil.getPlayerDataByRole(activePlayers, RoleType.WITCH);
 
         if (!witch.isHealingAvailable() && !witch.isKillingAvailable()) {
             sendPrivateMessage(witch.getOwner(), ScriptReader.KeyEntry.WITCH_NOTHING);
@@ -167,11 +167,11 @@ public class Game implements GameInterface {
 
     void afterNight() throws EndOfGameException {
         try {
-            List<Role> death = currentTurn.getResult();
-            for (Role role : death) {
+            List<PlayerData> death = currentTurn.getResult();
+            for (PlayerData role : death) {
                 this.manageDeath(role);
             }
-            RoleManagement.checkWin(activePlayers);
+            PlayerDataUtil.checkWin(activePlayers);
 
         } catch (UserIntendedException e) {
             sendPublicMessage(ScriptReader.KeyEntry.NO_DEATH);
@@ -183,7 +183,7 @@ public class Game implements GameInterface {
      *
      * @param eliminated the person to remove
      */
-    private void manageDeath(Role eliminated) {
+    private void manageDeath(PlayerData eliminated) {
         // handle double death if a player died from different ways
         if (deadPlayers.contains(eliminated)) {
             return;
@@ -195,7 +195,7 @@ public class Game implements GameInterface {
         muteAMember(eliminated.getOwner());
         sendPublicMessage(ScriptReader.KeyEntry.ELIMINATED,
                 Pair.of(ScriptReader.Tag.NAME, eliminated.getOwner().getUser().getName()),
-                Pair.of(ScriptReader.Tag.ROLE, eliminated.getRealRole().toString()));
+                Pair.of(ScriptReader.Tag.ROLE, eliminated.getRole().toString()));
     }
 
     /**
@@ -257,15 +257,15 @@ public class Game implements GameInterface {
         Waiter.register(this, dummyTurn);
     }
 
-    private boolean shortCircuitActionIfNeeded(EnhanceRoleType role, PlayerTurn turn, ScriptReader.KeyEntry publicMessageKey, int duration){
-        Collection<Role> everyone = CollectionUtils.union(activePlayers, deadPlayers);
-        if (RoleManagement.roleIsNotIn(everyone, role)) {
+    private boolean shortCircuitActionIfNeeded(RoleType roleType, PlayerTurn turn, ScriptReader.KeyEntry publicMessageKey, int duration){
+        Collection<PlayerData> everyone = CollectionUtils.union(activePlayers, deadPlayers);
+        if (PlayerDataUtil.isRoleNotIn(everyone, roleType)) {
             playNextAction(turn);
             return true;
         }
 
         sendPublicMessage(publicMessageKey);
-        if (RoleManagement.roleIsNotIn(activePlayers, role)) {
+        if (PlayerDataUtil.isRoleNotIn(activePlayers, roleType)) {
             registerDummyTurn(duration, turn);
             return true;
         }

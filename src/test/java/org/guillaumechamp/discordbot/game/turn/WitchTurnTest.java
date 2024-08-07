@@ -1,10 +1,9 @@
 package org.guillaumechamp.discordbot.game.turn;
 
 import net.dv8tion.jda.api.entities.Member;
-import org.guillaumechamp.discordbot.game.roles.ActionType;
-import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
-import org.guillaumechamp.discordbot.game.roles.Role;
-import org.guillaumechamp.discordbot.game.roles.WitchRole;
+import org.guillaumechamp.discordbot.game.roles.*;
+import org.guillaumechamp.discordbot.game.roles.PlayerData;
+import org.guillaumechamp.discordbot.game.roles.WitchPlayerData;
 import org.guillaumechamp.discordbot.util.DiscordTestUtil;
 import org.junit.jupiter.api.Test;
 
@@ -17,8 +16,8 @@ class WitchTurnTest {
     void shouldWitchCannotUseHealIfAlreadyUsed() {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1));
-        List<Role> testList = List.of(new WitchRole(memberList.get(0)), new Role(memberList.get(1), EnhanceRoleType.SIMPLE_VILLAGER));
-        WitchRole witch = (WitchRole) testList.get(0);
+        List<PlayerData> testList = List.of(new WitchPlayerData(memberList.get(0)), new PlayerData(memberList.get(1), RoleType.SIMPLE_VILLAGER));
+        WitchPlayerData witch = (WitchPlayerData) testList.get(0);
         WitchTurn turn = new WitchTurn(testList, testList.get(1));
         // --When
         witch.useHeal();
@@ -31,8 +30,8 @@ class WitchTurnTest {
     void shouldWitchCannotUseKillIfAlreadyUsed() {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1));
-        List<Role> testList = List.of(new WitchRole(memberList.get(0)), new Role(memberList.get(1), EnhanceRoleType.SIMPLE_VILLAGER));
-        WitchRole witch = (WitchRole) testList.get(0);
+        List<PlayerData> testList = List.of(new WitchPlayerData(memberList.get(0)), new PlayerData(memberList.get(1), RoleType.SIMPLE_VILLAGER));
+        WitchPlayerData witch = (WitchPlayerData) testList.get(0);
         WitchTurn turn = new WitchTurn(testList, testList.get(1));
         // --When
         witch.useKill();
@@ -45,8 +44,8 @@ class WitchTurnTest {
     void shouldWitchCanUseBothAction() {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1), DiscordTestUtil.getAMember(2));
-        List<Role> testList = List.of(new WitchRole(memberList.get(0)), new Role(memberList.get(1), EnhanceRoleType.SIMPLE_VILLAGER), new Role(memberList.get(2), EnhanceRoleType.SIMPLE_VILLAGER));
-        WitchRole witch = (WitchRole) testList.get(0);
+        List<PlayerData> testList = List.of(new WitchPlayerData(memberList.get(0)), new PlayerData(memberList.get(1), RoleType.SIMPLE_VILLAGER), new PlayerData(memberList.get(2), RoleType.SIMPLE_VILLAGER));
+        WitchPlayerData witch = (WitchPlayerData) testList.get(0);
         WitchTurn turn = new WitchTurn(testList, testList.get(1));
         // --Then
         assertThatNoException().isThrownBy(() -> turn.handleAction(memberList.get(0), memberList.get(2), ActionType.WITCH_KILL));
@@ -59,7 +58,7 @@ class WitchTurnTest {
     void shouldWitchCanNotSaveIfNoOneIsKill() {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1));
-        List<Role> testList = List.of(new WitchRole(memberList.get(0)), new Role(memberList.get(1), EnhanceRoleType.SIMPLE_VILLAGER));
+        List<PlayerData> testList = List.of(new WitchPlayerData(memberList.get(0)), new PlayerData(memberList.get(1), RoleType.SIMPLE_VILLAGER));
         WitchTurn turn = new WitchTurn(testList, null);
         // --Then
         assertThatThrownBy(() -> turn.handleAction(memberList.get(0), memberList.get(0), ActionType.WITCH_SAVE))
@@ -69,7 +68,7 @@ class WitchTurnTest {
     void shouldWitchHealNeedToPreciseAValidTarget() {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1));
-        List<Role> testList = List.of(new WitchRole(memberList.get(0)), new Role(memberList.get(1), EnhanceRoleType.SIMPLE_VILLAGER));
+        List<PlayerData> testList = List.of(new WitchPlayerData(memberList.get(0)), new PlayerData(memberList.get(1), RoleType.SIMPLE_VILLAGER));
         WitchTurn turn = new WitchTurn(testList, testList.get(1));
         // --When
         // --Then
@@ -81,7 +80,7 @@ class WitchTurnTest {
     void shouldWitchHealRemoveAPlayerFromResultList() {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1));
-        List<Role> testList = List.of(new WitchRole(memberList.get(0)), new Role(memberList.get(1), EnhanceRoleType.SIMPLE_VILLAGER));
+        List<PlayerData> testList = List.of(new WitchPlayerData(memberList.get(0)), new PlayerData(memberList.get(1), RoleType.SIMPLE_VILLAGER));
         WitchTurn turn = new WitchTurn(testList, testList.get(1));
         // --When
         assertThatNoException().isThrownBy(() -> turn.handleAction(memberList.get(0), memberList.get(1), ActionType.WITCH_SAVE));
@@ -93,7 +92,7 @@ class WitchTurnTest {
     void shouldWitchKillAddAPlayerFromResultList() {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1));
-        List<Role> testList = List.of(new WitchRole(memberList.get(0)), new Role(memberList.get(1), EnhanceRoleType.SIMPLE_VILLAGER));
+        List<PlayerData> testList = List.of(new WitchPlayerData(memberList.get(0)), new PlayerData(memberList.get(1), RoleType.SIMPLE_VILLAGER));
         WitchTurn turn = new WitchTurn(testList, testList.get(0));
         // --When
         assertThatNoException().isThrownBy(() -> turn.handleAction(memberList.get(0), memberList.get(1), ActionType.WITCH_KILL));

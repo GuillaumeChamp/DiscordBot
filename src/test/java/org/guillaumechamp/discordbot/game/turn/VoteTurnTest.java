@@ -2,8 +2,8 @@ package org.guillaumechamp.discordbot.game.turn;
 
 import net.dv8tion.jda.api.entities.Member;
 import org.guillaumechamp.discordbot.game.roles.ActionType;
-import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
-import org.guillaumechamp.discordbot.game.roles.Role;
+import org.guillaumechamp.discordbot.game.roles.RoleType;
+import org.guillaumechamp.discordbot.game.roles.PlayerData;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 import org.guillaumechamp.discordbot.util.DiscordTestUtil;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ class VoteTurnTest {
     void shouldVoteWorkOnlyForAllRoleAndWolf(){
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1), DiscordTestUtil.getAMember(2));
-        List<Role> testList = memberList.stream().map(member -> new Role(member, EnhanceRoleType.SIMPLE_VILLAGER)).toList();
+        List<PlayerData> testList = memberList.stream().map(member -> new PlayerData(member, RoleType.SIMPLE_VILLAGER)).toList();
         // --Then
         assertThatNoException().isThrownBy(()->new Vote(PlayerTurn.VILLAGE_VOTE, testList));
         assertThatNoException().isThrownBy(()->new Vote(PlayerTurn.WOLF_VOTE, testList));
@@ -33,7 +33,7 @@ class VoteTurnTest {
     void shouldGetResultNotThrowingExceptionIfUnanimousVote() throws UserIntendedException {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1), DiscordTestUtil.getAMember(2));
-        List<Role> testList = memberList.stream().map(member -> new Role(member, EnhanceRoleType.SIMPLE_VILLAGER)).toList();
+        List<PlayerData> testList = memberList.stream().map(member -> new PlayerData(member, RoleType.SIMPLE_VILLAGER)).toList();
         Vote vote = new Vote(PlayerTurn.VILLAGE_VOTE, testList);
         // --When
         assertThatNoException().isThrownBy(() -> {
@@ -45,7 +45,7 @@ class VoteTurnTest {
         assertThat(vote.getResult())
                 .hasSize(1)
                 .element(0)
-                .extracting(Role::getOwner)
+                .extracting(PlayerData::getOwner)
                 .isEqualTo(memberList.get(0));
     }
 
@@ -53,7 +53,7 @@ class VoteTurnTest {
     void shouldGetResultThrowExceptionIfNoUnanimousVote() {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1));
-        List<Role> testList = memberList.stream().map(member -> new Role(member, EnhanceRoleType.SIMPLE_VILLAGER)).toList();
+        List<PlayerData> testList = memberList.stream().map(member -> new PlayerData(member, RoleType.SIMPLE_VILLAGER)).toList();
         Vote vote = new Vote(PlayerTurn.VILLAGE_VOTE, testList);
         // --When
         assertThatNoException().isThrownBy(() -> {
@@ -69,7 +69,7 @@ class VoteTurnTest {
     void shouldGetResultThrowExceptionIfNoVote() {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1));
-        List<Role> testList = memberList.stream().map(member -> new Role(member, EnhanceRoleType.SIMPLE_VILLAGER)).toList();
+        List<PlayerData> testList = memberList.stream().map(member -> new PlayerData(member, RoleType.SIMPLE_VILLAGER)).toList();
         Vote vote = new Vote(PlayerTurn.VILLAGE_VOTE, testList);
         // --When
 
@@ -83,7 +83,7 @@ class VoteTurnTest {
     void shouldThrowExceptionIfVoteForNoOne() {
         // --Given
         Member member = DiscordTestUtil.getAMember(0);
-        List<Role> testList = Collections.singletonList(new Role(member, EnhanceRoleType.SIMPLE_VILLAGER));
+        List<PlayerData> testList = Collections.singletonList(new PlayerData(member, RoleType.SIMPLE_VILLAGER));
         Vote vote = new Vote(PlayerTurn.VILLAGE_VOTE, testList);
         // --Then
         assertThatThrownBy(() -> vote.handleAction(member, null, ActionType.VOTE))
@@ -95,7 +95,7 @@ class VoteTurnTest {
     void shouldThrowExceptionIfVillagerVoteWhileWerewolfTurn() {
         // --Given
         Member member = DiscordTestUtil.getAMember(0);
-        List<Role> testList = Collections.singletonList(new Role(member, EnhanceRoleType.SIMPLE_VILLAGER));
+        List<PlayerData> testList = Collections.singletonList(new PlayerData(member, RoleType.SIMPLE_VILLAGER));
         Vote vote = new Vote(PlayerTurn.WOLF_VOTE, testList);
         // --Then
         assertThatThrownBy(() -> vote.handleAction(member, member, ActionType.VOTE))

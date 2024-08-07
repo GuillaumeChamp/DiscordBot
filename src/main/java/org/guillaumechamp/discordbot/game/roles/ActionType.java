@@ -6,7 +6,7 @@ public enum ActionType {
     VOTE, SEER_SEE, WITCH_KILL, WITCH_SAVE;
 
     public static ActionType stringToActionType(String string) {
-        switch (string) {
+        switch (string.toLowerCase()) {
             case VOTE_COMMAND -> {
                 return VOTE;
             }

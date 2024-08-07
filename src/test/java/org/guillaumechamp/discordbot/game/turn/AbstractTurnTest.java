@@ -1,10 +1,9 @@
 package org.guillaumechamp.discordbot.game.turn;
 
 import net.dv8tion.jda.api.entities.Member;
-import org.guillaumechamp.discordbot.game.roles.ActionType;
-import org.guillaumechamp.discordbot.game.roles.EnhanceRoleType;
-import org.guillaumechamp.discordbot.game.roles.Role;
-import org.guillaumechamp.discordbot.game.roles.WitchRole;
+import org.guillaumechamp.discordbot.game.roles.*;
+import org.guillaumechamp.discordbot.game.roles.PlayerData;
+import org.guillaumechamp.discordbot.game.roles.WitchPlayerData;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 import org.guillaumechamp.discordbot.util.DiscordTestUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,10 +21,10 @@ class AbstractTurnTest {
 
     @BeforeEach
     void initAction() {
-        List<Role> testList = List.of(new Role(memberList.get(0), EnhanceRoleType.SEER), new WitchRole(memberList.get(1)));
-        testAbstractTurn = new AbstractTurn(EnhanceRoleType.WITCH, testList, Collections.singletonList(ActionType.WITCH_SAVE)) {
+        List<PlayerData> testList = List.of(new PlayerData(memberList.get(0), RoleType.SEER), new WitchPlayerData(memberList.get(1)));
+        testAbstractTurn = new AbstractTurn(RoleType.WITCH, testList, Collections.singletonList(ActionType.WITCH_SAVE)) {
             @Override
-            public List<Role> getResult() {
+            public List<PlayerData> getResult() {
                 return null;
             }
         };

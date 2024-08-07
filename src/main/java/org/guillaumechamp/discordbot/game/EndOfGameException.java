@@ -1,13 +1,13 @@
 package org.guillaumechamp.discordbot.game;
 
-import org.guillaumechamp.discordbot.game.roles.Role;
+import org.guillaumechamp.discordbot.game.roles.PlayerData;
 
 import java.util.Collection;
 
 public class EndOfGameException extends IllegalStateException {
-    private final transient Collection<Role> winningTeam;
+    private final transient Collection<PlayerData> winningTeam;
 
-    public EndOfGameException(String message, Collection<Role> composition) {
+    public EndOfGameException(String message, Collection<PlayerData> composition) {
         super(message);
         this.winningTeam = composition;
     }
