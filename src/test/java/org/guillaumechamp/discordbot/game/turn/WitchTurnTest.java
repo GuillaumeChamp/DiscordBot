@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.Member;
 import org.guillaumechamp.discordbot.game.roles.*;
 import org.guillaumechamp.discordbot.game.roles.PlayerData;
 import org.guillaumechamp.discordbot.game.roles.WitchPlayerData;
-import org.guillaumechamp.discordbot.util.DiscordTestUtil;
+import org.guillaumechamp.discordbot.testUtil.DiscordTestUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

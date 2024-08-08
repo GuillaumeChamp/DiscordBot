@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.io.listener;
+package org.guillaumechamp.discordbot.io.manager;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -15,13 +15,13 @@ import java.util.List;
 /**
  * Act as interface to map a guild (i.e. a server) to a set of game
  */
-public class Interface {
+public class GameManager {
     public static final Integer MAX_GAME_PER_GUILD = 3;
-    Guild server;
-    List<GameInterface> gameList = FixedSizeList.fixedSizeList(Arrays.asList(new GameInterface[MAX_GAME_PER_GUILD]));
-    List<AbstractTurn> currentAction = FixedSizeList.fixedSizeList(Arrays.asList(new AbstractTurn[MAX_GAME_PER_GUILD]));
+    private final Guild server;
+    private final List<GameInterface> gameList = FixedSizeList.fixedSizeList(Arrays.asList(new GameInterface[MAX_GAME_PER_GUILD]));
+    private final List<AbstractTurn> currentAction = FixedSizeList.fixedSizeList(Arrays.asList(new AbstractTurn[MAX_GAME_PER_GUILD]));
 
-    public Interface(Guild server) {
+    public GameManager(Guild server) {
         this.server = server;
     }
 

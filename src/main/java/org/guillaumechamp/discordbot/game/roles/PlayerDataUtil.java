@@ -82,8 +82,7 @@ public class PlayerDataUtil {
      */
     public static boolean isMemberA(Collection<PlayerData> players, Member memberToLookup, RoleType role) {
         if (players == null || memberToLookup == null) {
-            //not useless because we use collection
-            return false;
+            throw new InvalidParameterException("players or member is null");
         }
         for (PlayerData playerData : players) {
             if (playerData.getId().equals(memberToLookup.getId())) {
@@ -93,7 +92,7 @@ public class PlayerDataUtil {
                 return playerData.getRole() == role;
             }
         }
-        return false;
+        throw new InvalidParameterException("player not found");
     }
 
     /**
@@ -104,7 +103,7 @@ public class PlayerDataUtil {
      * @param side           side
      * @return true if voter is a type
      */
-    public static boolean isMemberIn(Collection<PlayerData> players, Member memberToLookup, RoleSide side) {
+    public static boolean isMemberInThatSide(Collection<PlayerData> players, Member memberToLookup, RoleSide side) {
         if (players == null || memberToLookup == null) {
             //not useless because we use collection
             return false;
@@ -125,6 +124,7 @@ public class PlayerDataUtil {
      */
     public static boolean isRoleNotIn(Collection<PlayerData> players, RoleType role) {
         if (players == null) {
+            //not useless because we use collection
             return true;
         }
         for (PlayerData player : players) {
@@ -166,7 +166,8 @@ public class PlayerDataUtil {
      */
     public static List<Member> getAllMembersBySide(Collection<PlayerData> players, RoleSide side) {
         if (players == null) {
-            return Collections.emptyList(); //not useless because we use collection
+            //not useless because we use collection
+            return Collections.emptyList();
         }
         List<Member> matching = new ArrayList<>(players.size() / 2);
         for (PlayerData player : players) {
@@ -187,6 +188,7 @@ public class PlayerDataUtil {
      */
     public static PlayerData getPlayerDataByRole(Collection<PlayerData> players, RoleType role) throws InvalidParameterException {
         if (players == null) {
+            //not useless because we use collection
             throw new InvalidParameterException("null collection of player not allowed");
         }
         for (PlayerData player : players) {

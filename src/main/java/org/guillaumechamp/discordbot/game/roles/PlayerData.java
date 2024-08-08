@@ -3,9 +3,9 @@ package org.guillaumechamp.discordbot.game.roles;
 import net.dv8tion.jda.api.entities.Member;
 
 public class PlayerData {
-    Member owner;
-    RoleSide type;
-    RoleType roleType;
+    private final Member owner;
+    private final RoleSide type;
+    private final RoleType roleType;
 
     public PlayerData(Member owner, RoleType roleType) {
         this.owner = owner;
@@ -32,7 +32,7 @@ public class PlayerData {
     @Override
     public String toString() {
         return owner.getUser().getName() +
-                ", was a " + type;
+                ", was a " + type + "("+type+")";
     }
 
     public RoleType getRole() {

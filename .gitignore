@@ -8,3 +8,4 @@
 /.idea/
 /src/main/resources/botConfiguration.properties
 /logs/
+/DiscordBot.iml

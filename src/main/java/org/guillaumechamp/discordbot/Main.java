@@ -3,11 +3,11 @@ package org.guillaumechamp.discordbot;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import org.guillaumechamp.discordbot.io.BotLogger;
-import org.guillaumechamp.discordbot.io.ChannelManager;
+import org.guillaumechamp.discordbot.service.BotLogger;
+import org.guillaumechamp.discordbot.io.manager.ChannelManager;
 import org.guillaumechamp.discordbot.io.listener.CommandListener;
 import org.guillaumechamp.discordbot.io.listener.CommandStore;
-import org.guillaumechamp.discordbot.io.listener.Waiter;
+import org.guillaumechamp.discordbot.service.WaiterService;
 
 public class Main {
     static JDA api;
@@ -19,9 +19,9 @@ public class Main {
                 .build();
         api.awaitReady();
         BotLogger.log(BotLogger.INFO, "Connected to : " + api.getGuilds());
-        CommandStore.create(api);
+        CommandStore.registerCommand(api);
         api.getGuilds().forEach(ChannelManager::clearAllCreatedChannelsFromGuild);
-        Waiter.initWaiter();
+        WaiterService.initWaiter();
     }
     //perm = 2646829136
 }

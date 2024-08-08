@@ -18,7 +18,7 @@ public class CommandStore {
     public static final String SAVE_COMMAND = "save";
     public static final String VOTE_COMMAND = "vote";
     public static final String SEE_COMMAND = "see";
-    protected static final List<String> GAME_COMMAND = Arrays.asList(KILL_COMMAND, SAVE_COMMAND, VOTE_COMMAND, SEE_COMMAND);
+    static final List<String> GAME_COMMAND = Arrays.asList(KILL_COMMAND, SAVE_COMMAND, VOTE_COMMAND, SEE_COMMAND);
     public static final String CREATE_GAME_COMMAND = "create";
     public static final String CREATE_GAME_COMMAND_ARG_1 = "max";
     public static final String STOP_GAME_COMMAND = "stop";
@@ -34,7 +34,7 @@ public class CommandStore {
     private CommandStore() {
     }
 
-    public static void create(JDA jda) {
+    public static void registerCommand(JDA jda) {
         jda.updateCommands().addCommands(
                 Commands.slash(CREATE_GAME_COMMAND, "Create a new open party")
                         .addOptions(new OptionData(OptionType.INTEGER, CREATE_GAME_COMMAND_ARG_1, "number of player allowed")

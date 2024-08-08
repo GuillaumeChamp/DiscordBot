@@ -1,8 +1,9 @@
-package org.guillaumechamp.discordbot.io;
+package org.guillaumechamp.discordbot.io.reader;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.guillaumechamp.discordbot.service.BotLogger;
 import org.slf4j.event.Level;
 
 import java.security.InvalidParameterException;

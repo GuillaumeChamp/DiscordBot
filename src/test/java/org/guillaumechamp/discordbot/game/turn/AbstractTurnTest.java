@@ -5,7 +5,7 @@ import org.guillaumechamp.discordbot.game.roles.*;
 import org.guillaumechamp.discordbot.game.roles.PlayerData;
 import org.guillaumechamp.discordbot.game.roles.WitchPlayerData;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
-import org.guillaumechamp.discordbot.util.DiscordTestUtil;
+import org.guillaumechamp.discordbot.testUtil.DiscordTestUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

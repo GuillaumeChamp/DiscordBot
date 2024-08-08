@@ -6,9 +6,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.guillaumechamp.discordbot.io.BotLogger;
-import org.guillaumechamp.discordbot.io.ChannelManager;
-import org.guillaumechamp.discordbot.io.PropertyReader;
+import org.guillaumechamp.discordbot.service.BotLogger;
+import org.guillaumechamp.discordbot.io.manager.ChannelManager;
+import org.guillaumechamp.discordbot.io.manager.GuildManager;
+import org.guillaumechamp.discordbot.io.reader.PropertyReader;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,17 +37,22 @@ public class CommandListener extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (CommandStore.GAME_COMMAND.contains(event.getName())) {
             handleGameAction(event);
+            return;
         }
 
         logEvent(event);
 
-        switch (event.getName()) {
-            case CommandStore.CREATE_GAME_COMMAND -> handleCreation(event);
-            case CommandStore.JOIN_GAME_COMMAND -> handleJoin(event);
-            case CommandStore.STOP_GAME_COMMAND -> handleStop(event);
-            case CommandStore.START_GAME_COMMAND -> handleStart(event);
-            case CommandStore.DISCONNECT_BOT_COMMAND -> handleDisconnect(event);
-            default -> BotLogger.log(BotLogger.FATAL, "Command registered but not handled");
+        if (CommandStore.DEFAULT_COMMAND.contains(event.getName())) {
+            switch (event.getName()) {
+                case CommandStore.CREATE_GAME_COMMAND -> handleCreation(event);
+                case CommandStore.JOIN_GAME_COMMAND -> handleJoin(event);
+                case CommandStore.STOP_GAME_COMMAND -> handleStop(event);
+                case CommandStore.START_GAME_COMMAND -> handleStart(event);
+                case CommandStore.DISCONNECT_BOT_COMMAND -> handleDisconnect(event);
+                default -> BotLogger.log(BotLogger.FATAL, "Command registered but not handled");
+            }
+        } else {
+            BotLogger.log(BotLogger.FATAL, "The command : " + event.getName() + "not belong to any category");
         }
     }
 

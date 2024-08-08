@@ -3,7 +3,7 @@ package org.guillaumechamp.discordbot.game;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.guillaumechamp.discordbot.io.ChannelManager;
+import org.guillaumechamp.discordbot.io.manager.ChannelManager;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 
 import java.util.ArrayList;

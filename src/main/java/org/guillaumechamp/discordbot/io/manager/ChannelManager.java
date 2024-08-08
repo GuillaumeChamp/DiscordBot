@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.io;
+package org.guillaumechamp.discordbot.io.manager;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -7,7 +7,8 @@ import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import org.apache.commons.lang3.StringUtils;
-import org.guillaumechamp.discordbot.io.listener.Interface;
+import org.guillaumechamp.discordbot.service.BotConfig;
+import org.guillaumechamp.discordbot.service.BotLogger;
 
 import java.security.InvalidParameterException;
 import java.util.Collection;
@@ -28,7 +29,7 @@ public class ChannelManager {
         if (server == null) {
             return;
         }
-        for (int i = 0; i < Interface.MAX_GAME_PER_GUILD; i++) {
+        for (int i = 0; i < GameManager.MAX_GAME_PER_GUILD; i++) {
             server.getTextChannelsByName(getGameChannelNameByIndexAndStatus(i, true), true).forEach(ChannelManager::deleteOldChannel);
             server.getTextChannelsByName(getGameChannelNameByIndexAndStatus(i, false), true).forEach(ChannelManager::deleteOldChannel);
         }
@@ -41,11 +42,11 @@ public class ChannelManager {
      * @param index  index of the game
      * @param isWolf append wolf prefix if true
      * @return the name of the channel
-     * @see Interface#MAX_GAME_PER_GUILD
+     * @see GameManager#MAX_GAME_PER_GUILD
      */
     public static String getGameChannelNameByIndexAndStatus(int index, boolean isWolf) {
-        if (index < 0 || index >= Interface.MAX_GAME_PER_GUILD) {
-            throw new InvalidParameterException("Index out of bound : index must be positive and lower than " + Interface.MAX_GAME_PER_GUILD);
+        if (index < 0 || index >= GameManager.MAX_GAME_PER_GUILD) {
+            throw new InvalidParameterException("Index out of bound : index must be positive and lower than " + GameManager.MAX_GAME_PER_GUILD);
         }
         StringBuilder builder = new StringBuilder().append("game").append(index);
         if (isWolf) {

@@ -43,7 +43,7 @@ public class Vote extends AbstractTurn {
         if (target == null) {
             throw new UserIntendedException("No player targeted");
         }
-        if (PlayerTurn.WOLF_VOTE.equals(playerTurn) && !PlayerDataUtil.isMemberIn(remainingPlayersList, target, RoleSide.WEREWOLF)) {
+        if (PlayerTurn.WOLF_VOTE.equals(playerTurn) && !PlayerDataUtil.isMemberInThatSide(remainingPlayersList, target, RoleSide.WEREWOLF)) {
             throw new UserIntendedException("You cannot vote");
         }
         playerTargetMap.put(PlayerDataUtil.getRoleByMemberId(remainingPlayersList, voter.getId()), target.getId());

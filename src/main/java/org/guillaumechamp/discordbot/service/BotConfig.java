@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.io;
+package org.guillaumechamp.discordbot.service;
 
 public class BotConfig {
     private static Boolean silenceMod = java.lang.Boolean.FALSE;

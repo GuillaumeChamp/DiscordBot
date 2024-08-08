@@ -1,7 +1,7 @@
 package org.guillaumechamp.discordbot.game.roles;
 
 import net.dv8tion.jda.api.entities.Member;
-import org.guillaumechamp.discordbot.util.DiscordTestUtil;
+import org.guillaumechamp.discordbot.testUtil.DiscordTestUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;

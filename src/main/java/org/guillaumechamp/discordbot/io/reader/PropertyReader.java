@@ -1,4 +1,6 @@
-package org.guillaumechamp.discordbot.io;
+package org.guillaumechamp.discordbot.io.reader;
+
+import org.guillaumechamp.discordbot.service.BotLogger;
 
 import java.io.IOException;
 import java.io.InputStream;

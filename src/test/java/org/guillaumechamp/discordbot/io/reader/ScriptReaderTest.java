@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.io;
+package org.guillaumechamp.discordbot.io.reader;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -97,9 +97,10 @@ class ScriptReaderTest {
                 .isInstanceOf(InvalidParameterException.class)
                 .hasMessageContaining("tag " + ScriptReader.Tag.NAME + " is missing");
     }
+
     @Test
-    void shouldReadLineWithTagReturnAnError(){
-        assertThatThrownBy(()->ScriptReader.readLine(ScriptReader.KeyEntry.ELIMINATED, ScriptReader.SupportedLanguage.FR))
+    void shouldReadLineWithTagReturnAnError() {
+        assertThatThrownBy(() -> ScriptReader.readLine(ScriptReader.KeyEntry.ELIMINATED, ScriptReader.SupportedLanguage.FR))
                 .isInstanceOf(InvalidParameterException.class)
                 .hasMessageContaining(Arrays.toString(new ScriptReader.Tag[]{ScriptReader.Tag.NAME, ScriptReader.Tag.ROLE}));
     }

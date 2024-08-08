@@ -9,8 +9,10 @@ class ActionTypeTest {
     @Test
     void shouldStringToActionTypeRaiseExceptionForBadInput() {
         String randomString = "dqEA0VXL";
-        assertThatThrownBy(()->ActionType.stringToActionType(randomString))
+        assertThatThrownBy(() -> ActionType.stringToActionType(randomString))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(randomString);
     }
+
+    //valid stringify values are test in CommandStoreTest due to privacy of command group
 }

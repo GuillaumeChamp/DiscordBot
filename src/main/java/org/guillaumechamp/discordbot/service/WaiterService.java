@@ -1,9 +1,8 @@
-package org.guillaumechamp.discordbot.io.listener;
+package org.guillaumechamp.discordbot.service;
 
 import com.sun.jdi.request.InvalidRequestStateException;
 import org.guillaumechamp.discordbot.game.Game;
 import org.guillaumechamp.discordbot.game.turn.AbstractTurn;
-import org.guillaumechamp.discordbot.io.BotLogger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,11 +13,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * Service to manage all actions that required to wait a moment before triggering it
  */
-public class Waiter {
+public class WaiterService {
     private static final Map<Game, ScheduledFuture<?>> registeredActions = new HashMap<>(3);
     private static final ScheduledThreadPoolExecutor threadPoolExecutor = new ScheduledThreadPoolExecutor(3);
 
-    private Waiter() {
+    private WaiterService() {
     }
 
     public static void initWaiter() {

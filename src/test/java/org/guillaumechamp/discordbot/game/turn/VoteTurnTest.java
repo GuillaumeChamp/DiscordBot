@@ -5,7 +5,7 @@ import org.guillaumechamp.discordbot.game.roles.ActionType;
 import org.guillaumechamp.discordbot.game.roles.RoleType;
 import org.guillaumechamp.discordbot.game.roles.PlayerData;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
-import org.guillaumechamp.discordbot.util.DiscordTestUtil;
+import org.guillaumechamp.discordbot.testUtil.DiscordTestUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;

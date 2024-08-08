@@ -1,12 +1,11 @@
-package org.guillaumechamp.discordbot.io;
+package org.guillaumechamp.discordbot.service;
 
 import com.sun.jdi.request.InvalidRequestStateException;
 import org.awaitility.Awaitility;
 import org.guillaumechamp.discordbot.game.Game;
 import org.guillaumechamp.discordbot.game.turn.DummyTurn;
 import org.guillaumechamp.discordbot.game.turn.PlayerTurn;
-import org.guillaumechamp.discordbot.io.listener.Waiter;
-import org.guillaumechamp.discordbot.util.AbstractDiscordTest;
+import org.guillaumechamp.discordbot.testUtil.AbstractDiscordTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -14,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.*;
 
-class WaiterTest extends AbstractDiscordTest {
+class WaiterServiceTest extends AbstractDiscordTest {
     @Test
     void shouldWaiterAwakeGameProperly() {
         final int duration = 4;
@@ -22,7 +21,7 @@ class WaiterTest extends AbstractDiscordTest {
         Game game = new Game(0, Collections.singletonList(testMember), testChannel);
         DummyTurn action = new DummyTurn(duration, PlayerTurn.NONE);
         //-- When
-        Waiter.register(game, action);
+        WaiterService.register(game, action);
         //-- Then
         Awaitility.await()
                 .atLeast(duration - 1, TimeUnit.SECONDS)
@@ -40,8 +39,8 @@ class WaiterTest extends AbstractDiscordTest {
         DummyTurn action = new DummyTurn(duration, PlayerTurn.NONE);
         DummyTurn action1 = new DummyTurn(duration, PlayerTurn.NONE);
         //-- When
-        Waiter.register(game, action);
-        Waiter.register(game1, action1);
+        WaiterService.register(game, action);
+        WaiterService.register(game1, action1);
         //-- Then
         Awaitility.await()
                 .atLeast(duration - 1, TimeUnit.SECONDS)
@@ -57,9 +56,9 @@ class WaiterTest extends AbstractDiscordTest {
         game.terminate();
         DummyTurn action = new DummyTurn(duration, PlayerTurn.NONE);
         //-- When
-        Waiter.register(game, action);
+        WaiterService.register(game, action);
         //-- Then
-        assertThat(Waiter.triggerActionEarlier(game)).isTrue();
+        assertThat(WaiterService.triggerActionEarlier(game)).isTrue();
     }
 
     @Test
@@ -67,7 +66,7 @@ class WaiterTest extends AbstractDiscordTest {
         //-- Given
         Game game = new Game(2, Collections.singletonList(testMember), testChannel);
         //-- Then
-        assertThat(Waiter.triggerActionEarlier(game)).isFalse();
+        assertThat(WaiterService.triggerActionEarlier(game)).isFalse();
     }
 
     @Test
@@ -79,9 +78,9 @@ class WaiterTest extends AbstractDiscordTest {
         DummyTurn action = new DummyTurn(duration, PlayerTurn.NONE);
         DummyTurn action1 = new DummyTurn(duration, PlayerTurn.NONE);
         //-- When
-        Waiter.register(game, action);
+        WaiterService.register(game, action);
         //-- Then
-        assertThatThrownBy(() -> Waiter.register(game, action1))
+        assertThatThrownBy(() -> WaiterService.register(game, action1))
                 .isInstanceOf(InvalidRequestStateException.class)
                 .hasMessage("two actions registered for the same game");
     }

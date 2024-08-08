@@ -7,18 +7,18 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.guillaumechamp.discordbot.game.turn.*;
 import org.guillaumechamp.discordbot.game.roles.*;
-import org.guillaumechamp.discordbot.io.ChannelManager;
-import org.guillaumechamp.discordbot.io.ScriptReader;
+import org.guillaumechamp.discordbot.io.manager.ChannelManager;
+import org.guillaumechamp.discordbot.io.reader.ScriptReader;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
-import org.guillaumechamp.discordbot.io.listener.GuildManager;
-import org.guillaumechamp.discordbot.io.listener.Waiter;
+import org.guillaumechamp.discordbot.io.manager.GuildManager;
+import org.guillaumechamp.discordbot.service.WaiterService;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.guillaumechamp.discordbot.io.ChannelManager.getGameChannelNameByIndexAndStatus;
-import static org.guillaumechamp.discordbot.io.ChannelManager.muteAMember;
+import static org.guillaumechamp.discordbot.io.manager.ChannelManager.getGameChannelNameByIndexAndStatus;
+import static org.guillaumechamp.discordbot.io.manager.ChannelManager.muteAMember;
 
 public class Game implements GameInterface {
     // Discord Related Data
@@ -37,7 +37,7 @@ public class Game implements GameInterface {
     /**
      * Start a game
      *
-     * @param id      of the pending game used by the Interface to route event
+     * @param id      of the pending game used by the GameManager to route event
      * @param members all player for this game
      * @param channel public channel of the game
      */
@@ -254,7 +254,7 @@ public class Game implements GameInterface {
     private void registerDummyTurn(int durationInSecond, PlayerTurn replacedTurn) {
         DummyTurn dummyTurn = new DummyTurn(durationInSecond, replacedTurn);
         GuildManager.getInterface(currentServer).registerAction(id, dummyTurn);
-        Waiter.register(this, dummyTurn);
+        WaiterService.register(this, dummyTurn);
     }
 
     private boolean shortCircuitActionIfNeeded(RoleType roleType, PlayerTurn turn, ScriptReader.KeyEntry publicMessageKey, int duration){
@@ -274,6 +274,6 @@ public class Game implements GameInterface {
     private void startAction(AbstractTurn action) {
         this.currentTurn = action;
         GuildManager.getInterface(currentServer).registerAction(id, action);
-        Waiter.register(this, action);
+        WaiterService.register(this, action);
     }
 }

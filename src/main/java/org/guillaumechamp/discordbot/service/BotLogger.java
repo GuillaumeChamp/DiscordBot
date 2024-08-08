@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.io;
+package org.guillaumechamp.discordbot.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

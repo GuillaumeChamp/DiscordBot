@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.util;
+package org.guillaumechamp.discordbot.testUtil;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
