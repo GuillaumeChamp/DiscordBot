@@ -126,7 +126,7 @@ public class CommandListener extends ListenerAdapter {
         Channel channel = event.getChannel();
 
         try {
-            int gameIndex = ChannelManager.resolveGameIndex(channel);
+            int gameIndex = ChannelManager.resolveGameIndexFromChannelName(channel.getName());
             GuildManager.getInterface(event.getGuild()).transferCommandToTheAction(gameIndex, event.getMember(), target, event.getName());
             assert target != null;
             event.getHook().editOriginal(event.getName() + " registered against " + target.getEffectiveName()).queue();

@@ -47,12 +47,8 @@ public class Game implements GameInterface {
         this.deadPlayers = new ArrayList<>(members.size());
         this.channel = channel;
         this.gameLanguage = ScriptReader.SupportedLanguage.EN;
-        if (channel == null) {
-            this.currentServer = null;
-        } else {
-            this.currentServer = channel.getGuild();
-            ChannelManager.createRestrictedChannel(currentServer, PlayerDataUtil.getAllMembersBySide(this.activePlayers, RoleSide.WEREWOLF), getGameChannelNameByIndexAndStatus(id, true));
-        }
+        this.currentServer = channel.getGuild();
+        ChannelManager.createRestrictedChannel(currentServer, PlayerDataUtil.getAllMembersBySide(this.activePlayers, RoleSide.WEREWOLF), getGameChannelNameByIndexAndStatus(id, true));
         this.initGame();
     }
 
@@ -205,6 +201,7 @@ public class Game implements GameInterface {
      */
     private void terminateGame(EndOfGameException endOfGameException) {
         this.isActive = false;
+        deadPlayers.forEach(playerData->ChannelManager.unmuteAMember(playerData.getOwner()));
         sendExceptionMessagePublicly(endOfGameException);
         GuildManager.getInterface(currentServer).stop(this.id);
     }
@@ -226,29 +223,29 @@ public class Game implements GameInterface {
     }
 
     private void sendExceptionMessagePublicly(Exception e) {
-        ChannelManager.sendPublicMessage(channel, e.getMessage());
+        ChannelManager.sendMessageToAChannel(channel, e.getMessage());
     }
 
     @SafeVarargs
     public final void sendPublicMessage(ScriptReader.KeyEntry key, Pair<ScriptReader.Tag, String>... wards) {
-        ChannelManager.sendPublicMessage(channel, ScriptReader.readLineAndParse(key, gameLanguage, wards));
+        ChannelManager.sendMessageToAChannel(channel, ScriptReader.readLineAndParse(key, gameLanguage, wards));
     }
 
     private void sendPublicMessage(ScriptReader.KeyEntry key) {
-        ChannelManager.sendPublicMessage(channel, ScriptReader.readLine(key, gameLanguage));
+        ChannelManager.sendMessageToAChannel(channel, ScriptReader.readLine(key, gameLanguage));
     }
 
     private void sendPrivateMessage(Member destination, ScriptReader.KeyEntry key) {
-        ChannelManager.sendPrivateMessage(destination, ScriptReader.readLine(key, gameLanguage));
+        ChannelManager.sendPrivateMessageToAMember(destination, ScriptReader.readLine(key, gameLanguage));
     }
 
     @SafeVarargs
     private void sendPrivateMessage(Member destination, ScriptReader.KeyEntry key, Pair<ScriptReader.Tag, String>... wards) {
-        ChannelManager.sendPrivateMessage(destination, ScriptReader.readLineAndParse(key, gameLanguage, wards));
+        ChannelManager.sendPrivateMessageToAMember(destination, ScriptReader.readLineAndParse(key, gameLanguage, wards));
     }
 
     private void sendExceptionMessagePrivately(Member destination, Exception e) {
-        ChannelManager.sendPrivateMessage(destination, e.getMessage());
+        ChannelManager.sendPrivateMessageToAMember(destination, e.getMessage());
     }
 
     private void registerDummyTurn(int durationInSecond, PlayerTurn replacedTurn) {

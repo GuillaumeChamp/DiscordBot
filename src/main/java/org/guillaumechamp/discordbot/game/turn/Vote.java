@@ -22,7 +22,7 @@ public class Vote extends AbstractTurn {
         for (PlayerData role : roles) {
             playerTargetMap.put(role, null);
         }
-        if (voteType!=PlayerTurn.VILLAGE_VOTE && voteType!=PlayerTurn.WOLF_VOTE){
+        if (voteType != PlayerTurn.VILLAGE_VOTE && voteType != PlayerTurn.WOLF_VOTE) {
             throw new IllegalArgumentException("Vote can only handle WOLF_VOTE or VILLAGE_VOTE");
         }
         this.playerTurn = voteType;
@@ -41,10 +41,10 @@ public class Vote extends AbstractTurn {
     public void handleAction(Member voter, Member target, ActionType action) throws UserIntendedException {
         super.handleAction(voter, target, action);
         if (target == null) {
-            throw new UserIntendedException("No player targeted");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_NO_TARGET);
         }
         if (PlayerTurn.WOLF_VOTE.equals(playerTurn) && !PlayerDataUtil.isMemberInThatSide(remainingPlayersList, target, RoleSide.WEREWOLF)) {
-            throw new UserIntendedException("You cannot vote");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_VOTE_NOT_ALLOWED);
         }
         playerTargetMap.put(PlayerDataUtil.getRoleByMemberId(remainingPlayersList, voter.getId()), target.getId());
     }
@@ -70,6 +70,6 @@ public class Vote extends AbstractTurn {
             ans.add(PlayerDataUtil.getRoleByMemberId(remainingPlayersList, tiedList.get(0)));
             return ans;
         }
-        throw new UserIntendedException("The choice is not unanimous no one will be kill");
+        throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_VOTE_NOT_UNANIMOUS);
     }
 }

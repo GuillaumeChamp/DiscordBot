@@ -33,13 +33,16 @@ public class WitchTurn extends AbstractTurn {
 
     private void handleSaveAction(WitchPlayerData witch, Member target) throws UserIntendedException {
         if (!witch.isHealingAvailable()){
-            throw new UserIntendedException("You already used this power !");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_POWER_ALREADY_USED);
         }
         if (CollectionUtils.isEmpty(deadPerson)){
-            throw new UserIntendedException("You have no one to save !");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_WITCH_NO_DEAD);
+        }
+        if (target==null){
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_NO_TARGET);
         }
         if (deadPerson.stream().noneMatch(role -> role.getOwner() == target)){
-            throw new UserIntendedException("This user will not died !");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_WITCH_WRONG_SAVE);
         }
         witch.useHeal();
         deadPerson.remove(0);
@@ -47,7 +50,7 @@ public class WitchTurn extends AbstractTurn {
 
     private void handleKillAction(WitchPlayerData witch, Member target) throws UserIntendedException {
         if (!witch.isKillingAvailable()){
-            throw new UserIntendedException("You already used this power !");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_POWER_ALREADY_USED);
         }
         witch.useKill();
         deadPerson.add(PlayerDataUtil.getRoleByMemberId(remainingPlayersList, target.getId()));

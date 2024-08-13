@@ -17,18 +17,19 @@ import static org.assertj.core.api.Assertions.*;
 class VoteTurnTest {
 
     @Test
-    void shouldVoteWorkOnlyForAllRoleAndWolf(){
+    void shouldVoteWorkOnlyForAllRoleAndWolf() {
         // --Given
         List<Member> memberList = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1), DiscordTestUtil.getAMember(2));
         List<PlayerData> testList = memberList.stream().map(member -> new PlayerData(member, RoleType.SIMPLE_VILLAGER)).toList();
         // --Then
-        assertThatNoException().isThrownBy(()->new Vote(PlayerTurn.VILLAGE_VOTE, testList));
-        assertThatNoException().isThrownBy(()->new Vote(PlayerTurn.WOLF_VOTE, testList));
-        assertThatThrownBy(()->new Vote(PlayerTurn.SEER, testList))
+        assertThatNoException().isThrownBy(() -> new Vote(PlayerTurn.VILLAGE_VOTE, testList));
+        assertThatNoException().isThrownBy(() -> new Vote(PlayerTurn.WOLF_VOTE, testList));
+        assertThatThrownBy(() -> new Vote(PlayerTurn.SEER, testList))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Vote can only handle WOLF_VOTE or VILLAGE_VOTE");
 
     }
+
     @Test
     void shouldGetResultNotThrowingExceptionIfUnanimousVote() throws UserIntendedException {
         // --Given
@@ -61,8 +62,9 @@ class VoteTurnTest {
             vote.handleAction(memberList.get(1), memberList.get(1), ActionType.VOTE);
         });
         // --Then
-        assertThatThrownBy(vote::getResult).isInstanceOf(UserIntendedException.class)
-                .hasMessage("The choice is not unanimous no one will be kill");
+        assertThatThrownBy(vote::getResult)
+                .isInstanceOf(UserIntendedException.class)
+                .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_VOTE_NOT_UNANIMOUS);
     }
 
     @Test
@@ -76,7 +78,7 @@ class VoteTurnTest {
         // --Then
         assertThatThrownBy(vote::getResult)
                 .isInstanceOf(UserIntendedException.class)
-                .hasMessage("The choice is not unanimous no one will be kill");
+                .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_VOTE_NOT_UNANIMOUS);
     }
 
     @Test
@@ -88,7 +90,7 @@ class VoteTurnTest {
         // --Then
         assertThatThrownBy(() -> vote.handleAction(member, null, ActionType.VOTE))
                 .isInstanceOf(UserIntendedException.class)
-                .hasMessage("No player targeted");
+                .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_NO_TARGET);
     }
 
     @Test
@@ -100,6 +102,6 @@ class VoteTurnTest {
         // --Then
         assertThatThrownBy(() -> vote.handleAction(member, member, ActionType.VOTE))
                 .isInstanceOf(UserIntendedException.class)
-                .hasMessage("You cannot vote");
+                .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_VOTE_NOT_ALLOWED);
     }
 }

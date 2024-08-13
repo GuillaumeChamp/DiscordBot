@@ -3,14 +3,12 @@ package org.guillaumechamp.discordbot.io.manager;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import org.apache.commons.lang3.StringUtils;
 import org.guillaumechamp.discordbot.service.BotConfig;
 import org.guillaumechamp.discordbot.service.BotLogger;
 
-import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -23,7 +21,7 @@ public class ChannelManager {
     }
 
     /**
-     * Clear all the game channels
+     * Clear all game's related channels
      */
     public static void clearAllCreatedChannelsFromGuild(Guild server) {
         if (server == null) {
@@ -41,12 +39,13 @@ public class ChannelManager {
      *
      * @param index  index of the game
      * @param isWolf append wolf prefix if true
-     * @return the name of the channel
+     * @return the name of the channel (game+n°+suffix)
+     * @throws IllegalArgumentException if game index is negative or higher than the max number of game allowed
      * @see GameManager#MAX_GAME_PER_GUILD
      */
     public static String getGameChannelNameByIndexAndStatus(int index, boolean isWolf) {
         if (index < 0 || index >= GameManager.MAX_GAME_PER_GUILD) {
-            throw new InvalidParameterException("Index out of bound : index must be positive and lower than " + GameManager.MAX_GAME_PER_GUILD);
+            throw new IllegalArgumentException("Index out of bound : index must be positive and lower than " + GameManager.MAX_GAME_PER_GUILD);
         }
         StringBuilder builder = new StringBuilder().append("game").append(index);
         if (isWolf) {
@@ -58,16 +57,25 @@ public class ChannelManager {
     /**
      * Create a new channel deleting older one
      *
-     * @param name channel name
-     * @return the channel
+     * @param channelName channel name
+     * @return the newly created channel
+     * @throws IllegalArgumentException if server is null or if name is empty (or null)
      */
-    public static TextChannel createChannelForAGuild(Guild server, String name) {
-        deleteOldChannel(server.getTextChannelsByName(name, true).get(0));
-        return server.createTextChannel(name).complete();
+    public static TextChannel createChannelForAGuild(Guild server, String channelName) {
+        if (server == null) {
+            throw new IllegalArgumentException("server must not be null");
+        }
+        if (!StringUtils.isNotEmpty(channelName)) {
+            throw new IllegalArgumentException("channel name must not be empty");
+        }
+        server.getTextChannelsByName(channelName, true)
+                .forEach(ChannelManager::deleteOldChannel);
+        return server.createTextChannel(channelName).complete();
     }
 
     /**
-     * Create channel only visible for a white list of user. Delete the older one
+     * Create channel only visible for a whitelist of users.
+     * Delete the older one.
      *
      * @param members whitelist (cannot hide it from the owner)
      * @param name    channel name
@@ -76,27 +84,35 @@ public class ChannelManager {
         if (Boolean.TRUE.equals(BotConfig.isSilence())) {
             return;
         }
-        deleteOldChannel(server.getTextChannelsByName(name, true).get(0));
+        if (server == null) {
+            throw new IllegalArgumentException("server must not be null");
+        }
+        if (!StringUtils.isNotEmpty(name)) {
+            throw new IllegalArgumentException("channel name must not be empty");
+        }
+
+        server.getTextChannelsByName(name, true).forEach(ChannelManager::deleteOldChannel);
 
         Collection<Permission> grant = EnumSet.of(Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY);
         Collection<Permission> revoked = EnumSet.of(Permission.MESSAGE_ATTACH_FILES);
 
         TextChannel channel = server.createTextChannel(name)
                 .addMemberPermissionOverride(server.getJDA().getSelfUser().getIdLong(), Permission.MANAGE_PERMISSIONS.getRawValue(), 0)
-                .addRolePermissionOverride(server.getPublicRole().getIdLong(), Collections.singleton(Permission.UNKNOWN), grant).complete();
-        TextChannelManager m = channel.getManager();
+                .addRolePermissionOverride(server.getPublicRole().getIdLong(), Collections.singleton(Permission.UNKNOWN), grant)
+                .complete();
+        TextChannelManager channelManager = channel.getManager();
         for (Member member : members) {
-            m.putMemberPermissionOverride(member.getIdLong(), grant, revoked).queue();
+            channelManager.putMemberPermissionOverride(member.getIdLong(), grant, revoked).queue();
         }
     }
 
-    public static void sendPublicMessage(TextChannel channel, String message) {
+    public static void sendMessageToAChannel(TextChannel channel, String message) {
         if (Boolean.TRUE.equals(BotConfig.isSilence())) {
             return;
         }
-        if (channel==null){
-            BotLogger.log(BotLogger.WARN,"Tried to send a message but channel is null");
-            throw new InvalidParameterException("Channel is null");
+        if (channel == null) {
+            BotLogger.log(BotLogger.WARN, "Tried to send a message but channel is null");
+            throw new IllegalArgumentException("Channel is null");
         }
         channel.sendMessage(message).queue();
     }
@@ -107,7 +123,7 @@ public class ChannelManager {
      * @param member  member to send a message to
      * @param message text to send
      */
-    public static void sendPrivateMessage(Member member, String message) {
+    public static void sendPrivateMessageToAMember(Member member, String message) {
         if (Boolean.TRUE.equals(BotConfig.isSilence())) {
             return;
         }
@@ -117,15 +133,15 @@ public class ChannelManager {
     /**
      * extract game index from a channel name
      *
-     * @param channel channel to parse to game index
+     * @param channelName channel to parse to game index
      * @return game index
-     * @throws InvalidParameterException if it cannot parse to integer
+     * @throws IllegalArgumentException if it cannot parse to integer
      */
-    public static Integer resolveGameIndex(Channel channel) throws InvalidParameterException {
-        if (!StringUtils.contains(channel.getName(), "game")) {
-            throw new InvalidParameterException("This is not a game channel");
+    public static Integer resolveGameIndexFromChannelName(String channelName) {
+        if (!StringUtils.contains(channelName, "game")) {
+            throw new IllegalArgumentException("This is not a game channel");
         }
-        return channel.getName().charAt(4) - '0';
+        return channelName.charAt(4) - '0';
     }
 
     /**
@@ -139,6 +155,17 @@ public class ChannelManager {
             member.mute(true).queue();
         }
     }
+    /**
+     * Unmute a person.
+     * Check if the player is in an audio channel
+     *
+     * @param member jda member
+     */
+    public static void unmuteAMember(Member member) {
+        if (member.getVoiceState() != null && member.getVoiceState().inAudioChannel()) {
+            member.mute(false).queue();
+        }
+    }
 
     /**
      * Clear discord function
@@ -146,7 +173,9 @@ public class ChannelManager {
      * @param channel channel to delete
      */
     private static void deleteOldChannel(TextChannel channel) {
-        if (channel == null) return;
+        if (channel == null) {
+            return;
+        }
         channel.delete().queue();
     }
 }

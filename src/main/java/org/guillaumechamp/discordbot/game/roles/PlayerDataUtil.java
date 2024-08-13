@@ -3,7 +3,6 @@ package org.guillaumechamp.discordbot.game.roles;
 import net.dv8tion.jda.api.entities.Member;
 import org.guillaumechamp.discordbot.game.EndOfGameException;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -79,10 +78,11 @@ public class PlayerDataUtil {
      * @param memberToLookup nullable, the person to lookup
      * @param role           role to check
      * @return true if the member own the given role, or if the member is in list and role is All. False elsewhere
+     * @throws IllegalArgumentException if an input is null or if the player is not found
      */
     public static boolean isMemberA(Collection<PlayerData> players, Member memberToLookup, RoleType role) {
         if (players == null || memberToLookup == null) {
-            throw new InvalidParameterException("players or member is null");
+            throw new IllegalArgumentException("players or member is null");
         }
         for (PlayerData playerData : players) {
             if (playerData.getId().equals(memberToLookup.getId())) {
@@ -92,7 +92,7 @@ public class PlayerDataUtil {
                 return playerData.getRole() == role;
             }
         }
-        throw new InvalidParameterException("player not found");
+        throw new IllegalArgumentException("player not found");
     }
 
     /**
@@ -141,20 +141,20 @@ public class PlayerDataUtil {
      * @param players  player's list
      * @param memberId the id of a member
      * @return the player data of the member
-     * @throws InvalidParameterException if one of the parameter is null or if the member is not in the player list
+     * @throws IllegalArgumentException if one of the parameter is null or if the member is not in the player list
      * @see Member#getId()
      */
-    public static PlayerData getRoleByMemberId(Collection<PlayerData> players, String memberId) throws InvalidParameterException {
+    public static PlayerData getRoleByMemberId(Collection<PlayerData> players, String memberId) {
         if (players == null || memberId == null) {
             //not useless because we use collection
-            throw new InvalidParameterException("null parameter not allowed");
+            throw new IllegalArgumentException("null parameter not allowed");
         }
         for (PlayerData player : players) {
             if (player.getId().equals(memberId)) {
                 return player;
             }
         }
-        throw new InvalidParameterException("This player is not in this list");
+        throw new IllegalArgumentException("This player is not in this list");
     }
 
     /**
@@ -184,19 +184,19 @@ public class PlayerDataUtil {
      * @param players players player's list
      * @param role    the role to look for
      * @return the matching player data
-     * @throws InvalidParameterException if the role is not found or if the player's collection is null
+     * @throws IllegalArgumentException if the role is not found or if the player's collection is null
      */
-    public static PlayerData getPlayerDataByRole(Collection<PlayerData> players, RoleType role) throws InvalidParameterException {
+    public static PlayerData getPlayerDataByRole(Collection<PlayerData> players, RoleType role) {
         if (players == null) {
             //not useless because we use collection
-            throw new InvalidParameterException("null collection of player not allowed");
+            throw new IllegalArgumentException("null collection of player not allowed");
         }
         for (PlayerData player : players) {
             if (player.getRole() == role) {
                 return player;
             }
         }
-        throw new InvalidParameterException("this role is not in the list");
+        throw new IllegalArgumentException("this role is not in the list");
     }
 
 }

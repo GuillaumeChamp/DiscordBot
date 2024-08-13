@@ -41,6 +41,13 @@ public class DiscordTestUtil {
         return oldChannel.isEmpty() ? api.getGuilds().get(0).createTextChannel("test", category).complete() : oldChannel.get(0);
     }
 
+    public static JDA getApi(){
+        if (api==null){
+            initialize();
+        }
+        return api;
+    }
+
     private static void initialize() {
         if (api == null) {
             String botToken = System.getenv("BOT_TOKEN");

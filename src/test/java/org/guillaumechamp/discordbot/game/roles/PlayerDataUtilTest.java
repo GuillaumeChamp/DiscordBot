@@ -5,7 +5,6 @@ import org.guillaumechamp.discordbot.game.EndOfGameException;
 import org.guillaumechamp.discordbot.testUtil.DiscordTestUtil;
 import org.junit.jupiter.api.Test;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -128,7 +127,7 @@ class PlayerDataUtilTest {
         Member notInMember = DiscordTestUtil.getAMember(1);
         // --Then
         assertThatThrownBy(() -> PlayerDataUtil.isMemberA(players, notInMember, RoleType.SIMPLE_VILLAGER))
-                .isInstanceOf(InvalidParameterException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("player not found");
     }
 
@@ -139,7 +138,7 @@ class PlayerDataUtilTest {
         List<PlayerData> players = Collections.singletonList(playerData);
         // --Then
         assertThatThrownBy(() -> PlayerDataUtil.isMemberA(players, null, RoleType.SIMPLE_VILLAGER))
-                .isInstanceOf(InvalidParameterException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("players or member is null");
     }
 
@@ -149,7 +148,7 @@ class PlayerDataUtilTest {
         Member member = DiscordTestUtil.getAMember(0);
         // --Then
         assertThatThrownBy(() -> PlayerDataUtil.isMemberA(null, member, RoleType.SIMPLE_VILLAGER))
-                .isInstanceOf(InvalidParameterException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("players or member is null");
     }
 
@@ -241,7 +240,7 @@ class PlayerDataUtilTest {
         String notInMemberId = DiscordTestUtil.getAMember(1).getId();
         // --Then
         assertThatThrownBy(() -> PlayerDataUtil.getRoleByMemberId(players, notInMemberId))
-                .isInstanceOf(InvalidParameterException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("This player is not in this list");
     }
 
@@ -251,7 +250,7 @@ class PlayerDataUtilTest {
         String memberId = DiscordTestUtil.getAMember(0).getId();
         // --Then
         assertThatThrownBy(() -> PlayerDataUtil.getRoleByMemberId(null, memberId))
-                .isInstanceOf(InvalidParameterException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("null parameter not allowed");
     }
 
@@ -262,7 +261,7 @@ class PlayerDataUtilTest {
         List<PlayerData> players = Collections.singletonList(playerData);
         // --Then
         assertThatThrownBy(() -> PlayerDataUtil.getRoleByMemberId(players, null))
-                .isInstanceOf(InvalidParameterException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("null parameter not allowed");
     }
 
@@ -312,7 +311,7 @@ class PlayerDataUtilTest {
         List<PlayerData> players = Collections.singletonList(playerData);
         // --Then
         assertThatThrownBy(() -> PlayerDataUtil.getPlayerDataByRole(players, RoleType.SIMPLE_WOLF))
-                .isInstanceOf(InvalidParameterException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("this role is not in the list");
     }
 
@@ -320,7 +319,7 @@ class PlayerDataUtilTest {
     void shouldGetPlayerDataByRoleThrowExceptionIfNullCollection() {
         // --Then
         assertThatThrownBy(() -> PlayerDataUtil.getPlayerDataByRole(null, RoleType.SIMPLE_WOLF))
-                .isInstanceOf(InvalidParameterException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("null collection of player not allowed");
     }
 
