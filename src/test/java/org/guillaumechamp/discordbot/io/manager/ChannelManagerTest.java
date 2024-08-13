@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.*;
 import static org.awaitility.Awaitility.await;
 
+@SuppressWarnings("DataFlowIssue")
 class ChannelManagerTest {
     @Test
     void shouldClearAllCreatedChannelsFromGuildClearAllChannels() {
