@@ -15,6 +15,7 @@ import java.util.List;
 
 public class DiscordTestUtil {
     private static JDA api;
+    private static TextChannel testChannel;
 
     /**
      * Allow to retrieve a member of the first server for test purposes
@@ -34,11 +35,21 @@ public class DiscordTestUtil {
         return members.get(number);
     }
 
-    public static TextChannel createTestChannel() {
+
+    public static Member getOwner() {
         initialize();
+        return api.getGuilds().get(0).getOwner();
+    }
+
+    public static TextChannel getTestChannel() {
+        initialize();
+        if (testChannel!=null){
+            return testChannel;
+        }
         Category category = api.getCategoriesByName("MUTE_ME", false).get(0);
         List<TextChannel> oldChannel = api.getGuilds().get(0).getTextChannelsByName("test", true);
-        return oldChannel.isEmpty() ? api.getGuilds().get(0).createTextChannel("test", category).complete() : oldChannel.get(0);
+        testChannel = oldChannel.isEmpty() ? api.getGuilds().get(0).createTextChannel("test", category).complete() : oldChannel.get(0);
+        return testChannel;
     }
 
     public static JDA getApi(){

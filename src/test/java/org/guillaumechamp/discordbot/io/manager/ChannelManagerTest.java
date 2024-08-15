@@ -1,7 +1,11 @@
 package org.guillaumechamp.discordbot.io.manager;
 
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.guillaumechamp.discordbot.service.BotConfig;
 import org.guillaumechamp.discordbot.testUtil.DiscordTestUtil;
 import org.junit.jupiter.api.Test;
 
@@ -70,7 +74,7 @@ class ChannelManagerTest {
 
     @Test
     void shouldCreateChannelForAGuildThrowExceptionIfGuildIsNull() {
-        assertThatThrownBy(() -> ChannelManager.createChannelForAGuild(null,null))
+        assertThatThrownBy(() -> ChannelManager.createChannelForAGuild(null, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("server must not be null");
     }
@@ -78,7 +82,7 @@ class ChannelManagerTest {
     @Test
     void shouldCreateChannelForAGuildThrowExceptionIfNameIsNull() {
         Guild guild = DiscordTestUtil.getApi().getGuilds().get(0);
-        assertThatThrownBy(() -> ChannelManager.createChannelForAGuild(guild,null))
+        assertThatThrownBy(() -> ChannelManager.createChannelForAGuild(guild, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("channel name must not be empty");
     }
@@ -86,7 +90,7 @@ class ChannelManagerTest {
     @Test
     void shouldCreateChannelForAGuildThrowExceptionIfNameIsEmpty() {
         Guild guild = DiscordTestUtil.getApi().getGuilds().get(0);
-        assertThatThrownBy(() -> ChannelManager.createChannelForAGuild(guild,""))
+        assertThatThrownBy(() -> ChannelManager.createChannelForAGuild(guild, ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("channel name must not be empty");
     }
@@ -96,14 +100,118 @@ class ChannelManagerTest {
         // --Given
         Guild guild = DiscordTestUtil.getApi().getGuilds().get(0);
         String randomName = "fksf64fser";
-        ChannelManager.createChannelForAGuild(guild,randomName);
+        ChannelManager.createChannelForAGuild(guild, randomName);
         TextChannel createdChannel = guild.getTextChannelsByName(randomName, false).get(0);
+        await().pollDelay(2, TimeUnit.SECONDS).until(() -> true);
         // --When
-        ChannelManager.createChannelForAGuild(guild,randomName);
+        ChannelManager.createChannelForAGuild(guild, randomName);
         TextChannel newChannel = guild.getTextChannelsByName(randomName, false).get(0);
         // --Then
         assertThat(createdChannel.getTimeCreated()).isNotEqualTo(newChannel.getTimeCreated());
         // --Finally
         newChannel.delete().queue();
     }
+
+    @Test
+    void shouldResolveGameIndexFromChannelNameReturnValidValueForValidInput() {
+        assertThat(ChannelManager.resolveGameIndexFromChannelName("game2werewolf")).isEqualTo(2);
+    }
+
+    @Test
+    void shouldResolveGameIndexFromChannelNameThrowExceptionIfChannelNotStartByGame() {
+        assertThatThrownBy(() -> ChannelManager.resolveGameIndexFromChannelName("sssgame2"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("This is not a game channel");
+    }
+
+    @Test
+    void shouldResolveGameIndexFromChannelNameThrowExceptionIfNumberIsInvalid() {
+        assertThatThrownBy(() -> ChannelManager.resolveGameIndexFromChannelName("game-"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("This is not a valid pattern name, expected game#suffix");
+    }
+
+    @Test
+    void shouldResolveGameIndexFromChannelNameThrowExceptionIfNumberIsTooHigh() {
+        assertThatThrownBy(() -> ChannelManager.resolveGameIndexFromChannelName("game" + GameManager.MAX_GAME_PER_GUILD + 1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("This is not a valid pattern name, expected game#suffix");
+    }
+
+    @Test
+    void shouldMuteThrowExceptionIfMemberIsNull() {
+        assertThatThrownBy(() -> ChannelManager.muteAMember(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("member is null");
+        assertThatThrownBy(() -> ChannelManager.unmuteAMember(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("member is null");
+    }
+
+    @Test
+    void shouldMuteBeIgnoredIfMemberIsNotInAVoiceChannel() {
+        Member member = DiscordTestUtil.getAMember(0);
+        assertThatNoException().isThrownBy(() -> ChannelManager.muteAMember(member));
+        assertThatNoException().isThrownBy(() -> ChannelManager.unmuteAMember(member));
+    }
+
+    @Test
+    void shouldSendPrivateMessageToAMemberThrowExceptionIfMemberIsNull() {
+        assertThatThrownBy(() -> ChannelManager.sendPrivateMessageToAMember(null, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("member is null");
+    }
+
+    @Test
+    void shouldSendPrivateMessageToAMemberThrowExceptionIfMessageIsEmpty() {
+        Member member = DiscordTestUtil.getAMember(0);
+        assertThatThrownBy(() -> ChannelManager.sendPrivateMessageToAMember(member, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("message is null or empty");
+        assertThatThrownBy(() -> ChannelManager.sendPrivateMessageToAMember(member, ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("message is null or empty");
+    }
+
+    @Test
+    void shouldSendPrivateMessageToAMemberNotSendMessageIfMuteMode() {
+        // --Given
+        Member member = DiscordTestUtil.getOwner();
+        PrivateChannel privateChannel = member.getUser().openPrivateChannel().complete();
+        String testMessage = "This test message will never be seen #00000";
+        BotConfig.changeBotMessagePolicy(true);
+        // --When
+        ChannelManager.sendPrivateMessageToAMember(member, testMessage);
+        BotConfig.changeBotMessagePolicy(false);
+        await().pollDelay(1, TimeUnit.SECONDS).until(() -> true);
+        // --Then
+        assertThat(privateChannel.getHistoryAround(privateChannel.getLatestMessageId(),2).complete().getRetrievedHistory())
+                .last()
+                .extracting(Message::getContentRaw)
+                .isNotEqualTo(testMessage);
+
+    }
+
+    @Test
+    void shouldSendPrivateMessageToAMemberWorkProperly() {
+        // --Given
+        Member member = DiscordTestUtil.getOwner();
+        PrivateChannel privateChannel = member.getUser().openPrivateChannel().complete();
+        String testMessage = "This is a test message please ignore me #00001";
+        // --When
+        ChannelManager.sendPrivateMessageToAMember(member, testMessage);
+        await().pollDelay(1, TimeUnit.SECONDS).until(() -> true);
+        // --Then
+        assertThat(privateChannel.getHistoryAround(privateChannel.getLatestMessageId(),2).complete().getRetrievedHistory())
+                .last()
+                .extracting(Message::getContentRaw)
+                .isEqualTo(testMessage);
+    }
+
+    /*
+    ### the following test are missing because there are too expensive or intrusive ###
+        - create restricted channel
+        - send message publicly
+     */
+
 }

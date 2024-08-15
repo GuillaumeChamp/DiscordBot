@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import org.apache.commons.lang3.StringUtils;
 import org.guillaumechamp.discordbot.service.BotConfig;
-import org.guillaumechamp.discordbot.service.BotLogger;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -65,7 +64,7 @@ public class ChannelManager {
         if (server == null) {
             throw new IllegalArgumentException("server must not be null");
         }
-        if (!StringUtils.isNotEmpty(channelName)) {
+        if (StringUtils.isEmpty(channelName)) {
             throw new IllegalArgumentException("channel name must not be empty");
         }
         server.getTextChannelsByName(channelName, true)
@@ -81,9 +80,6 @@ public class ChannelManager {
      * @param name    channel name
      */
     public static void createRestrictedChannel(Guild server, List<Member> members, String name) {
-        if (Boolean.TRUE.equals(BotConfig.isSilence())) {
-            return;
-        }
         if (server == null) {
             throw new IllegalArgumentException("server must not be null");
         }
@@ -107,12 +103,14 @@ public class ChannelManager {
     }
 
     public static void sendMessageToAChannel(TextChannel channel, String message) {
+        if (channel == null) {
+            throw new IllegalArgumentException("Channel is null");
+        }
+        if (StringUtils.isEmpty(message)){
+            throw new IllegalArgumentException("message is null or empty");
+        }
         if (Boolean.TRUE.equals(BotConfig.isSilence())) {
             return;
-        }
-        if (channel == null) {
-            BotLogger.log(BotLogger.WARN, "Tried to send a message but channel is null");
-            throw new IllegalArgumentException("Channel is null");
         }
         channel.sendMessage(message).queue();
     }
@@ -124,10 +122,17 @@ public class ChannelManager {
      * @param message text to send
      */
     public static void sendPrivateMessageToAMember(Member member, String message) {
+        if (member==null){
+            throw new IllegalArgumentException("member is null");
+        }
+        if (StringUtils.isEmpty(message)){
+            throw new IllegalArgumentException("message is null or empty");
+        }
         if (Boolean.TRUE.equals(BotConfig.isSilence())) {
             return;
         }
         member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
+
     }
 
     /**
@@ -138,10 +143,14 @@ public class ChannelManager {
      * @throws IllegalArgumentException if it cannot parse to integer
      */
     public static Integer resolveGameIndexFromChannelName(String channelName) {
-        if (!StringUtils.contains(channelName, "game")) {
+        if (!StringUtils.startsWith(channelName, "game")) {
             throw new IllegalArgumentException("This is not a game channel");
         }
-        return channelName.charAt(4) - '0';
+        int index = channelName.charAt(4) - '0';
+        if (index >= GameManager.MAX_GAME_PER_GUILD || index < 0) {
+            throw new IllegalArgumentException("This is not a valid pattern name, expected game#suffix");
+        }
+        return index;
     }
 
     /**
@@ -151,10 +160,9 @@ public class ChannelManager {
      * @param member jda member
      */
     public static void muteAMember(Member member) {
-        if (member.getVoiceState() != null && member.getVoiceState().inAudioChannel()) {
-            member.mute(true).queue();
-        }
+        updateMuteStatus(member, true);
     }
+
     /**
      * Unmute a person.
      * Check if the player is in an audio channel
@@ -162,16 +170,18 @@ public class ChannelManager {
      * @param member jda member
      */
     public static void unmuteAMember(Member member) {
+        updateMuteStatus(member, false);
+    }
+
+    private static void updateMuteStatus(Member member, boolean newValue) {
+        if (member == null) {
+            throw new IllegalArgumentException("member is null");
+        }
         if (member.getVoiceState() != null && member.getVoiceState().inAudioChannel()) {
-            member.mute(false).queue();
+            member.mute(newValue).queue();
         }
     }
 
-    /**
-     * Clear discord function
-     *
-     * @param channel channel to delete
-     */
     private static void deleteOldChannel(TextChannel channel) {
         if (channel == null) {
             return;
