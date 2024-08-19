@@ -16,7 +16,7 @@ import java.util.List;
  * Act as interface to map a guild (i.e. a server) to a set of game
  */
 public class GameManager {
-    public static final Integer MAX_GAME_PER_GUILD = 3;
+    public static final int MAX_GAME_PER_GUILD = 3;
     private final Guild server;
     private final List<GameInterface> gameList = FixedSizeList.fixedSizeList(Arrays.asList(new GameInterface[MAX_GAME_PER_GUILD]));
     private final List<AbstractTurn> currentAction = FixedSizeList.fixedSizeList(Arrays.asList(new AbstractTurn[MAX_GAME_PER_GUILD]));

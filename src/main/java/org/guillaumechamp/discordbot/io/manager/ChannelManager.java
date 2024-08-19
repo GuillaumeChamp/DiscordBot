@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.guillaumechamp.discordbot.service.BotConfig;
 
@@ -81,15 +82,15 @@ public class ChannelManager {
      */
     public static void createRestrictedChannel(Guild server, List<Member> members, String name) {
         if (server == null) {
-            throw new IllegalArgumentException("server must not be null");
+            throw new IllegalArgumentException("server is null");
         }
         if (!StringUtils.isNotEmpty(name)) {
-            throw new IllegalArgumentException("channel name must not be empty");
+            throw new IllegalArgumentException("channel name is null or empty");
         }
 
         server.getTextChannelsByName(name, true).forEach(ChannelManager::deleteOldChannel);
 
-        Collection<Permission> grant = EnumSet.of(Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY);
+        Collection<Permission> grant = EnumSet.of(Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY, Permission.VIEW_CHANNEL);
         Collection<Permission> revoked = EnumSet.of(Permission.MESSAGE_ATTACH_FILES);
 
         TextChannel channel = server.createTextChannel(name)
@@ -97,6 +98,9 @@ public class ChannelManager {
                 .addRolePermissionOverride(server.getPublicRole().getIdLong(), Collections.singleton(Permission.UNKNOWN), grant)
                 .complete();
         TextChannelManager channelManager = channel.getManager();
+        if (CollectionUtils.isEmpty(members)){
+            return;
+        }
         for (Member member : members) {
             channelManager.putMemberPermissionOverride(member.getIdLong(), grant, revoked).queue();
         }
@@ -104,7 +108,7 @@ public class ChannelManager {
 
     public static void sendMessageToAChannel(TextChannel channel, String message) {
         if (channel == null) {
-            throw new IllegalArgumentException("Channel is null");
+            throw new IllegalArgumentException("destination is null");
         }
         if (StringUtils.isEmpty(message)){
             throw new IllegalArgumentException("message is null or empty");
@@ -123,7 +127,7 @@ public class ChannelManager {
      */
     public static void sendPrivateMessageToAMember(Member member, String message) {
         if (member==null){
-            throw new IllegalArgumentException("member is null");
+            throw new IllegalArgumentException("destination is null");
         }
         if (StringUtils.isEmpty(message)){
             throw new IllegalArgumentException("message is null or empty");

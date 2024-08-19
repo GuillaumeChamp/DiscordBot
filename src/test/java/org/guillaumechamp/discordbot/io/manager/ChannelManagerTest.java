@@ -9,6 +9,8 @@ import org.guillaumechamp.discordbot.service.BotConfig;
 import org.guillaumechamp.discordbot.testUtil.DiscordTestUtil;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.*;
@@ -159,7 +161,7 @@ class ChannelManagerTest {
     void shouldSendPrivateMessageToAMemberThrowExceptionIfMemberIsNull() {
         assertThatThrownBy(() -> ChannelManager.sendPrivateMessageToAMember(null, null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("member is null");
+                .hasMessage("destination is null");
     }
 
     @Test
@@ -185,7 +187,7 @@ class ChannelManagerTest {
         BotConfig.changeBotMessagePolicy(false);
         await().pollDelay(1, TimeUnit.SECONDS).until(() -> true);
         // --Then
-        assertThat(privateChannel.getHistoryAround(privateChannel.getLatestMessageId(),2).complete().getRetrievedHistory())
+        assertThat(privateChannel.getHistoryAround(privateChannel.getLatestMessageId(), 1).complete().getRetrievedHistory())
                 .last()
                 .extracting(Message::getContentRaw)
                 .isNotEqualTo(testMessage);
@@ -202,16 +204,117 @@ class ChannelManagerTest {
         ChannelManager.sendPrivateMessageToAMember(member, testMessage);
         await().pollDelay(1, TimeUnit.SECONDS).until(() -> true);
         // --Then
-        assertThat(privateChannel.getHistoryAround(privateChannel.getLatestMessageId(),2).complete().getRetrievedHistory())
+        assertThat(privateChannel.getHistoryAround(privateChannel.getLatestMessageId(), 1).complete().getRetrievedHistory())
                 .last()
                 .extracting(Message::getContentRaw)
                 .isEqualTo(testMessage);
     }
 
+    @Test
+    void shouldSendMessageToAChannelThrowExceptionIfMemberIsNull() {
+        assertThatThrownBy(() -> ChannelManager.sendMessageToAChannel(null, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("destination is null");
+    }
+
+    @Test
+    void shouldSendMessageToAChannelThrowExceptionIfMessageIsEmpty() {
+        TextChannel testChannel = DiscordTestUtil.getTestChannel();
+        assertThatThrownBy(() -> ChannelManager.sendMessageToAChannel(testChannel, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("message is null or empty");
+        assertThatThrownBy(() -> ChannelManager.sendMessageToAChannel(testChannel, ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("message is null or empty");
+    }
+
+    @Test
+    void shouldSendMessageToAChannelNotSendMessageIfMuteMode() {
+        // --Given
+        TextChannel testChannel = DiscordTestUtil.getTestChannel();
+        String testMessage = "This test message will never be seen #00003";
+        BotConfig.changeBotMessagePolicy(true);
+        // --When
+        ChannelManager.sendMessageToAChannel(testChannel, testMessage);
+        BotConfig.changeBotMessagePolicy(false);
+        await().pollDelay(1, TimeUnit.SECONDS).until(() -> true);
+        // --Then
+        assertThat(testChannel.getHistoryAround(testChannel.getLatestMessageId(), 1).complete().getRetrievedHistory())
+                .last()
+                .extracting(Message::getContentRaw)
+                .isNotEqualTo(testMessage);
+
+    }
+
+    @Test
+    void shouldSendMessageToAChannelWorkProperly() {
+        // --Given
+        TextChannel testChannel = DiscordTestUtil.getTestChannel();
+        String testMessage = "This is a test message please ignore me #00004";
+        // --When
+        ChannelManager.sendMessageToAChannel(testChannel, testMessage);
+        await().pollDelay(1, TimeUnit.SECONDS).until(() -> true);
+        // --Then
+        assertThat(testChannel.getHistoryAround(testChannel.getLatestMessageId(), 1).complete().getRetrievedHistory())
+                .last()
+                .extracting(Message::getContentRaw)
+                .isEqualTo(testMessage);
+    }
+
+    @Test
+    void shouldCreateRestrictedChannelThrowExceptionIfMemberIsNull() {
+        assertThatThrownBy(() -> ChannelManager.createRestrictedChannel(null, null, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("server is null");
+    }
+
+    @Test
+    void shouldCreateRestrictedChannelThrowExceptionIfChannelNameIsEmpty() {
+        Guild server = DiscordTestUtil.getApi().getGuilds().get(0);
+        assertThatThrownBy(() -> ChannelManager.createRestrictedChannel(server, null, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("channel name is null or empty");
+        assertThatThrownBy(() -> ChannelManager.createRestrictedChannel(server, null, ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("channel name is null or empty");
+    }
+
+    @Test
+    void shouldCreateRestrictedChannelNotThrowExceptionIfMembersIsNullOrEmpty() {
+        // --Given
+        String testName = "testChannel17";
+        Guild server = DiscordTestUtil.getApi().getGuilds().get(0);
+        // --When
+        assertThatNoException().isThrownBy(() -> ChannelManager.createRestrictedChannel(server, null, testName));
+        assertThatNoException().isThrownBy(() -> ChannelManager.createRestrictedChannel(server, Collections.emptyList(), testName));
+        // --Finally
+        server.getTextChannelsByName(testName, true).forEach(channel -> channel.delete().queue());
+    }
+
+    @Test
+    void shouldCreateRestrictedChannelWorkWithAList() {
+        // --Given
+        String testName = "testChannel18";
+        Guild server = DiscordTestUtil.getApi().getGuilds().get(0);
+        List<Member> testMembers = List.of(DiscordTestUtil.getAMember(0), DiscordTestUtil.getAMember(1));
+        // --When
+        ChannelManager.createRestrictedChannel(server, testMembers, testName);
+        // --Then
+        assertThat(server.getTextChannelsByName(testName, true))
+                .singleElement()
+                .satisfies(channel -> {
+                    assertThat(channel.canTalk(testMembers.get(0))).isTrue();
+                    assertThat(channel.canTalk(testMembers.get(1))).isTrue();
+                });
+        // --Finally
+        server.getTextChannelsByName(testName, true).forEach(channel -> channel.delete().queue());
+    }
+
+
     /*
-    ### the following test are missing because there are too expensive or intrusive ###
-        - create restricted channel
-        - send message publicly
+    ### the following test are missing because there are too expensive, intrusive or depend on members online###
+        - create restricted channel grant the right permissions (because bot and owner are invalid test user and need two more users)
+        - mute a member (because need an online user and will mute it which is too intrusive)
      */
 
 }

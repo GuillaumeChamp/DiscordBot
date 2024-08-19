@@ -17,43 +17,8 @@ public class DiscordTestUtil {
     private static JDA api;
     private static TextChannel testChannel;
 
-    /**
-     * Allow to retrieve a member of the first server for test purposes
-     * Warning : there is no guarantee that two different numbers mean two different members.
-     *
-     * @param number position of the member in the server list.
-     *               If there n is number of member connected, for any number greater or equal to n will give the member n-1
-     * @return guaranteed to have at least a member (the bot itself)
-     */
-    public static Member getAMember(int number) {
-        initialize();
-        List<Member> members = api.getGuilds().get(0).getMembers();
-        if (members.size() <= number) {
-            System.out.println("There are only " + members.size() + " member(s) on this server, return the last");
-            return members.get(members.size() - 1);
-        }
-        return members.get(number);
-    }
-
-
-    public static Member getOwner() {
-        initialize();
-        return api.getGuilds().get(0).getOwner();
-    }
-
-    public static TextChannel getTestChannel() {
-        initialize();
-        if (testChannel!=null){
-            return testChannel;
-        }
-        Category category = api.getCategoriesByName("MUTE_ME", false).get(0);
-        List<TextChannel> oldChannel = api.getGuilds().get(0).getTextChannelsByName("test", true);
-        testChannel = oldChannel.isEmpty() ? api.getGuilds().get(0).createTextChannel("test", category).complete() : oldChannel.get(0);
-        return testChannel;
-    }
-
-    public static JDA getApi(){
-        if (api==null){
+    public static JDA getApi() {
+        if (api == null) {
             initialize();
         }
         return api;
@@ -76,5 +41,40 @@ public class DiscordTestUtil {
             }
         }
     }
+
+    public static Member getOwner() {
+        initialize();
+        return api.getGuilds().get(0).getOwner();
+    }
+
+    /**
+     * Allow to retrieve a member of the first server for test purposes
+     * Warning : there is no guarantee that two different numbers mean two different members.
+     *
+     * @param number position of the member in the server list.
+     *               If there n is number of member connected, for any number greater or equal to n will give the member n-1
+     * @return guaranteed to have at least a member (the bot itself)
+     */
+    public static Member getAMember(int number) {
+        initialize();
+        List<Member> members = api.getGuilds().get(0).getMembers();
+        if (members.size() <= number) {
+            System.out.println("There are only " + members.size() + " member(s) on this server, return the last");
+            return members.get(members.size() - 1);
+        }
+        return members.get(number);
+    }
+
+    public static TextChannel getTestChannel() {
+        initialize();
+        if (testChannel != null) {
+            return testChannel;
+        }
+        Category category = api.getCategoriesByName("MUTE_ME", false).get(0);
+        List<TextChannel> oldChannel = api.getGuilds().get(0).getTextChannelsByName("test", true);
+        testChannel = oldChannel.isEmpty() ? api.getGuilds().get(0).createTextChannel("test", category).complete() : oldChannel.get(0);
+        return testChannel;
+    }
+
 
 }

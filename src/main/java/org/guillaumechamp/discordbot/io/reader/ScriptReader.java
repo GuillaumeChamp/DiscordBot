@@ -101,6 +101,7 @@ public class ScriptReader {
         String path = language == SupportedLanguage.FR ? PATH_FR : PATH_EN;
         String text = PropertyReader.getPropertyFromFile(path, keyEntry.keyName);
 
+        // text can be null if key not exist but is backend up KeyEntry
         if (text == null) {
             String errorMessage = keyEntry.keyName + " not found in " + path;
             BotLogger.log(BotLogger.WARN, errorMessage);
@@ -118,10 +119,6 @@ public class ScriptReader {
      * @return the new string if ward exist, the input string if ward not found and log it to bot log
      */
     private static String parse(String payload, String tag, String content) {
-        if (!StringUtils.contains(payload, tag)) {
-            BotLogger.log(BotLogger.WARN, tag + " not found in " + payload);
-            return payload;
-        }
         return StringUtils.replace(payload, tag, content);
     }
 }
