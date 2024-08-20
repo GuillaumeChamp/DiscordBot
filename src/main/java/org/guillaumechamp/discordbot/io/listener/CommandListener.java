@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.guillaumechamp.discordbot.service.BotLogger;
-import org.guillaumechamp.discordbot.io.manager.ChannelManager;
+import org.guillaumechamp.discordbot.io.manager.ChannelUtils;
 import org.guillaumechamp.discordbot.io.manager.GuildManager;
 import org.guillaumechamp.discordbot.io.reader.PropertyReader;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
@@ -49,10 +49,10 @@ public class CommandListener extends ListenerAdapter {
                 case CommandStore.STOP_GAME_COMMAND -> handleStop(event);
                 case CommandStore.START_GAME_COMMAND -> handleStart(event);
                 case CommandStore.DISCONNECT_BOT_COMMAND -> handleDisconnect(event);
-                default -> BotLogger.log(BotLogger.FATAL, "Command registered but not handled");
+                default -> BotLogger.fatal("Command registered but not handled");
             }
         } else {
-            BotLogger.log(BotLogger.FATAL, "The command : " + event.getName() + "not belong to any category");
+            BotLogger.fatal("The command : " + event.getName() + "not belong to any category");
         }
     }
 
@@ -61,8 +61,8 @@ public class CommandListener extends ListenerAdapter {
         String providedPassword = event.getOption(CommandStore.ARGUMENT_PASSWORD, OptionMapping::getAsString);
         if (expectedPassword.equals(providedPassword)) {
             event.reply("bye").setEphemeral(true).queue();
-            BotLogger.log(BotLogger.INFO, event.getUser().getName() + " has shutdown the bot");
-            ChannelManager.clearAllCreatedChannelsFromGuild(event.getGuild());
+            BotLogger.info(event.getUser().getName() + " has shutdown the bot");
+            ChannelUtils.clearAllCreatedChannelsFromGuild(event.getGuild());
             event.getJDA().shutdown();
         } else event.reply("you are not allow to shutdown the bot").queue();
     }
@@ -71,7 +71,7 @@ public class CommandListener extends ListenerAdapter {
         event.deferReply().setEphemeral(true).queue();
         int maximumPlayers = event.getOption(CommandStore.CREATE_GAME_COMMAND_ARG_1, 512, OptionMapping::getAsInt);
         try {
-            GuildManager.getInterface(event.getGuild()).createGame(maximumPlayers);
+            GuildManager.getGameManager(event.getGuild()).createGame(maximumPlayers);
             event.getHook().sendMessage("the game have been create").setEphemeral(true).queue();
         } catch (UserIntendedException e) {
             event.getHook().sendMessage(e.getMessage()).setEphemeral(true).queue();
@@ -81,7 +81,7 @@ public class CommandListener extends ListenerAdapter {
     private void handleJoin(SlashCommandInteractionEvent event) {
         int option = event.getOption(CommandStore.ARGUMENT_ID, 0, OptionMapping::getAsInt);
         try {
-            GuildManager.getInterface(event.getGuild()).addPlayer(event.getMember(), option);
+            GuildManager.getGameManager(event.getGuild()).addPlayer(event.getMember(), option);
             event.reply(Objects.requireNonNull(event.getMember()).getEffectiveName() + ", You have been added to the game " + option)
                     .setEphemeral(true)
                     .queue();
@@ -94,7 +94,7 @@ public class CommandListener extends ListenerAdapter {
         int option = event.getOption(CommandStore.ARGUMENT_ID, 0, OptionMapping::getAsInt);
         try {
             event.reply("starting . . .").setEphemeral(true).queue();
-            GuildManager.getInterface(event.getGuild()).start(option);
+            GuildManager.getGameManager(event.getGuild()).start(option);
         } catch (UserIntendedException e) {
             event.getHook().editOriginal(e.getMessage()).queue();
         }
@@ -103,7 +103,7 @@ public class CommandListener extends ListenerAdapter {
     private void handleStop(SlashCommandInteractionEvent event) {
         int option = event.getOption(CommandStore.ARGUMENT_ID, 0, OptionMapping::getAsInt);
         try {
-            GuildManager.getInterface(event.getGuild()).stop(option);
+            GuildManager.getGameManager(event.getGuild()).stop(option);
             event.reply("game deleted").queue();
         } catch (NullPointerException ignored) {
             event.reply("this game do not exist").setEphemeral(true).queue();
@@ -126,8 +126,8 @@ public class CommandListener extends ListenerAdapter {
         Channel channel = event.getChannel();
 
         try {
-            int gameIndex = ChannelManager.resolveGameIndexFromChannelName(channel.getName());
-            GuildManager.getInterface(event.getGuild()).transferCommandToTheAction(gameIndex, event.getMember(), target, event.getName());
+            int gameIndex = ChannelUtils.resolveGameIndexFromChannelName(channel.getName());
+            GuildManager.getGameManager(event.getGuild()).transferCommandToTheAction(gameIndex, event.getMember(), target, event.getName());
             assert target != null;
             event.getHook().editOriginal(event.getName() + " registered against " + target.getEffectiveName()).queue();
         } catch (UserIntendedException e) {
@@ -141,7 +141,7 @@ public class CommandListener extends ListenerAdapter {
                 .add("/" + event.getName())
                 .add(stringifyOptions(event.getOptions()))
                 .toString();
-        BotLogger.log(BotLogger.INFO, logString);
+        BotLogger.info(logString);
     }
 
     private String stringifyOptions(List<OptionMapping> options) {

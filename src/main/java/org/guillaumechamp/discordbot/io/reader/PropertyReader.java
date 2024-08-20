@@ -39,7 +39,7 @@ public class PropertyReader {
             return properties.getProperty(key);
         } catch (IOException e) {
             String errorMessage = "Unable to open property file " + path;
-            BotLogger.log(BotLogger.FATAL, errorMessage);
+            BotLogger.fatal(errorMessage);
             throw new NoSuchElementException(e);
         }
     }

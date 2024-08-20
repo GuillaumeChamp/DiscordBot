@@ -3,7 +3,7 @@ package org.guillaumechamp.discordbot.game;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.guillaumechamp.discordbot.io.manager.ChannelManager;
+import org.guillaumechamp.discordbot.io.manager.ChannelUtils;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class PendingGame implements GameInterface {
         this.players = new ArrayList<>();
         this.id = id;
         this.limit = limit;
-        channel = ChannelManager.createChannelForAGuild(server, ChannelManager.getGameChannelNameByIndexAndStatus(id, true));
+        channel = ChannelUtils.createChannelForAGuild(server, ChannelUtils.getGameChannelNameByIndexAndStatus(id, true));
         channel.sendMessage("A new game will start !\n/join " + id + " to join it (" + limit + " players max )").queue();
     }
 

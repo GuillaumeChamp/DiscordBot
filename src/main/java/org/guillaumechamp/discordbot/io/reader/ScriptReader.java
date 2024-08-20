@@ -4,7 +4,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.guillaumechamp.discordbot.service.BotLogger;
-import org.slf4j.event.Level;
 
 import java.security.InvalidParameterException;
 import java.util.Arrays;
@@ -80,7 +79,7 @@ public class ScriptReader {
      */
     public static String readLine(KeyEntry keyEntry, SupportedLanguage language) {
         if (!ArrayUtils.isEmpty(keyEntry.tags)) {
-            BotLogger.log(Level.WARN,"No tag provided, expected :" + Arrays.toString(keyEntry.tags));
+            BotLogger.error("No tag provided, expected :" + Arrays.toString(keyEntry.tags));
             throw new InvalidParameterException("No tag provided, expected :" + Arrays.toString(keyEntry.tags));
         }
         return unsafeReadLine(keyEntry, language);
@@ -104,7 +103,7 @@ public class ScriptReader {
         // text can be null if key not exist but is backend up KeyEntry
         if (text == null) {
             String errorMessage = keyEntry.keyName + " not found in " + path;
-            BotLogger.log(BotLogger.WARN, errorMessage);
+            BotLogger.error(errorMessage);
             throw new MissingResourceException(errorMessage, path, keyEntry.keyName);
         }
         return text;

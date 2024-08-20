@@ -15,9 +15,9 @@ import java.util.EnumSet;
 import java.util.List;
 
 
-public class ChannelManager {
+public class ChannelUtils {
 
-    private ChannelManager() {
+    private ChannelUtils() {
     }
 
     /**
@@ -28,8 +28,8 @@ public class ChannelManager {
             return;
         }
         for (int i = 0; i < GameManager.MAX_GAME_PER_GUILD; i++) {
-            server.getTextChannelsByName(getGameChannelNameByIndexAndStatus(i, true), true).forEach(ChannelManager::deleteOldChannel);
-            server.getTextChannelsByName(getGameChannelNameByIndexAndStatus(i, false), true).forEach(ChannelManager::deleteOldChannel);
+            clearOldChannelByName(server, getGameChannelNameByIndexAndStatus(i, true));
+            clearOldChannelByName(server, getGameChannelNameByIndexAndStatus(i, false));
         }
     }
 
@@ -47,9 +47,12 @@ public class ChannelManager {
         if (index < 0 || index >= GameManager.MAX_GAME_PER_GUILD) {
             throw new IllegalArgumentException("Index out of bound : index must be positive and lower than " + GameManager.MAX_GAME_PER_GUILD);
         }
-        StringBuilder builder = new StringBuilder().append("game").append(index);
+        final String gamePrefix = "game";
+        final String wolfSuffix = "wolf";
+
+        StringBuilder builder = new StringBuilder().append(gamePrefix).append(index);
         if (isWolf) {
-            builder.append("wolf");
+            builder.append(wolfSuffix);
         }
         return builder.toString();
     }
@@ -68,8 +71,7 @@ public class ChannelManager {
         if (StringUtils.isEmpty(channelName)) {
             throw new IllegalArgumentException("channel name must not be empty");
         }
-        server.getTextChannelsByName(channelName, true)
-                .forEach(ChannelManager::deleteOldChannel);
+        clearOldChannelByName(server, channelName);
         return server.createTextChannel(channelName).complete();
     }
 
@@ -87,22 +89,21 @@ public class ChannelManager {
         if (!StringUtils.isNotEmpty(name)) {
             throw new IllegalArgumentException("channel name is null or empty");
         }
+        final Collection<Permission> grant = EnumSet.of(Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY, Permission.VIEW_CHANNEL);
+        final Collection<Permission> revoked = EnumSet.of(Permission.MESSAGE_ATTACH_FILES);
 
-        server.getTextChannelsByName(name, true).forEach(ChannelManager::deleteOldChannel);
-
-        Collection<Permission> grant = EnumSet.of(Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY, Permission.VIEW_CHANNEL);
-        Collection<Permission> revoked = EnumSet.of(Permission.MESSAGE_ATTACH_FILES);
+        clearOldChannelByName(server, name);
 
         TextChannel channel = server.createTextChannel(name)
                 .addMemberPermissionOverride(server.getJDA().getSelfUser().getIdLong(), Permission.MANAGE_PERMISSIONS.getRawValue(), 0)
                 .addRolePermissionOverride(server.getPublicRole().getIdLong(), Collections.singleton(Permission.UNKNOWN), grant)
                 .complete();
         TextChannelManager channelManager = channel.getManager();
-        if (CollectionUtils.isEmpty(members)){
+        if (CollectionUtils.isEmpty(members)) {
             return;
         }
         for (Member member : members) {
-            channelManager.putMemberPermissionOverride(member.getIdLong(), grant, revoked).queue();
+            channelManager.putMemberPermissionOverride(member.getIdLong(), grant, revoked).complete();
         }
     }
 
@@ -110,7 +111,7 @@ public class ChannelManager {
         if (channel == null) {
             throw new IllegalArgumentException("destination is null");
         }
-        if (StringUtils.isEmpty(message)){
+        if (StringUtils.isEmpty(message)) {
             throw new IllegalArgumentException("message is null or empty");
         }
         if (Boolean.TRUE.equals(BotConfig.isSilence())) {
@@ -126,10 +127,10 @@ public class ChannelManager {
      * @param message text to send
      */
     public static void sendPrivateMessageToAMember(Member member, String message) {
-        if (member==null){
+        if (member == null) {
             throw new IllegalArgumentException("destination is null");
         }
-        if (StringUtils.isEmpty(message)){
+        if (StringUtils.isEmpty(message)) {
             throw new IllegalArgumentException("message is null or empty");
         }
         if (Boolean.TRUE.equals(BotConfig.isSilence())) {
@@ -186,10 +187,13 @@ public class ChannelManager {
         }
     }
 
-    private static void deleteOldChannel(TextChannel channel) {
-        if (channel == null) {
-            return;
-        }
-        channel.delete().queue();
+    private static void clearOldChannelByName(Guild server, String name) {
+        server.getTextChannelsByName(name, true).forEach(channel -> {
+            if (channel == null) {
+                return;
+            }
+            channel.delete().complete();
+        });
     }
+
 }

@@ -26,7 +26,7 @@ public class WaiterService {
 
     public static void register(Game game, AbstractTurn action) {
         if (registeredActions.containsKey(game)) {
-            BotLogger.log(BotLogger.FATAL, "two actions registered for the same game");
+            BotLogger.fatal("two actions registered for the same game");
             throw new InvalidRequestStateException("two actions registered for the same game");
         }
         ScheduledFuture<?> future = threadPoolExecutor.schedule(() -> {
@@ -45,7 +45,7 @@ public class WaiterService {
     public static boolean triggerActionEarlier(Game source) {
         ScheduledFuture<?> future = registeredActions.get(source);
         if (future == null) {
-            BotLogger.log(BotLogger.WARN, "No action registered for this game");
+            BotLogger.error("No action registered for this game");
             return false;
         }
         future.cancel(false);

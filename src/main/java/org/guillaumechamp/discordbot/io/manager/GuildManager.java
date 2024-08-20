@@ -13,7 +13,7 @@ public class GuildManager {
     private GuildManager() {
     }
 
-    public static GameManager getInterface(Guild guild) {
+    public static GameManager getGameManager(Guild guild) {
         if (interfaceList.containsKey(guild)) {
             return interfaceList.get(guild);
         }

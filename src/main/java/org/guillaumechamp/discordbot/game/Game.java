@@ -7,7 +7,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.guillaumechamp.discordbot.game.turn.*;
 import org.guillaumechamp.discordbot.game.roles.*;
-import org.guillaumechamp.discordbot.io.manager.ChannelManager;
+import org.guillaumechamp.discordbot.io.manager.ChannelUtils;
 import org.guillaumechamp.discordbot.io.reader.ScriptReader;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 import org.guillaumechamp.discordbot.io.manager.GuildManager;
@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.guillaumechamp.discordbot.io.manager.ChannelManager.getGameChannelNameByIndexAndStatus;
-import static org.guillaumechamp.discordbot.io.manager.ChannelManager.muteAMember;
+import static org.guillaumechamp.discordbot.io.manager.ChannelUtils.getGameChannelNameByIndexAndStatus;
+import static org.guillaumechamp.discordbot.io.manager.ChannelUtils.muteAMember;
 
 public class Game implements GameInterface {
     // Discord Related Data
@@ -48,7 +48,7 @@ public class Game implements GameInterface {
         this.channel = channel;
         this.gameLanguage = ScriptReader.SupportedLanguage.EN;
         this.currentServer = channel.getGuild();
-        ChannelManager.createRestrictedChannel(currentServer, PlayerDataUtil.getAllMembersBySide(this.activePlayers, RoleSide.WEREWOLF), getGameChannelNameByIndexAndStatus(id, true));
+        ChannelUtils.createRestrictedChannel(currentServer, PlayerDataUtil.getAllMembersBySide(this.activePlayers, RoleSide.WEREWOLF), getGameChannelNameByIndexAndStatus(id, true));
         this.initGame();
     }
 
@@ -201,9 +201,9 @@ public class Game implements GameInterface {
      */
     private void terminateGame(EndOfGameException endOfGameException) {
         this.isActive = false;
-        deadPlayers.forEach(playerData->ChannelManager.unmuteAMember(playerData.getOwner()));
+        deadPlayers.forEach(playerData-> ChannelUtils.unmuteAMember(playerData.getOwner()));
         sendExceptionMessagePublicly(endOfGameException);
-        GuildManager.getInterface(currentServer).stop(this.id);
+        GuildManager.getGameManager(currentServer).stop(this.id);
     }
 
 
@@ -223,34 +223,34 @@ public class Game implements GameInterface {
     }
 
     private void sendExceptionMessagePublicly(Exception e) {
-        ChannelManager.sendMessageToAChannel(channel, e.getMessage());
+        ChannelUtils.sendMessageToAChannel(channel, e.getMessage());
     }
 
     @SafeVarargs
     public final void sendPublicMessage(ScriptReader.KeyEntry key, Pair<ScriptReader.Tag, String>... wards) {
-        ChannelManager.sendMessageToAChannel(channel, ScriptReader.readLineAndParse(key, gameLanguage, wards));
+        ChannelUtils.sendMessageToAChannel(channel, ScriptReader.readLineAndParse(key, gameLanguage, wards));
     }
 
     private void sendPublicMessage(ScriptReader.KeyEntry key) {
-        ChannelManager.sendMessageToAChannel(channel, ScriptReader.readLine(key, gameLanguage));
+        ChannelUtils.sendMessageToAChannel(channel, ScriptReader.readLine(key, gameLanguage));
     }
 
     private void sendPrivateMessage(Member destination, ScriptReader.KeyEntry key) {
-        ChannelManager.sendPrivateMessageToAMember(destination, ScriptReader.readLine(key, gameLanguage));
+        ChannelUtils.sendPrivateMessageToAMember(destination, ScriptReader.readLine(key, gameLanguage));
     }
 
     @SafeVarargs
     private void sendPrivateMessage(Member destination, ScriptReader.KeyEntry key, Pair<ScriptReader.Tag, String>... wards) {
-        ChannelManager.sendPrivateMessageToAMember(destination, ScriptReader.readLineAndParse(key, gameLanguage, wards));
+        ChannelUtils.sendPrivateMessageToAMember(destination, ScriptReader.readLineAndParse(key, gameLanguage, wards));
     }
 
     private void sendExceptionMessagePrivately(Member destination, Exception e) {
-        ChannelManager.sendPrivateMessageToAMember(destination, e.getMessage());
+        ChannelUtils.sendPrivateMessageToAMember(destination, e.getMessage());
     }
 
     private void registerDummyTurn(int durationInSecond, PlayerTurn replacedTurn) {
         DummyTurn dummyTurn = new DummyTurn(durationInSecond, replacedTurn);
-        GuildManager.getInterface(currentServer).registerAction(id, dummyTurn);
+        GuildManager.getGameManager(currentServer).registerAction(id, dummyTurn);
         WaiterService.register(this, dummyTurn);
     }
 
@@ -270,7 +270,7 @@ public class Game implements GameInterface {
     }
     private void startAction(AbstractTurn action) {
         this.currentTurn = action;
-        GuildManager.getInterface(currentServer).registerAction(id, action);
+        GuildManager.getGameManager(currentServer).registerAction(id, action);
         WaiterService.register(this, action);
     }
 }
