@@ -36,7 +36,7 @@ public class GameManager {
                 gameList.set(i, new PendingGame(server, i, maxPlayerSize));
                 return;
             }
-        throw new UserIntendedException("max number of game reached");
+        throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_MAX_NUMBER_OF_GAME_REACHED);
     }
 
     /**
@@ -47,11 +47,8 @@ public class GameManager {
      * @throws UserIntendedException if unable to add
      */
     public void addPlayer(Member member, int gameId) throws UserIntendedException {
-        if (member == null) {
-            throw new UserIntendedException("Unable to find who talk");
-        }
         if (gameList.get(gameId) == null) {
-            throw new UserIntendedException("The game not exist yet use /create to create it");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
         }
         gameList.get(gameId).addPlayer(member);
     }
@@ -62,7 +59,7 @@ public class GameManager {
      */
     public void start(int id) throws UserIntendedException {
         if (gameList.get(id) == null) {
-            throw new UserIntendedException("Create the game before using /create");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
         }
         gameList.set(id, gameList.get(id).startGame());
     }
@@ -73,14 +70,17 @@ public class GameManager {
      * @param gameIndex index og the game to stop
      *                  do not check if game exist
      */
-    public void stop(int gameIndex) {
+    public void stop(int gameIndex) throws UserIntendedException {
+        if (gameList.get(gameIndex)==null){
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
+        }
         gameList.get(gameIndex).terminate();
         gameList.set(gameIndex, null);
     }
 
     public void transferCommandToTheAction(int gameIndex, Member member, Member target, String action) throws UserIntendedException {
         if (gameList.get(gameIndex) == null) {
-            throw new UserIntendedException("This game is not active");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
         }
         currentAction.get(gameIndex).handleAction(member, target, ActionType.stringToActionType(action));
     }

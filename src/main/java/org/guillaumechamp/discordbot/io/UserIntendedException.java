@@ -1,6 +1,10 @@
 package org.guillaumechamp.discordbot.io;
 
 public class UserIntendedException extends Exception {
+    public static final String EXCEPTION_MESSAGE_MAX_NUMBER_OF_GAME_REACHED = "Cannot create a new game, the max number of active game for this server is reached";
+    public static final String EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST = "This game does not exist, use /create to create a new game";
+
+    // ######### Game relative exception #########
     public static final String EXCEPTION_MESSAGE_AUTHOR_NOT_IN_THE_GAME = "You are not in the game";
     public static final String EXCEPTION_MESSAGE_TARGET_NOT_IN_THE_GAME = "The target is not in the game";
     public static final String EXCEPTION_MESSAGE_NO_TARGET = "No player targeted";
@@ -13,7 +17,6 @@ public class UserIntendedException extends Exception {
     public static final String EXCEPTION_MESSAGE_POWER_ALREADY_USED = "You already used this power !";
     public static final String EXCEPTION_MESSAGE_WITCH_NO_DEAD = "You have no one to save !";
     public static final String EXCEPTION_MESSAGE_WITCH_WRONG_SAVE = "This user will not died !";
-
 
 
     public UserIntendedException(String message) {

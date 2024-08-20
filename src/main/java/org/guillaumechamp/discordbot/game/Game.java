@@ -68,6 +68,10 @@ public class Game implements GameInterface {
             return;
         }
         try {
+            if (currentTurn==null){ // if game have just started
+                this.beforeWolf();
+                return;
+            }
             TurnResolver.triggerNextAction(this, currentTurn.getPlayerTurn());
         } catch (EndOfGameException endOfGame) {
             this.terminateGame(endOfGame);
@@ -203,7 +207,11 @@ public class Game implements GameInterface {
         this.isActive = false;
         deadPlayers.forEach(playerData-> ChannelUtils.unmuteAMember(playerData.getOwner()));
         sendExceptionMessagePublicly(endOfGameException);
-        GuildManager.getGameManager(currentServer).stop(this.id);
+        try {
+            GuildManager.getGameManager(currentServer).stop(this.id);
+        } catch (UserIntendedException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 

@@ -20,7 +20,7 @@ public class PendingGame implements GameInterface {
         this.id = id;
         this.limit = limit;
         channel = ChannelUtils.createChannelForAGuild(server, ChannelUtils.getGameChannelNameByIndexAndStatus(id, true));
-        channel.sendMessage("A new game will start !\n/join " + id + " to join it (" + limit + " players max )").queue();
+        ChannelUtils.sendMessageToAChannel(channel,"A new game will start !\n/join " + id + " to join it (" + limit + " players max )");
     }
 
     public void addPlayer(Member member) throws UserIntendedException {
@@ -31,7 +31,7 @@ public class PendingGame implements GameInterface {
             throw new UserIntendedException("The game is full");
         }
         players.add(member);
-        channel.sendMessage(member.getEffectiveName() + " join the game").queue();
+        ChannelUtils.sendMessageToAChannel(channel,member.getEffectiveName() + " join the game");
         if (players.size() == limit) {
             this.startGame();
         }

@@ -6,15 +6,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.guillaumechamp.discordbot.service.BotLogger;
+import org.guillaumechamp.discordbot.io.UserIntendedException;
 import org.guillaumechamp.discordbot.io.manager.ChannelUtils;
 import org.guillaumechamp.discordbot.io.manager.GuildManager;
 import org.guillaumechamp.discordbot.io.reader.PropertyReader;
-import org.guillaumechamp.discordbot.io.UserIntendedException;
+import org.guillaumechamp.discordbot.service.BotLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.StringJoiner;
 
 /**
@@ -56,6 +55,7 @@ public class CommandListener extends ListenerAdapter {
         }
     }
 
+    //TODO : endure consistency of reply (defer and get hook)
     private void handleDisconnect(SlashCommandInteractionEvent event) {
         String expectedPassword = PropertyReader.getBotPropertyFromFile(CommandStore.ARGUMENT_PASSWORD);
         String providedPassword = event.getOption(CommandStore.ARGUMENT_PASSWORD, OptionMapping::getAsString);
@@ -80,9 +80,13 @@ public class CommandListener extends ListenerAdapter {
 
     private void handleJoin(SlashCommandInteractionEvent event) {
         int option = event.getOption(CommandStore.ARGUMENT_ID, 0, OptionMapping::getAsInt);
+        if (event.getMember() == null) {
+            event.reply("you cannot join a game using private message because a game belong to a server").setEphemeral(true).queue();
+            return;
+        }
         try {
             GuildManager.getGameManager(event.getGuild()).addPlayer(event.getMember(), option);
-            event.reply(Objects.requireNonNull(event.getMember()).getEffectiveName() + ", You have been added to the game " + option)
+            event.reply(event.getMember().getEffectiveName() + ", You have been added to the game " + option)
                     .setEphemeral(true)
                     .queue();
         } catch (UserIntendedException exception) {
@@ -105,8 +109,8 @@ public class CommandListener extends ListenerAdapter {
         try {
             GuildManager.getGameManager(event.getGuild()).stop(option);
             event.reply("game deleted").queue();
-        } catch (NullPointerException ignored) {
-            event.reply("this game do not exist").setEphemeral(true).queue();
+        } catch (UserIntendedException e) {
+            event.reply(e.getMessage()).setEphemeral(true).queue();
         }
     }
 
@@ -117,25 +121,26 @@ public class CommandListener extends ListenerAdapter {
      * @param event SlashCommandInteractionEvent
      */
     private void handleGameAction(SlashCommandInteractionEvent event) {
-        if (event.getOption(CommandStore.ARGUMENT_USER) == null) {
+        // at this moment, every game action need a target as argument
+        Member target = event.getOption(CommandStore.ARGUMENT_USER, OptionMapping::getAsMember);
+        if (target == null) {
             event.reply("You forget the user").setEphemeral(true).queue();
+            return;
         }
         event.deferReply().queue();
 
-        Member target = event.getOption(CommandStore.ARGUMENT_USER, OptionMapping::getAsMember);
         Channel channel = event.getChannel();
 
         try {
             int gameIndex = ChannelUtils.resolveGameIndexFromChannelName(channel.getName());
             GuildManager.getGameManager(event.getGuild()).transferCommandToTheAction(gameIndex, event.getMember(), target, event.getName());
-            assert target != null;
             event.getHook().editOriginal(event.getName() + " registered against " + target.getEffectiveName()).queue();
         } catch (UserIntendedException e) {
             event.getHook().editOriginal(e.getMessage()).queue();
         }
     }
 
-    private void logEvent(SlashCommandInteractionEvent event){
+    private void logEvent(SlashCommandInteractionEvent event) {
         String logString = new StringJoiner(" ")
                 .add(event.getInteraction().getUser().toString())
                 .add("/" + event.getName())

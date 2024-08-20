@@ -11,9 +11,9 @@ public class TestAppender extends ListAppender<ILoggingEvent> {
     }
 
     public boolean contains(String string, Level level) {
-        return this.list.stream()
-                .anyMatch(event -> event.toString().contains(string)
-                        && event.getLevel().equals(level));
+        return this.list
+                .stream()
+                .anyMatch(event -> event.toString().contains(string) && event.getLevel().equals(level));
     }
 
 }
