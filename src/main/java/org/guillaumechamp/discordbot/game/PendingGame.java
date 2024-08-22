@@ -7,15 +7,19 @@ import org.guillaumechamp.discordbot.io.manager.ChannelUtils;
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PendingGame implements GameInterface {
     private final int id;
     private final int limit;
     private boolean isExpired = false;
-    private final ArrayList<Member> players;
+    private final List<Member> players;
     private final TextChannel channel;
 
     public PendingGame(Guild server, int id, int limit) {
+        if (server==null){
+            throw new IllegalArgumentException("Pending game must be attached to a guild");
+        }
         this.players = new ArrayList<>();
         this.id = id;
         this.limit = limit;
@@ -25,10 +29,12 @@ public class PendingGame implements GameInterface {
 
     public void addPlayer(Member member) throws UserIntendedException {
         if (isExpired) {
-            throw new UserIntendedException("the game is already started");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_GAME_ALREADY_STARTED);
         }
         if (players.size() >= limit) {
-            throw new UserIntendedException("The game is full");
+            // in production this case is extremely because that mean that two addPlayer request are processed at the same time
+            // (when game is started this pending game is dereferenced)
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_MAX_NUMBER_OF_PLAYER_REACHED);
         }
         players.add(member);
         ChannelUtils.sendMessageToAChannel(channel,member.getEffectiveName() + " join the game");
@@ -44,7 +50,7 @@ public class PendingGame implements GameInterface {
 
     public Game startGame() throws UserIntendedException {
         if (isExpired) {
-            throw new UserIntendedException("the game is already in progress");
+            throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_GAME_ALREADY_STARTED);
         }
         isExpired = true;
         Game newGame = new Game(id, players, channel);

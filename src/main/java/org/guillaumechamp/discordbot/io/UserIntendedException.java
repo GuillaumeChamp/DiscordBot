@@ -3,6 +3,9 @@ package org.guillaumechamp.discordbot.io;
 public class UserIntendedException extends Exception {
     public static final String EXCEPTION_MESSAGE_MAX_NUMBER_OF_GAME_REACHED = "Cannot create a new game, the max number of active game for this server is reached";
     public static final String EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST = "This game does not exist, use /create to create a new game";
+    public static final String EXCEPTION_MESSAGE_GAME_ALREADY_STARTED = "The game is already started";
+    public static final String EXCEPTION_MESSAGE_MAX_NUMBER_OF_PLAYER_REACHED= "The game is full";
+
 
     // ######### Game relative exception #########
     public static final String EXCEPTION_MESSAGE_AUTHOR_NOT_IN_THE_GAME = "You are not in the game";
