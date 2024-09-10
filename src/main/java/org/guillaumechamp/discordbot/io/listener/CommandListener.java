@@ -1,20 +1,13 @@
 package org.guillaumechamp.discordbot.io.listener;
 
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.guillaumechamp.discordbot.io.UserIntendedException;
 import org.guillaumechamp.discordbot.io.manager.ChannelUtils;
-import org.guillaumechamp.discordbot.io.manager.GuildManager;
-import org.guillaumechamp.discordbot.io.reader.PropertyReader;
 import org.guillaumechamp.discordbot.service.BotLogger;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.StringJoiner;
 
 /**
  * Service that listen all text message (command and regular message)
@@ -34,129 +27,94 @@ public class CommandListener extends ListenerAdapter {
      */
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        if (CommandStore.GAME_COMMAND.contains(event.getName())) {
-            handleGameAction(event);
+        if (event.getMember() == null) {
+            event.reply("This command is not allow in private channel, use a server channel instead").setEphemeral(true).queue();
             return;
         }
 
-        logEvent(event);
+        event.deferReply().setEphemeral(true).queue();
 
-        if (CommandStore.DEFAULT_COMMAND.contains(event.getName())) {
-            switch (event.getName()) {
-                case CommandStore.CREATE_GAME_COMMAND -> handleCreation(event);
-                case CommandStore.JOIN_GAME_COMMAND -> handleJoin(event);
-                case CommandStore.STOP_GAME_COMMAND -> handleStop(event);
-                case CommandStore.START_GAME_COMMAND -> handleStart(event);
-                case CommandStore.DISCONNECT_BOT_COMMAND -> handleDisconnect(event);
-                default -> BotLogger.fatal("Command registered but not handled");
-            }
+        if (CommandStore.GAME_COMMAND.contains(event.getName())) {
+            handleGameAction(event);
+        } else if (CommandStore.DEFAULT_COMMAND.contains(event.getName())) {
+            handleGeneralCommands(event);
         } else {
             BotLogger.fatal("The command : " + event.getName() + "not belong to any category");
         }
     }
 
-    //TODO : endure consistency of reply (defer and get hook)
-    private void handleDisconnect(SlashCommandInteractionEvent event) {
-        String expectedPassword = PropertyReader.getBotPropertyFromFile(CommandStore.ARGUMENT_PASSWORD);
-        String providedPassword = event.getOption(CommandStore.ARGUMENT_PASSWORD, OptionMapping::getAsString);
-        if (expectedPassword.equals(providedPassword)) {
-            event.reply("bye").setEphemeral(true).queue();
-            BotLogger.info(event.getUser().getName() + " has shutdown the bot");
-            ChannelUtils.clearAllCreatedChannelsFromGuild(event.getGuild());
-            event.getJDA().shutdown();
-        } else event.reply("you are not allow to shutdown the bot").queue();
+    private void handleGeneralCommands(SlashCommandInteractionEvent event) {
+        CommandContent commandContent;
+        String answer;
+        switch (event.getName()) {
+            case CommandStore.CREATE_GAME_COMMAND -> {
+                commandContent = parseCreation(event);
+                answer = GeneralCommandHandler.handleCreation(commandContent);
+            }
+            case CommandStore.JOIN_GAME_COMMAND -> {
+                commandContent = parseJoinStartStop(event);
+                answer = GeneralCommandHandler.handleJoin(commandContent);
+            }
+            case CommandStore.STOP_GAME_COMMAND -> {
+                commandContent = parseJoinStartStop(event);
+                answer = GeneralCommandHandler.handleStop(commandContent);
+            }
+            case CommandStore.START_GAME_COMMAND -> {
+                commandContent = parseJoinStartStop(event);
+                answer = GeneralCommandHandler.handleStart(commandContent);
+            }
+            case CommandStore.DISCONNECT_BOT_COMMAND -> {
+                commandContent = parseDisconnect(event);
+                answer = GeneralCommandHandler.handleDisconnect(commandContent);
+            }
+            default -> {
+                BotLogger.fatal("Command registered but not handled");
+                return;
+            }
+        }
+        logAndAnswer(event, answer, commandContent);
     }
 
-    private void handleCreation(SlashCommandInteractionEvent event) {
-        event.deferReply().setEphemeral(true).queue();
-        int maximumPlayers = event.getOption(CommandStore.CREATE_GAME_COMMAND_ARG_1, 512, OptionMapping::getAsInt);
-        try {
-            GuildManager.getGameManager(event.getGuild()).createGame(maximumPlayers);
-            event.getHook().sendMessage("the game have been create").setEphemeral(true).queue();
-        } catch (UserIntendedException e) {
-            event.getHook().sendMessage(e.getMessage()).setEphemeral(true).queue();
-        }
+    private CommandContent parseDisconnect(SlashCommandInteractionEvent event) {
+        return generateBaseCommandContent(event)
+                .stringArgument(event.getOption(CommandStore.ARGUMENT_PASSWORD, OptionMapping::getAsString))
+                .build();
     }
 
-    private void handleJoin(SlashCommandInteractionEvent event) {
-        int option = event.getOption(CommandStore.ARGUMENT_ID, 0, OptionMapping::getAsInt);
-        if (event.getMember() == null) {
-            event.reply("you cannot join a game using private message because a game belong to a server").setEphemeral(true).queue();
-            return;
-        }
-        try {
-            GuildManager.getGameManager(event.getGuild()).addPlayer(event.getMember(), option);
-            event.reply(event.getMember().getEffectiveName() + ", You have been added to the game " + option)
-                    .setEphemeral(true)
-                    .queue();
-        } catch (UserIntendedException exception) {
-            event.reply(exception.getMessage()).setEphemeral(true).queue();
-        }
+    private CommandContent parseCreation(SlashCommandInteractionEvent event) {
+        Integer maximumPlayers = event.getOption(CommandStore.CREATE_GAME_COMMAND_ARG_1, OptionMapping::getAsInt);
+        return generateBaseCommandContent(event)
+                .intArgument(maximumPlayers)
+                .build();
     }
 
-    private void handleStart(SlashCommandInteractionEvent event) {
-        int option = event.getOption(CommandStore.ARGUMENT_ID, 0, OptionMapping::getAsInt);
-        try {
-            event.reply("starting . . .").setEphemeral(true).queue();
-            GuildManager.getGameManager(event.getGuild()).start(option);
-        } catch (UserIntendedException e) {
-            event.getHook().editOriginal(e.getMessage()).queue();
-        }
+    private CommandContent parseJoinStartStop(SlashCommandInteractionEvent event) {
+        Integer option = event.getOption(CommandStore.ARGUMENT_ID, OptionMapping::getAsInt);
+        return generateBaseCommandContent(event)
+                .intArgument(option)
+                .build();
     }
 
-    private void handleStop(SlashCommandInteractionEvent event) {
-        int option = event.getOption(CommandStore.ARGUMENT_ID, 0, OptionMapping::getAsInt);
-        try {
-            GuildManager.getGameManager(event.getGuild()).stop(option);
-            event.reply("game deleted").queue();
-        } catch (UserIntendedException e) {
-            event.reply(e.getMessage()).setEphemeral(true).queue();
-        }
-    }
-
-    /**
-     * This method handle command relative to a game.
-     * Will later be enriched and moved to a dedicated interface or util
-     *
-     * @param event SlashCommandInteractionEvent
-     */
     private void handleGameAction(SlashCommandInteractionEvent event) {
-        // at this moment, every game action need a target as argument
         Member target = event.getOption(CommandStore.ARGUMENT_USER, OptionMapping::getAsMember);
-        if (target == null) {
-            event.reply("You forget the user").setEphemeral(true).queue();
-            return;
-        }
-        event.deferReply().queue();
-
-        Channel channel = event.getChannel();
-
-        try {
-            int gameIndex = ChannelUtils.resolveGameIndexFromChannelName(channel.getName());
-            GuildManager.getGameManager(event.getGuild()).transferCommandToTheAction(gameIndex, event.getMember(), target, event.getName());
-            event.getHook().editOriginal(event.getName() + " registered against " + target.getEffectiveName()).queue();
-        } catch (UserIntendedException e) {
-            event.getHook().editOriginal(e.getMessage()).queue();
-        }
+        CommandContent commandContent = generateBaseCommandContent(event)
+                .target(target)
+                .gameIndex(ChannelUtils.resolveGameIndexFromChannelName(event.getChannel().getName()))
+                .build();
+        event.getHook().sendMessage(GeneralCommandHandler.handleGameCommand(commandContent)).queue();
     }
 
-    private void logEvent(SlashCommandInteractionEvent event) {
-        String logString = new StringJoiner(" ")
-                .add(event.getInteraction().getUser().toString())
-                .add("/" + event.getName())
-                .add(stringifyOptions(event.getOptions()))
-                .toString();
-        BotLogger.info(logString);
+    private CommandContent.CommandContentBuilder generateBaseCommandContent(SlashCommandInteractionEvent event) {
+        return CommandContent.builder()
+                .api(event.getJDA())
+                .guild(event.getGuild())
+                .commandType(event.getName())
+                .author(event.getMember());
     }
 
-    private String stringifyOptions(List<OptionMapping> options) {
-        StringBuilder stringBuilder = new StringBuilder(" ");
-        for (OptionMapping mapping : options) {
-            stringBuilder.append(mapping.getName())
-                    .append('=')
-                    .append(mapping.getAsString());
-        }
-        return stringBuilder.toString();
+    private void logAndAnswer(SlashCommandInteractionEvent event, String answer, CommandContent commandContent) {
+        BotLogger.info(commandContent.toString());
+        event.getHook().sendMessage(answer).complete();
     }
 
 }

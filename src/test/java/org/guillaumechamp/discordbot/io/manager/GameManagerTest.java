@@ -51,7 +51,7 @@ class GameManagerTest {
         // --When
         manager.createGame(512);
         // --Then
-        assertThatNoException().isThrownBy(() -> manager.addPlayer(DiscordTestUtil.getOwner(), 0));
+        assertThatNoException().isThrownBy(() -> manager.addPlayer(DiscordTestUtil.getOwner(), null));
         assertThatThrownBy(() -> manager.addPlayer(DiscordTestUtil.getOwner(), 1))
                 .isInstanceOf(UserIntendedException.class)
                 .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
@@ -69,7 +69,7 @@ class GameManagerTest {
         assertThatThrownBy(() -> manager.start(1))
                 .isInstanceOf(UserIntendedException.class)
                 .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
-        assertThatNoException().isThrownBy(() -> manager.start(0));
+        assertThatNoException().isThrownBy(() -> manager.start(null));
         // --Finally
         ChannelUtils.clearAllCreatedChannelsFromGuild(testGuild);
     }
@@ -84,7 +84,7 @@ class GameManagerTest {
         assertThatThrownBy(() -> manager.stop(1))
                 .isInstanceOf(UserIntendedException.class)
                 .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
-        assertThatNoException().isThrownBy(() -> manager.stop(0));
+        assertThatNoException().isThrownBy(() -> manager.stop(null));
         // --Finally
         ChannelUtils.clearAllCreatedChannelsFromGuild(testGuild);
     }

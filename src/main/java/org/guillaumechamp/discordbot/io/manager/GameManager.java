@@ -30,7 +30,10 @@ public class GameManager {
      *
      * @param maxPlayerSize max size of the game
      */
-    public void createGame(int maxPlayerSize) throws UserIntendedException {
+    public void createGame(Integer maxPlayerSize) throws UserIntendedException {
+        if (maxPlayerSize==null){
+            maxPlayerSize = 512;
+        }
         for (int i = 0; i < MAX_GAME_PER_GUILD; i++)
             if (gameList.get(i) == null) {
                 gameList.set(i, new PendingGame(server, i, maxPlayerSize));
@@ -46,7 +49,10 @@ public class GameManager {
      * @param gameId id of the party
      * @throws UserIntendedException if unable to add
      */
-    public void addPlayer(Member member, int gameId) throws UserIntendedException {
+    public void addPlayer(Member member, Integer gameId) throws UserIntendedException {
+        if (gameId==null){
+            gameId=0;
+        }
         if (gameList.get(gameId) == null) {
             throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
         }
@@ -54,28 +60,34 @@ public class GameManager {
     }
 
     /**
-     * @param id of the game to launch
+     * @param gameId of the game to launch
      * @throws UserIntendedException if unable to start
      */
-    public void start(int id) throws UserIntendedException {
-        if (gameList.get(id) == null) {
+    public void start(Integer gameId) throws UserIntendedException {
+        if (gameId==null){
+            gameId=0;
+        }
+        if (gameList.get(gameId) == null) {
             throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
         }
-        gameList.set(id, gameList.get(id).startGame());
+        gameList.set(gameId, gameList.get(gameId).startGame());
     }
 
     /**
      * Stop a game
      *
-     * @param gameIndex index og the game to stop
+     * @param gameId index og the game to stop
      *                  do not check if game exist
      */
-    public void stop(int gameIndex) throws UserIntendedException {
-        if (gameList.get(gameIndex)==null){
+    public void stop(Integer gameId) throws UserIntendedException {
+        if (gameId==null){
+            gameId=0;
+        }
+        if (gameList.get(gameId)==null){
             throw new UserIntendedException(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
         }
-        gameList.get(gameIndex).terminate();
-        gameList.set(gameIndex, null);
+        gameList.get(gameId).terminate();
+        gameList.set(gameId, null);
     }
 
     public void transferCommandToTheAction(int gameIndex, Member member, Member target, String action) throws UserIntendedException {
