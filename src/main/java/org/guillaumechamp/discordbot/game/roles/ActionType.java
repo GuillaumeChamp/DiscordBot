@@ -1,6 +1,6 @@
 package org.guillaumechamp.discordbot.game.roles;
 
-import static org.guillaumechamp.discordbot.io.listener.CommandStore.*;
+import static org.guillaumechamp.discordbot.io.commands.CommandStore.*;
 
 public enum ActionType {
     VOTE, SEER_SEE, WITCH_KILL, WITCH_SAVE;

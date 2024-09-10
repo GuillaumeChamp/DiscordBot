@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.guillaumechamp.discordbot.io.listener.CommandListener;
+import org.guillaumechamp.discordbot.io.commands.CommandListener;
 
 import java.util.List;
 

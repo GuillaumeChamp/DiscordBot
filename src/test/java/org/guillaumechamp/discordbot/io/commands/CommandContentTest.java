@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.io.listener;
+package org.guillaumechamp.discordbot.io.commands;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -39,18 +39,20 @@ class CommandContentTest {
 
     @Test
     void shouldCommandContentBeParsedInTheRightOrder(){
+        Member testMember = DiscordTestUtil.getAMember(0);
         CommandContent commandContent = CommandContent.builder()
                 .api(DiscordTestUtil.getApi())
                 .commandType("create")
                 .guild(DiscordTestUtil.getTestChannel().getGuild())
-                .author(DiscordTestUtil.getAMember(0))
+                .author(testMember)
                 .stringArgument("dummy")
                 .intArgument(42)
-                .target(DiscordTestUtil.getAMember(0))
+                .gameIndex(-1)
+                .target(testMember)
                 .build();
 
         assertThat(commandContent.toString())
-                .hasToString("Wolfy of Thiercelieux [Des Ingé et des jeux] used create");
+                .hasToString(testMember.getEffectiveName() + " [Des Ingé et des jeux] used create dummy 42 [game -1] against " + testMember.getEffectiveName());
     }
 
 }

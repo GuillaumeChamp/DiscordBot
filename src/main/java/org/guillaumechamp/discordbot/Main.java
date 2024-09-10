@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.guillaumechamp.discordbot.service.BotLogger;
 import org.guillaumechamp.discordbot.io.manager.ChannelUtils;
-import org.guillaumechamp.discordbot.io.listener.CommandListener;
-import org.guillaumechamp.discordbot.io.listener.CommandStore;
+import org.guillaumechamp.discordbot.io.commands.CommandListener;
+import org.guillaumechamp.discordbot.io.commands.CommandStore;
 import org.guillaumechamp.discordbot.service.WaiterService;
 
 public class Main {

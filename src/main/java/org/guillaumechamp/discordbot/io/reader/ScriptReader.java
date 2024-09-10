@@ -100,7 +100,7 @@ public class ScriptReader {
         String path = language == SupportedLanguage.FR ? PATH_FR : PATH_EN;
         String text = PropertyReader.getPropertyFromFile(path, keyEntry.keyName);
 
-        // text can be null if key not exist but is backend up KeyEntry
+        // text can be null if key not exist but is backend up by KeyEntry
         if (text == null) {
             String errorMessage = keyEntry.keyName + " not found in " + path;
             BotLogger.error(errorMessage);

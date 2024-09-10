@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.io.listener;
+package org.guillaumechamp.discordbot.io.commands;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.interactions.DiscordLocale;

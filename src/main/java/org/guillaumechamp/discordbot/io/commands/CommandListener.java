@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.io.listener;
+package org.guillaumechamp.discordbot.io.commands;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 public class CommandListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        // don't read message
+        // don't read messages
     }
 
     /**

@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.io.listener;
+package org.guillaumechamp.discordbot.io.commands;
 
 import org.guillaumechamp.discordbot.io.UserIntendedException;
 import org.guillaumechamp.discordbot.io.manager.ChannelUtils;

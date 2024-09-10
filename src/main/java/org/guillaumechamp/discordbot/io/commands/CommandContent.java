@@ -1,4 +1,4 @@
-package org.guillaumechamp.discordbot.io.listener;
+package org.guillaumechamp.discordbot.io.commands;
 
 import lombok.Builder;
 import lombok.Getter;

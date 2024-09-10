@@ -29,6 +29,14 @@ class GameManagerTest {
     }
 
     @Test
+    void shouldGameManagerHandleCreationWithMissingSizeOfGame() {
+        // --Given
+        GameManager manager = new GameManager(testGuild);
+        // --When
+        assertThatNoException().isThrownBy(() -> manager.createGame(null));
+    }
+
+    @Test
     void shouldGameManagerHandleCreationUntilLimitIsReach() {
         // --Given
         GameManager manager = new GameManager(testGuild);
@@ -40,8 +48,6 @@ class GameManagerTest {
         assertThatThrownBy(() -> manager.createGame(512))
                 .isInstanceOf(UserIntendedException.class)
                 .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_MAX_NUMBER_OF_GAME_REACHED);
-        // --Finally
-        ChannelUtils.clearAllCreatedChannelsFromGuild(testGuild);
     }
 
     @Test
@@ -55,8 +61,6 @@ class GameManagerTest {
         assertThatThrownBy(() -> manager.addPlayer(DiscordTestUtil.getOwner(), 1))
                 .isInstanceOf(UserIntendedException.class)
                 .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
-        // --Finally
-        ChannelUtils.clearAllCreatedChannelsFromGuild(testGuild);
     }
 
     @Test
@@ -70,8 +74,6 @@ class GameManagerTest {
                 .isInstanceOf(UserIntendedException.class)
                 .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
         assertThatNoException().isThrownBy(() -> manager.start(null));
-        // --Finally
-        ChannelUtils.clearAllCreatedChannelsFromGuild(testGuild);
     }
 
     @Test
@@ -79,14 +81,12 @@ class GameManagerTest {
         // --Given
         GameManager manager = new GameManager(testGuild);
         // --When
-        manager.createGame(512);
+        manager.createGame(null);
         // --Then
         assertThatThrownBy(() -> manager.stop(1))
                 .isInstanceOf(UserIntendedException.class)
                 .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
         assertThatNoException().isThrownBy(() -> manager.stop(null));
-        // --Finally
-        ChannelUtils.clearAllCreatedChannelsFromGuild(testGuild);
     }
 
     @Test
@@ -101,8 +101,6 @@ class GameManagerTest {
                 .hasMessage(UserIntendedException.EXCEPTION_MESSAGE_GAME_DOES_NOT_EXIST);
         assertThatThrownBy(() -> manager.transferCommandToTheAction(0, null, null, null))
                 .isInstanceOf(NullPointerException.class);
-        // --Finally
-        ChannelUtils.clearAllCreatedChannelsFromGuild(testGuild);
     }
 
     @Test
